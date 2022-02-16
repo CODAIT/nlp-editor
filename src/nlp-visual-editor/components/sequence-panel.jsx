@@ -1,4 +1,5 @@
 import React, { Children, isValidElement, cloneElement } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
   NumberInput,
@@ -9,9 +10,23 @@ import {
 import './sequence-panel.scss';
 import { node } from 'prop-types';
 
+import { saveNlpNode } from '../../redux/slice';
+
 class SequencePanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pattern: '',
+    };
+  }
+
+  componentDidMount() {
+    const pattern = this.constructPattern();
+    this.setState({ pattern });
+  }
+
   constructPattern = () => {
-    const { canvasController, nodeId, pipelineId } = this.props;
+    const { canvasController, nodeId, pipelineId, nodes } = this.props;
     const pipelineNodes = canvasController.getNodes(pipelineId);
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = this.getImmediateUpstreamNodes(
@@ -19,7 +34,16 @@ class SequencePanel extends React.Component {
       pipelineNodes,
       pipelineLinks,
     );
-    console.log(immediateNodes);
+    let pattern = '';
+    immediateNodes.forEach((id, index) => {
+      node = nodes.find((n) => n.nodeId === id);
+      const { label } = node;
+      pattern += `(<${label}.${label}>)`;
+      if (index < immediateNodes.length - 1) {
+        pattern += `<Token>{1,2}`;
+      }
+    });
+    return pattern;
   };
 
   getImmediateUpstreamNodes = (nodeId, nodes, links) => {
@@ -39,9 +63,27 @@ class SequencePanel extends React.Component {
     return childrenWithProps;
   };
 
+  validateParameters = () => {
+    const { pattern } = this.state;
+    const { nodeId } = this.props;
+
+    let errorMessage =
+      pattern.length === 0 ? 'You must enter a pattern.' : undefined;
+
+    this.setState({ errorMessage });
+
+    if (!errorMessage) {
+      const node = {
+        nodeId,
+        pattern,
+      };
+      this.props.saveNlpNode({ node });
+    }
+  };
+
   render() {
     const children = this.handleChildComponents();
-    const pattern = this.constructPattern();
+    const { pattern } = this.state;
     return (
       <div className="sequence-panel">
         <div className="sequence-token">
@@ -85,7 +127,7 @@ class SequencePanel extends React.Component {
           labelText="Sequence pattern"
           size="sm"
           helperText="Ex: (<Division.Division>)<Token>{1,2}(<Metric.Metric>)"
-          value="(<Division.Division>)<Token>{1,2}(<Metric.Metric>)"
+          value={pattern}
         />
         {children}
       </div>
@@ -93,8 +135,17 @@ class SequencePanel extends React.Component {
   }
 }
 
+SequencePanel.propTypes = {
+  pattern: PropTypes.string,
+};
+
 const mapStateToProps = (state) => ({
+  nodes: state.nodesReducer.nodes,
   pipelineId: state.nodesReducer.pipelineId,
 });
 
-export default connect(mapStateToProps, null)(SequencePanel);
+const mapDispatchToProps = (dispatch) => ({
+  saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SequencePanel);

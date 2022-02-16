@@ -32,6 +32,7 @@ class RegexPanel extends React.Component {
       errorMessage: undefined,
     };
   }
+
   getDdlMatchCaseItems = () => {
     return [
       { id: 'match', text: 'Match case' },

@@ -1,13 +1,13 @@
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
-import { v4 as uuid4 } from 'uuid';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
+import { Button } from 'carbon-components-react';
+import { Run32 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
 
 import './nlp-visual-editor.scss';
-
 import { store } from '../redux/store';
 
 import {
@@ -20,6 +20,10 @@ import {
 class VisualEditor extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      selectedNodeId: '',
+    };
 
     this.canvasController = new CanvasController();
     this.canvasController.setPipelineFlowPalette(nlpPalette);
@@ -38,7 +42,6 @@ class VisualEditor extends React.Component {
     const pipelineNames = nodes.map((n) => n.label).join();
     if (names !== pipelineNames) {
       //if nodenames changed, update flow structure
-      console.log('need to update nodes');
       this.props.nodes.forEach((n) => {
         const { nodeId, label } = n;
         this.canvasController.setNodeLabel(
@@ -48,6 +51,29 @@ class VisualEditor extends React.Component {
         );
       });
     }
+  };
+
+  getToolbar = () => {
+    return [
+      { action: 'palette', label: 'Palette', enable: true },
+      { divider: true },
+      {
+        action: 'run',
+        tooltip: 'Run NLP rule',
+        jsx: (
+          <div className="toolbar-run-button">
+            <Button
+              id={'btn-run'}
+              size="field"
+              kind="primary"
+              renderIcon={Run32}
+            >
+              Run
+            </Button>
+          </div>
+        ),
+      },
+    ];
   };
 
   onEditCanvas = (data, command) => {
@@ -61,18 +87,6 @@ class VisualEditor extends React.Component {
       this.props.saveNlpNode({ node: { label, nodeId, type, description } });
     }
   };
-
-  /*onNewNode = (action, data) => {
-    const nodeId = uuid4();
-    if (action == 'create_node') {
-      const { nodeType } = data;
-      const { description, label, parameters } = nodeType;
-      const { type } = parameters;
-      this.props.saveNlpNode({ node: { label, nodeId, type, description } });
-      return nodeId;
-    }
-    return null;
-  };*/
 
   onNodeClick = (source) => {
     const { clickType, objectType } = source;
@@ -110,7 +124,8 @@ class VisualEditor extends React.Component {
 
   render() {
     const { showRightPanel } = this.props;
-    const rightFlyoutContent = showRightPanel && this.getRHSPanel();
+    const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
+    const toolbarConfig = this.getToolbar();
 
     return (
       <div className="nlp-visual-editor">
@@ -120,8 +135,8 @@ class VisualEditor extends React.Component {
             rightFlyoutContent={rightFlyoutContent}
             showRightFlyout={showRightPanel}
             clickActionHandler={this.onNodeClick}
-            idGeneratorHandler={this.onNewNode}
             editActionHandler={this.onEditCanvas}
+            toolbarConfig={toolbarConfig}
           />
         </IntlProvider>
       </div>
