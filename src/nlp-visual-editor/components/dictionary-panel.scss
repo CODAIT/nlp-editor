@@ -1,0 +1,24 @@
+.dictionary-panel {
+    display: flex;
+    flex-direction: column;
+
+    .input-controls {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: end;
+
+        button {
+            max-height: 40px;
+        }
+    }
+
+    select {
+        border: 0;
+        background-color: #f4f4f4;
+        margin-bottom: 1.5rem;
+    }
+
+    .bx--dropdown__wrapper {
+        padding-bottom: 1rem;
+    }
+}
