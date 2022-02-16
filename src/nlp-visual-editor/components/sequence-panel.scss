@@ -1,0 +1,31 @@
+.sequence-panel{
+    
+    .token-controls {
+        display: flex;
+        padding-left: 30px;
+
+        span {
+            padding: 0 10px;
+            align-items: center;
+            display: inline-flex;
+        }
+
+        >.bx--form-item {
+            padding: 0 0;
+            flex: 0;
+        }
+
+        .number-range {
+            max-width: 100px;
+
+            input {
+                padding-right: 2rem;
+                min-width: 100px;
+            }
+        }
+    }
+
+    .bx--form-item{
+        padding-top: 1.5rem;
+    }
+}
