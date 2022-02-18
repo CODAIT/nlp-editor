@@ -9,6 +9,7 @@ import RHSPanel from './components/rhs-panel';
 
 import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
+import NodeValidator from '../utils/NodeValidator';
 
 import {
   deleteNodes,
@@ -23,10 +24,13 @@ class VisualEditor extends React.Component {
 
     this.state = {
       selectedNodeId: '',
+      enableFlowExecutionBtn: false,
     };
 
     this.canvasController = new CanvasController();
     this.canvasController.setPipelineFlowPalette(nlpPalette);
+
+    this.nodeValidator = new NodeValidator(this.canvasController);
   }
 
   componentDidMount() {
@@ -53,12 +57,37 @@ class VisualEditor extends React.Component {
     }
   };
 
+  validatePipeline = () => {
+    const { nodes, pipelineId } = this.props;
+    const { selectedNodeId } = this.state;
+    const node = nodes.find((n) => n.nodeId === selectedNodeId);
+    return this.nodeValidator.validate(pipelineId, node);
+  };
+
   runPipeline = () => {
-    const { nodes } = this.props;
-    console.log(nodes);
+    const response = this.validatePipeline();
+    const { isValid } = response;
+    if (!isValid) {
+      const { error } = response;
+      this.canvasController.setNotificationMessages([
+        {
+          id: '123',
+          type: 'error',
+          content: error,
+        },
+      ]);
+      this.canvasController.openNotificationPanel();
+    }
+    if (isValid) {
+      this.canvasController.clearNotificationMessages();
+      this.canvasController.closeNotificationPanel();
+    }
+
+    console.log('isValid', response);
   };
 
   getToolbar = () => {
+    const { enableFlowExecutionBtn } = this.state;
     return [
       { action: 'palette', label: 'Palette', enable: true },
       { divider: true },
@@ -72,6 +101,7 @@ class VisualEditor extends React.Component {
               size="field"
               kind="primary"
               renderIcon={Play32}
+              disabled={!enableFlowExecutionBtn}
               onClick={this.runPipeline}
             >
               Run
@@ -90,26 +120,38 @@ class VisualEditor extends React.Component {
       const { newNode } = data;
       const { id: nodeId, description, label, parameters } = newNode;
       const { type } = parameters;
-      this.props.saveNlpNode({ node: { label, nodeId, type, description } });
+      this.props.saveNlpNode({
+        //set isValid false, we'll check when user opens modal to save values
+        node: { label, nodeId, type, description, isValid: false },
+      });
     }
   };
 
-  onNodeClick = (source) => {
+  onCanvasAreaClick = (source) => {
     const { clickType, objectType } = source;
 
-    if (clickType === 'DOUBLE_CLICK') {
-      if (objectType === 'node') {
-        const { id } = source;
-        this.setState({
-          selectedNodeId: id,
-        });
+    if (objectType === 'node') {
+      const { id } = source;
+      this.setState({ selectedNodeId: id });
+      if (clickType === 'DOUBLE_CLICK') {
+        //open props panel on double-click to edit node properties
         this.props.setShowRightPanel({ showPanel: true });
+      } else if (clickType === 'SINGLE_CLICK') {
+        const { enableFlowExecutionBtn } = this.state;
+        //enable to run a node
+        if (enableFlowExecutionBtn === false) {
+          //only set if false, we want to avoid a re-render
+          this.setState({ enableFlowExecutionBtn: true });
+        }
       }
-    } else if (clickType === 'SINGLE_CLICK') {
+    } else {
+      //if node is not clicked/selected do not enable run button
+      this.setState({ enableFlowExecutionBtn: false });
       if (objectType === 'canvas') {
         this.onPanelClose();
       }
     }
+    console.log('clickType', clickType);
   };
 
   onPanelClose = () => {
@@ -128,10 +170,24 @@ class VisualEditor extends React.Component {
     );
   };
 
+  getNotificationConfig = () => {
+    return {
+      action: 'notification',
+      label: 'Notifications',
+      notificationHeader: 'Notification Center',
+      notificationSubtitle: 'subtitle',
+      enable: true,
+      emptyMessage: "You don't have any notifications right now.",
+      clearAllMessage: 'Clear all',
+      keepOpen: true,
+    };
+  };
+
   render() {
     const { showRightPanel } = this.props;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const toolbarConfig = this.getToolbar();
+    const notificationConfig = this.getNotificationConfig();
 
     return (
       <div className="nlp-visual-editor">
@@ -140,9 +196,10 @@ class VisualEditor extends React.Component {
             canvasController={this.canvasController}
             rightFlyoutContent={rightFlyoutContent}
             showRightFlyout={showRightPanel}
-            clickActionHandler={this.onNodeClick}
+            clickActionHandler={this.onCanvasAreaClick}
             editActionHandler={this.onEditCanvas}
             toolbarConfig={toolbarConfig}
+            notificationConfig={notificationConfig}
           />
         </IntlProvider>
       </div>

@@ -15,7 +15,6 @@ import {
 
 import './regex-panel.scss';
 import { saveNlpNode } from '../../redux/slice';
-import { useFeatureFlags } from 'carbon-components-react/lib/components/FeatureFlags';
 
 class RegexPanel extends React.Component {
   constructor(props) {
@@ -122,6 +121,7 @@ class RegexPanel extends React.Component {
         nodeId,
         regexInput,
         ...rest,
+        isValid: true,
       };
 
       const xml = this.convertToXML();
