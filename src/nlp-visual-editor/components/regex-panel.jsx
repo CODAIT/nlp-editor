@@ -1,6 +1,9 @@
 import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+
+import JsonToXML from '../../utils/JsonToXML';
+
 import {
   Checkbox,
   Dropdown,
@@ -8,28 +11,18 @@ import {
   RadioButton,
   RadioButtonGroup,
   TextArea,
-  InlineNotification,
 } from 'carbon-components-react';
 
 import './regex-panel.scss';
 import { saveNlpNode } from '../../redux/slice';
+import { useFeatureFlags } from 'carbon-components-react/lib/components/FeatureFlags';
 
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
+    const { saveNlpNode, children, ...rest } = props;
     this.state = {
-      regexInput: props.regexInput || '',
-      expressionType: props.expressionType || 'regular',
-      caseSensitivity: props.caseSensitivity || 'match',
-      tokenRange: props.tokenRange || {
-        checked: false,
-        range: [0, 0],
-      },
-      canonEq: props.canonEq || false,
-      dotAll: props.dotAll || false,
-      multiline: props.multiline || false,
-      unixLines: props.unixLines || false,
-      errorMessage: undefined,
+      ...rest,
     };
   }
 
@@ -52,12 +45,72 @@ class RegexPanel extends React.Component {
     return childrenWithProps;
   };
 
+  convertToXML = () => {
+    const { label, type } = this.props;
+    const {
+      caseSensitivity,
+      expressionType,
+      regexInput,
+      tokenRange,
+      canonEq,
+      multiline,
+      unixLines,
+    } = this.state;
+
+    let matchingFlag = '';
+    if (expressionType === 'literal') {
+      matchingFlag = 'LITERAL';
+      if (caseSensitivity === 'ignore') {
+        matchingFlag += ' CASE_INSENSITIVE';
+      } else if (caseSensitivity === 'match-unicode') {
+        matchingFlag += ' CASE_INSENSITIVE UNICODE';
+      }
+    }
+    if (expressionType === 'regular') {
+      if (caseSensitivity === 'ignore') {
+        matchingFlag += 'CASE_INSENSITIVE';
+      } else if (caseSensitivity === 'match-unicode') {
+        matchingFlag += 'CASE_INSENSITIVE UNICODE';
+      } else if (caseSensitivity === 'match') {
+        matchingFlag += 'DOTALL';
+      }
+      if (canonEq) {
+        matchingFlag += ' CANON_EQ';
+      }
+      if (multiline) {
+        matchingFlag += ' MULTILINE';
+      }
+      if (unixLines) {
+        matchingFlag += ' UNIX_LINES';
+      }
+    }
+    let min, max;
+    if (tokenRange.checked) {
+      [min, max] = tokenRange.range;
+    }
+    const props = {
+      label,
+      type,
+      pattern: regexInput,
+      matchingFlag,
+      min,
+      max,
+    };
+    const jsonToXML = new JsonToXML();
+    const xml = jsonToXML.transform(props);
+    console.log(xml);
+    return xml;
+  };
+
   validateParameters = () => {
     const { errorMessage, regexInput, ...rest } = this.state;
     const { nodeId } = this.props;
     let err = undefined;
     try {
       new RegExp(regexInput);
+      if (regexInput.trim().length === 0) {
+        throw 'You must enter an expression.';
+      }
     } catch (e) {
       err = 'The expression is not a valid Regex';
     }
@@ -69,17 +122,44 @@ class RegexPanel extends React.Component {
         nodeId,
         regexInput,
         ...rest,
-        /*regexInput,
-        expressionType,
-        caseSensitivity,
-        tokenRange,
-        canonEq,
-        dotAll,
-        multiline,
-        unixLines,*/
       };
+
+      const xml = this.convertToXML();
       this.props.saveNlpNode({ node });
     }
+  };
+
+  onCaseSensitivityChange = (selectedItem) => {
+    const { id } = selectedItem;
+    let props = { caseSensitivity: id };
+    if (id === 'match') {
+      props = {
+        ...props,
+        dotAll: true,
+      };
+    }
+    this.setState({ ...props });
+  };
+
+  onExpresionTypeChange = (type) => {
+    const { caseSensitivity } = this.state;
+    let props = { expressionType: type };
+    if (type === 'literal') {
+      // if literal is selected then all checkboxes should be unchecked
+      props = {
+        ...props,
+        canonEq: false,
+        dotAll: false,
+        multiline: false,
+        unixLines: false,
+      };
+    } else if (type === 'regular' && caseSensitivity === 'match') {
+      props = {
+        ...props,
+        dotAll: true,
+      };
+    }
+    this.setState({ ...props });
   };
 
   render() {
@@ -96,21 +176,17 @@ class RegexPanel extends React.Component {
       unixLines,
       errorMessage,
     } = this.state;
+    const disableCheckboxes = expressionType === 'literal';
     return (
       <div className="regex-panel">
-        {errorMessage && (
-          <InlineNotification
-            kind="error"
-            title="Errors"
-            subtitle={errorMessage}
-          />
-        )}
         <div className="regex-panel-contents">
           <TextArea
             labelText="Enter a regular expression"
             placeholder=""
             helperText="Example: [A-Z][a-z]+(s+[A-Z][a-z]+){0,2} to find one to three capitalized words"
             value={regexInput}
+            invalid={errorMessage !== undefined}
+            invalidText={errorMessage}
             onChange={(e) => {
               this.setState({ regexInput: e.target.value });
             }}
@@ -119,7 +195,10 @@ class RegexPanel extends React.Component {
             legendText="Match expression as"
             name="rdExpression"
             defaultSelected={expressionType}
-            onChange={(value) => this.setState({ expressionType: value })}
+            onChange={(value) => {
+              this.onExpresionTypeChange(value);
+              //this.setState({ expressionType: value })
+            }}
           >
             <RadioButton
               labelText="Regular expression"
@@ -141,8 +220,7 @@ class RegexPanel extends React.Component {
               matchCaseItems ? matchCaseItems.text : ''
             }
             onChange={({ selectedItem }) => {
-              const { id } = selectedItem;
-              this.setState({ caseSensitivity: id });
+              this.onCaseSensitivityChange(selectedItem);
             }}
           />
           <div className="token-range">
@@ -206,24 +284,28 @@ class RegexPanel extends React.Component {
               labelText="Allow canonical equivalence (CANON_EQ)"
               id="chkCanEq"
               checked={canonEq}
+              disabled={disableCheckboxes}
               onChange={(checked) => this.setState({ canonEq: checked })}
             />
             <Checkbox
               labelText="Read line delimiters as characters (DOTALL)"
               id="chkLineDel"
               checked={dotAll}
+              disabled={caseSensitivity === 'match' || disableCheckboxes}
               onChange={(checked) => this.setState({ dotAll: checked })}
             />
             <Checkbox
               labelText="^ and $ begin and end a line (MULTILINE)"
               id="chkParams"
               checked={multiline}
+              disabled={disableCheckboxes}
               onChange={(checked) => this.setState({ multiline: checked })}
             />
             <Checkbox
               labelText="Newline character ( ) ends a line (UNIX_LINES)"
               id="chkNewline"
               checked={unixLines}
+              disabled={disableCheckboxes}
               onChange={(checked) => this.setState({ unixLines: checked })}
             />
           </div>
@@ -236,6 +318,21 @@ class RegexPanel extends React.Component {
 
 RegexPanel.propTypes = {
   nodeId: PropTypes.string.isRequired,
+};
+
+RegexPanel.defaultProps = {
+  regexInput: '',
+  expressionType: 'regular',
+  caseSensitivity: 'match',
+  tokenRange: {
+    checked: false,
+    range: [0, 0],
+  },
+  canonEq: false,
+  dotAll: true,
+  multiline: false,
+  unixLines: false,
+  errorMessage: undefined,
 };
 
 const mapStateToProps = (state) => ({

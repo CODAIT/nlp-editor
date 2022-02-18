@@ -4,6 +4,7 @@ const initialState = {
   nodes: [],
   pipelineId: undefined,
   canvasController: undefined,
+  errorMessage: undefined,
   showRightPanel: false,
 };
 
@@ -26,6 +27,10 @@ const nodesSlice = createSlice({
       });
       state.nodes = newNodes;
     },
+    setErrorMessage: (state, action) => {
+      const { message } = action.payload;
+      state.errorMessage = message;
+    },
     saveNlpNode: (state, action) => {
       //stores or replaces node.
       const { node } = action.payload;
@@ -39,6 +44,11 @@ const nodesSlice = createSlice({
   },
 });
 
-export const { deleteNodes, saveNlpNode, setPipelineId, setShowRightPanel } =
-  nodesSlice.actions;
+export const {
+  deleteNodes,
+  saveNlpNode,
+  setErrorMessage,
+  setPipelineId,
+  setShowRightPanel,
+} = nodesSlice.actions;
 export default nodesSlice.reducer;

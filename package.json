@@ -8,6 +8,10 @@
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "body-parser": "^1.19.2",
+    "express": "^4.17.2",
+    "js2xmlparser": "^4.0.2",
+    "path": "^0.12.7",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -17,6 +21,7 @@
   },
   "scripts": {
     "format": "prettier --write './src/**/*.{js,jsx}'",
+    "serve": "node server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -50,5 +55,6 @@
     "react-intl": "^5.24.6",
     "react-redux": "^7.2.6",
     "sass": "^1.49.7"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }

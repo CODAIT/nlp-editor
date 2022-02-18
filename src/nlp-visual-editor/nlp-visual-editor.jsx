@@ -3,7 +3,7 @@ import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
 import { Button } from 'carbon-components-react';
-import { Run32 } from '@carbon/icons-react';
+import { Play32 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
 
@@ -36,7 +36,7 @@ class VisualEditor extends React.Component {
     });
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = () => {
     const names = this.props.nodes.map((n) => n.label).join();
     const { nodes } = this.canvasController.getPipeline(this.props.pipelineId);
     const pipelineNames = nodes.map((n) => n.label).join();
@@ -53,6 +53,11 @@ class VisualEditor extends React.Component {
     }
   };
 
+  runPipeline = () => {
+    const { nodes } = this.props;
+    console.log(nodes);
+  };
+
   getToolbar = () => {
     return [
       { action: 'palette', label: 'Palette', enable: true },
@@ -66,7 +71,8 @@ class VisualEditor extends React.Component {
               id={'btn-run'}
               size="field"
               kind="primary"
-              renderIcon={Run32}
+              renderIcon={Play32}
+              onClick={this.runPipeline}
             >
               Run
             </Button>
