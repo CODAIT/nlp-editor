@@ -8,8 +8,8 @@ import {
   TextArea,
 } from 'carbon-components-react';
 import './sequence-panel.scss';
-import { node } from 'prop-types';
 
+import { getImmediateUpstreamNodes } from '../../utils';
 import { saveNlpNode } from '../../redux/slice';
 
 class SequencePanel extends React.Component {
@@ -27,16 +27,11 @@ class SequencePanel extends React.Component {
 
   constructPattern = () => {
     const { canvasController, nodeId, pipelineId, nodes } = this.props;
-    const pipelineNodes = canvasController.getNodes(pipelineId);
     const pipelineLinks = canvasController.getLinks(pipelineId);
-    const immediateNodes = this.getImmediateUpstreamNodes(
-      nodeId,
-      pipelineNodes,
-      pipelineLinks,
-    );
+    const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
     let pattern = '';
     immediateNodes.forEach((id, index) => {
-      node = nodes.find((n) => n.nodeId === id);
+      const node = nodes.find((n) => n.nodeId === id);
       const { label } = node;
       pattern += `(<${label}.${label}>)`;
       if (index < immediateNodes.length - 1) {
@@ -44,12 +39,6 @@ class SequencePanel extends React.Component {
       }
     });
     return pattern;
-  };
-
-  getImmediateUpstreamNodes = (nodeId, nodes, links) => {
-    const upstreamLinks = links.filter((l) => l.trgNodeId === nodeId);
-    const upstreamNodes = upstreamLinks.map((l) => l.srcNodeId);
-    return upstreamNodes;
   };
 
   handleChildComponents = () => {
