@@ -10,6 +10,7 @@ import RHSPanel from './components/rhs-panel';
 import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
+import JsonToXML from '../utils/JsonToXML';
 
 import {
   deleteNodes,
@@ -31,6 +32,7 @@ class VisualEditor extends React.Component {
     this.canvasController.setPipelineFlowPalette(nlpPalette);
 
     this.nodeValidator = new NodeValidator(this.canvasController);
+    this.jsonToXML = new JsonToXML();
   }
 
   componentDidMount() {
@@ -65,6 +67,8 @@ class VisualEditor extends React.Component {
   };
 
   runPipeline = () => {
+    const { nodes } = this.props;
+    const { selectedNodeId } = this.state;
     const response = this.validatePipeline();
     const { isValid } = response;
     if (!isValid) {
@@ -81,6 +85,9 @@ class VisualEditor extends React.Component {
     if (isValid) {
       this.canvasController.clearNotificationMessages();
       this.canvasController.closeNotificationPanel();
+      const node = nodes.find((n) => n.nodeId === selectedNodeId);
+      const xml = this.jsonToXML.transform(node);
+      console.log(xml);
     }
 
     console.log('isValid', response);

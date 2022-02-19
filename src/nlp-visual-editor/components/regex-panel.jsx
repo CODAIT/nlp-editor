@@ -2,8 +2,6 @@ import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import JsonToXML from '../../utils/JsonToXML';
-
 import {
   Checkbox,
   Dropdown,
@@ -44,63 +42,6 @@ class RegexPanel extends React.Component {
     return childrenWithProps;
   };
 
-  convertToXML = () => {
-    const { label, type } = this.props;
-    const {
-      caseSensitivity,
-      expressionType,
-      regexInput,
-      tokenRange,
-      canonEq,
-      multiline,
-      unixLines,
-    } = this.state;
-
-    let matchingFlag = '';
-    if (expressionType === 'literal') {
-      matchingFlag = 'LITERAL';
-      if (caseSensitivity === 'ignore') {
-        matchingFlag += ' CASE_INSENSITIVE';
-      } else if (caseSensitivity === 'match-unicode') {
-        matchingFlag += ' CASE_INSENSITIVE UNICODE';
-      }
-    }
-    if (expressionType === 'regular') {
-      if (caseSensitivity === 'ignore') {
-        matchingFlag += 'CASE_INSENSITIVE';
-      } else if (caseSensitivity === 'match-unicode') {
-        matchingFlag += 'CASE_INSENSITIVE UNICODE';
-      } else if (caseSensitivity === 'match') {
-        matchingFlag += 'DOTALL';
-      }
-      if (canonEq) {
-        matchingFlag += ' CANON_EQ';
-      }
-      if (multiline) {
-        matchingFlag += ' MULTILINE';
-      }
-      if (unixLines) {
-        matchingFlag += ' UNIX_LINES';
-      }
-    }
-    let min, max;
-    if (tokenRange.checked) {
-      [min, max] = tokenRange.range;
-    }
-    const props = {
-      label,
-      type,
-      pattern: regexInput,
-      matchingFlag,
-      min,
-      max,
-    };
-    const jsonToXML = new JsonToXML();
-    const xml = jsonToXML.transform(props);
-    console.log(xml);
-    return xml;
-  };
-
   validateParameters = () => {
     const { errorMessage, regexInput, ...rest } = this.state;
     const { nodeId } = this.props;
@@ -123,8 +64,6 @@ class RegexPanel extends React.Component {
         ...rest,
         isValid: true,
       };
-
-      const xml = this.convertToXML();
       this.props.saveNlpNode({ node });
     }
   };
