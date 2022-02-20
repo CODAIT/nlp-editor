@@ -8,6 +8,7 @@ import {
   TextInput,
 } from 'carbon-components-react';
 import { Delete16 } from '@carbon/icons-react';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
 
 import './dictionary-panel.scss';
@@ -50,7 +51,9 @@ class DictionaryPanel extends React.Component {
 
   onUpdateList = () => {
     const { inputText, items } = this.state;
-    this.setState({ items: items.concat(inputText), inputText: '' });
+    this.setState({ items: items.concat(inputText), inputText: '' }, () => {
+      this.validateParameters();
+    });
   };
 
   onSelectionChange = (e) => {
@@ -87,13 +90,11 @@ class DictionaryPanel extends React.Component {
     this.setState({ externalResourceChecked: value });
   };
 
-  validateParameters = () => {
+  onSavePane = () => {
+    const errorMessage = this.validateParameters();
     const { items, caseSensitivity, lemmaMatch, externalResourceChecked } =
       this.state;
     const { nodeId } = this.props;
-    const errorMessage =
-      items.length === 0 ? 'You must enter a phrase to match.' : undefined;
-    this.setState({ errorMessage });
 
     if (!errorMessage) {
       const node = {
@@ -107,11 +108,21 @@ class DictionaryPanel extends React.Component {
     }
   };
 
+  validateParameters = () => {
+    const { items } = this.state;
+
+    const errorMessage =
+      items.length === 0 ? 'You must enter a phrase to match.' : undefined;
+
+    this.setState({ errorMessage });
+    return errorMessage;
+  };
+
   handleChildComponents = () => {
     const { children } = this.props;
     const childrenWithProps = Children.map(children, (child) => {
       if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.validateParameters });
+        return cloneElement(child, { onClick: this.onSavePane });
       }
       return child;
     });
@@ -131,19 +142,18 @@ class DictionaryPanel extends React.Component {
     const children = this.handleChildComponents();
     return (
       <div className="dictionary-panel">
-        {errorMessage && (
-          <InlineNotification
-            kind="error"
-            title="Errors"
-            subtitle={errorMessage}
-          />
-        )}
-        <div className="input-controls">
+        <div
+          className={classNames('input-controls', {
+            error: errorMessage !== undefined,
+          })}
+        >
           <TextInput
             id="inputTextMatch"
             labelText="Enter phrase to match"
             type="text"
             size="sm"
+            invalid={errorMessage !== undefined}
+            invalidText={errorMessage}
             onChange={(e) => {
               this.setState({ inputText: e.target.value });
             }}

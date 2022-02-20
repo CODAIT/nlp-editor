@@ -1,24 +1,32 @@
 .dictionary-panel {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    .input-controls {
-        display: inline-flex;
-        flex-direction: row;
-        align-items: end;
+  .input-controls {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: end;
 
-        button {
-            max-height: 40px;
-        }
+    button {
+      max-height: 40px;
     }
 
-    select {
-        border: 0;
-        background-color: #f4f4f4;
-        margin-bottom: 1.5rem;
-    }
+    &.error {
+      align-items: center;
 
-    .bx--dropdown__wrapper {
-        padding-bottom: 1rem;
+      button {
+        margin-top: 4px;
+      }
     }
+  }
+
+  select {
+    border: 0;
+    background-color: #f4f4f4;
+    margin-bottom: 1.5rem;
+  }
+
+  .bx--dropdown__wrapper {
+    padding-bottom: 1rem;
+  }
 }

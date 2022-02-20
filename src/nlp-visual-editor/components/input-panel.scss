@@ -1,0 +1,32 @@
+.input-panel {
+  .file-upload-control {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 1.2rem;
+    }
+
+    label.bx--btn {
+      max-width: 150px;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .files-selected {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 1rem;
+    }
+
+    .btn-upload {
+      max-width: 150px;
+      margin-top: 1rem;
+    }
+  }
+}
