@@ -1,12 +1,6 @@
 import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Button,
-  Checkbox,
-  Dropdown,
-  InlineNotification,
-  TextInput,
-} from 'carbon-components-react';
+import { Button, Checkbox, Dropdown, TextInput } from 'carbon-components-react';
 import { Delete16 } from '@carbon/icons-react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -103,6 +97,7 @@ class DictionaryPanel extends React.Component {
         caseSensitivity,
         lemmaMatch,
         externalResourceChecked,
+        isValid: true,
       };
       this.props.saveNlpNode({ node });
     }

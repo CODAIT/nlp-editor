@@ -122,6 +122,8 @@ class VisualEditor extends React.Component {
   onEditCanvas = (data, command) => {
     const { editType, selectedObjectIds } = data;
     if (editType === 'deleteSelectedObjects') {
+      this.props.setShowRightPanel({ showPanel: false });
+      this.setState({ selectedNodeId: undefined });
       this.props.deleteNodes({ ids: selectedObjectIds });
     } else if (['createNode', 'createAutoNode'].includes(editType)) {
       const { newNode } = data;
