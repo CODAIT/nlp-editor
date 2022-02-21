@@ -8,8 +8,13 @@ import {
   NumberInput,
   RadioButton,
   RadioButtonGroup,
+  SkeletonText,
   TextArea,
+  Tabs,
+  Tab,
 } from 'carbon-components-react';
+
+import NlpResultsHighlight from './nlp-results-highlight';
 
 import './regex-panel.scss';
 import { saveNlpNode } from '../../redux/slice';
@@ -22,6 +27,16 @@ class RegexPanel extends React.Component {
       ...rest,
     };
   }
+
+  fetchResults = () => {
+    fetch('/api/results', {
+      headers: { 'Content-Type': 'text/html' },
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        this.setState({ nlpResults: data });
+      });
+  };
 
   getDdlMatchCaseItems = () => {
     return [
@@ -114,142 +129,154 @@ class RegexPanel extends React.Component {
       multiline,
       unixLines,
       errorMessage,
+      nlpResults,
     } = this.state;
     const disableCheckboxes = expressionType === 'literal';
     return (
       <div className="regex-panel">
-        <div className="regex-panel-contents">
-          <TextArea
-            labelText="Enter a regular expression"
-            placeholder=""
-            helperText="Example: [A-Z][a-z]+(s+[A-Z][a-z]+){0,2} to find one to three capitalized words"
-            value={regexInput}
-            invalid={errorMessage !== undefined}
-            invalidText={errorMessage}
-            onChange={(e) => {
-              this.setState({ regexInput: e.target.value });
-            }}
-          />
-          <RadioButtonGroup
-            legendText="Match expression as"
-            name="rdExpression"
-            defaultSelected={expressionType}
-            onChange={(value) => {
-              this.onExpresionTypeChange(value);
-              //this.setState({ expressionType: value })
-            }}
-          >
-            <RadioButton
-              labelText="Regular expression"
-              value="regular"
-              id="rd1"
-            />
-            <RadioButton labelText="Literal text" value="literal" id="rd2" />
-          </RadioButtonGroup>
-          <Dropdown
-            id="ddlMatchCase"
-            titleText="Case sensitivity"
-            label="Dropdown menu options"
-            size="sm"
-            initialSelectedItem={matchCaseItems.find(
-              (item) => caseSensitivity == item.id,
-            )}
-            items={matchCaseItems}
-            itemToString={(matchCaseItems) =>
-              matchCaseItems ? matchCaseItems.text : ''
-            }
-            onChange={({ selectedItem }) => {
-              this.onCaseSensitivityChange(selectedItem);
-            }}
-          />
-          <div className="token-range">
-            <Checkbox
-              labelText="Token range"
-              id="chkTokenRange"
-              checked={tokenRange.checked}
-              onChange={(checked) =>
-                this.setState({ tokenRange: { ...tokenRange, checked } })
-              }
-            />
-            <div className="token-controls">
-              <NumberInput
-                id="rangeNumFrom"
-                min={0}
-                max={99}
-                value={tokenRange.range[0]}
-                size="sm"
-                label="tokens from"
-                hideLabel
-                invalidText="Number is not valid"
-                className="number-range"
-                disabled={!tokenRange.checked}
+        <Tabs>
+          <Tab id="idTabConfig" label="Configuration">
+            <div className="regex-panel-contents">
+              <TextArea
+                labelText="Enter a regular expression"
+                placeholder=""
+                helperText="Example: [A-Z][a-z]+(s+[A-Z][a-z]+){0,2} to find one to three capitalized words"
+                value={regexInput}
+                invalid={errorMessage !== undefined}
+                invalidText={errorMessage}
                 onChange={(e) => {
-                  const { range, checked } = tokenRange;
-                  this.setState({
-                    tokenRange: {
-                      checked,
-                      range: [e.imaginaryTarget.value, range[1]],
-                    },
-                  });
+                  this.setState({ regexInput: e.target.value });
                 }}
               />
-              <span>to</span>
-              <NumberInput
-                id="rangeNumTo"
-                min={0}
-                max={99}
-                value={tokenRange.range[1]}
+              <RadioButtonGroup
+                legendText="Match expression as"
+                name="rdExpression"
+                defaultSelected={expressionType}
+                onChange={(value) => {
+                  this.onExpresionTypeChange(value);
+                }}
+              >
+                <RadioButton
+                  labelText="Regular expression"
+                  value="regular"
+                  id="rd1"
+                />
+                <RadioButton
+                  labelText="Literal text"
+                  value="literal"
+                  id="rd2"
+                />
+              </RadioButtonGroup>
+              <Dropdown
+                id="ddlMatchCase"
+                titleText="Case sensitivity"
+                label="Dropdown menu options"
                 size="sm"
-                label="tokens to"
-                hideLabel
-                invalidText="Number is not valid"
-                className="number-range"
-                disabled={!tokenRange.checked}
-                onChange={(e) => {
-                  const { range, checked } = tokenRange;
-                  this.setState({
-                    tokenRange: {
-                      checked,
-                      range: [range[0], e.imaginaryTarget.value],
-                    },
-                  });
+                initialSelectedItem={matchCaseItems.find(
+                  (item) => caseSensitivity == item.id,
+                )}
+                items={matchCaseItems}
+                itemToString={(matchCaseItems) =>
+                  matchCaseItems ? matchCaseItems.text : ''
+                }
+                onChange={({ selectedItem }) => {
+                  this.onCaseSensitivityChange(selectedItem);
                 }}
               />
-              <span>tokens</span>
+              <div className="token-range">
+                <Checkbox
+                  labelText="Token range"
+                  id="chkTokenRange"
+                  checked={tokenRange.checked}
+                  onChange={(checked) =>
+                    this.setState({ tokenRange: { ...tokenRange, checked } })
+                  }
+                />
+                <div className="token-controls">
+                  <NumberInput
+                    id="rangeNumFrom"
+                    min={0}
+                    max={99}
+                    value={tokenRange.range[0]}
+                    size="sm"
+                    label="tokens from"
+                    hideLabel
+                    invalidText="Number is not valid"
+                    className="number-range"
+                    disabled={!tokenRange.checked}
+                    onChange={(e) => {
+                      const { range, checked } = tokenRange;
+                      this.setState({
+                        tokenRange: {
+                          checked,
+                          range: [e.imaginaryTarget.value, range[1]],
+                        },
+                      });
+                    }}
+                  />
+                  <span>to</span>
+                  <NumberInput
+                    id="rangeNumTo"
+                    min={0}
+                    max={99}
+                    value={tokenRange.range[1]}
+                    size="sm"
+                    label="tokens to"
+                    hideLabel
+                    invalidText="Number is not valid"
+                    className="number-range"
+                    disabled={!tokenRange.checked}
+                    onChange={(e) => {
+                      const { range, checked } = tokenRange;
+                      this.setState({
+                        tokenRange: {
+                          checked,
+                          range: [range[0], e.imaginaryTarget.value],
+                        },
+                      });
+                    }}
+                  />
+                  <span>tokens</span>
+                </div>
+              </div>
+              <div className="chk-series">
+                <Checkbox
+                  labelText="Allow canonical equivalence (CANON_EQ)"
+                  id="chkCanEq"
+                  checked={canonEq}
+                  disabled={disableCheckboxes}
+                  onChange={(checked) => this.setState({ canonEq: checked })}
+                />
+                <Checkbox
+                  labelText="Read line delimiters as characters (DOTALL)"
+                  id="chkLineDel"
+                  checked={dotAll}
+                  disabled={caseSensitivity === 'match' || disableCheckboxes}
+                  onChange={(checked) => this.setState({ dotAll: checked })}
+                />
+                <Checkbox
+                  labelText="^ and $ begin and end a line (MULTILINE)"
+                  id="chkParams"
+                  checked={multiline}
+                  disabled={disableCheckboxes}
+                  onChange={(checked) => this.setState({ multiline: checked })}
+                />
+                <Checkbox
+                  labelText="Newline character ( ) ends a line (UNIX_LINES)"
+                  id="chkNewline"
+                  checked={unixLines}
+                  disabled={disableCheckboxes}
+                  onChange={(checked) => this.setState({ unixLines: checked })}
+                />
+              </div>
             </div>
-          </div>
-          <div className="chk-series">
-            <Checkbox
-              labelText="Allow canonical equivalence (CANON_EQ)"
-              id="chkCanEq"
-              checked={canonEq}
-              disabled={disableCheckboxes}
-              onChange={(checked) => this.setState({ canonEq: checked })}
-            />
-            <Checkbox
-              labelText="Read line delimiters as characters (DOTALL)"
-              id="chkLineDel"
-              checked={dotAll}
-              disabled={caseSensitivity === 'match' || disableCheckboxes}
-              onChange={(checked) => this.setState({ dotAll: checked })}
-            />
-            <Checkbox
-              labelText="^ and $ begin and end a line (MULTILINE)"
-              id="chkParams"
-              checked={multiline}
-              disabled={disableCheckboxes}
-              onChange={(checked) => this.setState({ multiline: checked })}
-            />
-            <Checkbox
-              labelText="Newline character ( ) ends a line (UNIX_LINES)"
-              id="chkNewline"
-              checked={unixLines}
-              disabled={disableCheckboxes}
-              onChange={(checked) => this.setState({ unixLines: checked })}
-            />
-          </div>
-        </div>
-        {children}
+            {children}
+          </Tab>
+          <Tab id="idTabResults" label="Results" onClick={this.fetchResults}>
+            {nlpResults && <NlpResultsHighlight data={nlpResults} />}
+            {!nlpResults && <SkeletonText />}
+          </Tab>
+        </Tabs>
       </div>
     );
   }
