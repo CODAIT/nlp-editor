@@ -17,12 +17,13 @@ class SequencePanel extends React.Component {
     super(props);
     this.state = {
       pattern: '',
+      upstreamNodes: [],
     };
   }
 
   componentDidMount() {
-    const pattern = this.constructPattern();
-    this.setState({ pattern });
+    const { pattern, upstreamNodes } = this.constructPattern();
+    this.setState({ pattern, upstreamNodes });
   }
 
   constructPattern = () => {
@@ -30,15 +31,33 @@ class SequencePanel extends React.Component {
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
     let pattern = '';
+    const upstreamNodes = [];
     immediateNodes.forEach((id, index) => {
       const node = nodes.find((n) => n.nodeId === id);
-      const { label } = node;
+      const { label, nodeId } = node;
       pattern += `(<${label}.${label}>)`;
       if (index < immediateNodes.length - 1) {
         pattern += `<Token>{1,2}`;
       }
+      upstreamNodes.push({ label, nodeId });
     });
-    return pattern;
+    return { pattern, upstreamNodes };
+  };
+
+  getTokens = () => {
+    const { pattern } = this.state;
+    const tokens = [];
+    const tokenList = pattern.match(/<Token.+?(?=\()/g);
+    if (tokenList) {
+      tokenList.forEach((str) => {
+        const strToken = str.match(/\d,\d/g);
+        if (strToken) {
+          const [min, max] = strToken[0].split(',');
+          tokens.push({ min, max });
+        }
+      });
+    }
+    return tokens;
   };
 
   handleChildComponents = () => {
@@ -53,7 +72,7 @@ class SequencePanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { pattern } = this.state;
+    const { pattern, upstreamNodes } = this.state;
     const { nodeId } = this.props;
 
     let errorMessage =
@@ -62,9 +81,13 @@ class SequencePanel extends React.Component {
     this.setState({ errorMessage });
 
     if (!errorMessage) {
+      const tokens = this.getTokens();
       const node = {
         nodeId,
         pattern,
+        upstreamNodes,
+        tokens,
+        isValid: true,
       };
       this.props.saveNlpNode({ node });
     }
@@ -117,6 +140,9 @@ class SequencePanel extends React.Component {
           size="sm"
           helperText="Ex: (<Division.Division>)<Token>{1,2}(<Metric.Metric>)"
           value={pattern}
+          onChange={(e) => {
+            this.setState({ pattern: e.target.value });
+          }}
         />
         {children}
       </div>

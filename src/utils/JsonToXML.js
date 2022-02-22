@@ -2,6 +2,7 @@ const js2xmlparser = require('js2xmlparser');
 
 import DictionaryNode from './transform/DictionaryNode';
 import RegexNode from './transform/RegexNode';
+import SequenceNode from './transform/SequenceNode';
 
 export default function JsonToXML() {
   this.transform = function (node) {
@@ -13,6 +14,9 @@ export default function JsonToXML() {
         break;
       case 'dictionary':
         obj = new DictionaryNode(node);
+        break;
+      case 'sequence':
+        obj = new SequenceNode(node);
         break;
     }
     return obj.transform();
