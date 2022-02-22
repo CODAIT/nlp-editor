@@ -89,8 +89,6 @@ class VisualEditor extends React.Component {
       const xml = this.jsonToXML.transform(node);
       console.log(xml);
     }
-
-    console.log('isValid', response);
   };
 
   getToolbar = () => {
