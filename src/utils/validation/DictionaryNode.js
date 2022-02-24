@@ -14,7 +14,7 @@ export default class DictionaryNode {
     if (!isValid) {
       return {
         isValid,
-        error: 'Dictionary node missing some required parameters.',
+        error: 'Dictionary node missing required parameters.',
       };
     }
 

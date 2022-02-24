@@ -1,4 +1,31 @@
 .nlp-visual-editor {
   margin-top: 3rem;
   height: 100%;
+
+  .common-canvas-with-bottom-panel {
+    .bottom-panel {
+      min-height: 393px;
+      max-height: 393px;
+    }
+  }
+
+  .right-flyout-panel {
+    border-left: 1px solid #e0e0e0;
+  }
+
+  .warning-modal {
+    display: flex;
+    padding-left: 0.5rem;
+
+    .warning-icon {
+      fill: rgb(255, 131, 43);
+    }
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 0.3rem;
+      font-size: 1rem;
+    }
+  }
 }

@@ -14,7 +14,7 @@ import {
   Tab,
 } from 'carbon-components-react';
 
-import NlpResultsHighlight from './nlp-results-highlight';
+import NlpResultsHighlight from '../views/components/nlp-results-highlight';
 
 import './regex-panel.scss';
 import { saveNlpNode } from '../../redux/slice';
@@ -132,6 +132,10 @@ class RegexPanel extends React.Component {
       nlpResults,
     } = this.state;
     const disableCheckboxes = expressionType === 'literal';
+    const spans = [
+      { start: 163, end: 171 },
+      { start: 1456, end: 1464 },
+    ];
     return (
       <div className="regex-panel">
         <Tabs>
@@ -273,7 +277,9 @@ class RegexPanel extends React.Component {
             {children}
           </Tab>
           <Tab id="idTabResults" label="Results" onClick={this.fetchResults}>
-            {nlpResults && <NlpResultsHighlight data={nlpResults} />}
+            {nlpResults && (
+              <NlpResultsHighlight textToHighlight={nlpResults} spans={spans} />
+            )}
             {!nlpResults && <SkeletonText />}
           </Tab>
         </Tabs>

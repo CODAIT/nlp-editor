@@ -2,10 +2,12 @@ import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
-import { Button } from 'carbon-components-react';
-import { Play32 } from '@carbon/icons-react';
+import { Button, Modal } from 'carbon-components-react';
+import { Play32, WarningAlt24 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
+import TabularView from './views/tabular-view';
+import DocumentViewer from './views/document-viewer';
 
 import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
@@ -16,6 +18,7 @@ import {
   deleteNodes,
   saveNlpNode,
   setPipelineId,
+  setShowBottomPanel,
   setShowRightPanel,
 } from '../redux/slice';
 
@@ -24,8 +27,13 @@ class VisualEditor extends React.Component {
     super(props);
 
     this.state = {
-      selectedNodeId: '',
+      selectedNodeId: undefined,
       enableFlowExecutionBtn: false,
+      execResults: {
+        tabularData: [],
+        nodeId: undefined,
+      },
+      errorMessage: undefined,
     };
 
     this.canvasController = new CanvasController();
@@ -42,7 +50,8 @@ class VisualEditor extends React.Component {
     });
   }
 
-  componentDidUpdate = () => {
+  componentDidUpdate = (prevProps) => {
+    //listening to update the names of nodes when changed on their panel
     const names = this.props.nodes.map((n) => n.label).join();
     const { nodes } = this.canvasController.getPipeline(this.props.pipelineId);
     const pipelineNames = nodes.map((n) => n.label).join();
@@ -57,38 +66,75 @@ class VisualEditor extends React.Component {
         );
       });
     }
+
+    //check if new row in table was selected, render DocumentViewer
+    const { selectedRow } = this.props;
+    if (
+      selectedRow &&
+      prevProps.selectedRow &&
+      selectedRow.tuple_id !== prevProps.selectedRow.tuple_id
+    ) {
+      this.setState({ selectedNodeId: undefined });
+    }
+  };
+
+  transformToXML = () => {
+    const { nodes } = this.props;
+    const { selectedNodeId } = this.state;
+
+    ///Transform to XML and make request
+    const node = nodes.find((n) => n.nodeId === selectedNodeId);
+    return this.jsonToXML.transform(node);
   };
 
   validatePipeline = () => {
     const { nodes, pipelineId } = this.props;
     const { selectedNodeId } = this.state;
-    const node = nodes.find((n) => n.nodeId === selectedNodeId);
-    return this.nodeValidator.validate(pipelineId, node);
-  };
+    // clear any previous messages
 
-  runPipeline = () => {
-    const { nodes } = this.props;
-    const { selectedNodeId } = this.state;
-    const response = this.validatePipeline();
+    const node = nodes.find((n) => n.nodeId === selectedNodeId);
+    const response = this.nodeValidator.validate(pipelineId, node);
     const { isValid } = response;
     if (!isValid) {
       const { error } = response;
-      this.canvasController.setNotificationMessages([
-        {
-          id: '123',
-          type: 'error',
-          content: error,
-        },
-      ]);
-      this.canvasController.openNotificationPanel();
+      this.setState({ errorMessage: error });
     }
-    if (isValid) {
-      this.canvasController.clearNotificationMessages();
-      this.canvasController.closeNotificationPanel();
-      const node = nodes.find((n) => n.nodeId === selectedNodeId);
-      const xml = this.jsonToXML.transform(node);
-      console.log(xml);
+    return isValid;
+  };
+
+  execute = (xml) => {
+    this.props.setShowBottomPanel({ showPanel: true });
+    const { selectedNodeId } = this.state;
+
+    setTimeout(() => {
+      fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: xml,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          //set as undefined to render DocumentViewer
+          this.setState({
+            showRun: true,
+            execResults: {
+              tabularData: data,
+              nodeId: selectedNodeId,
+            },
+          });
+        });
+    }, 1000);
+  };
+
+  runPipeline = () => {
+    const isValid = this.validatePipeline();
+    if (!isValid) {
+      return false;
     }
+
+    const xml = this.transformToXML();
+    this.execute(xml);
+    console.log(xml);
   };
 
   getToolbar = () => {
@@ -142,6 +188,7 @@ class VisualEditor extends React.Component {
       this.setState({ selectedNodeId: id });
       if (clickType === 'DOUBLE_CLICK') {
         //open props panel on double-click to edit node properties
+        this.setState({ showRun: false });
         this.props.setShowRightPanel({ showPanel: true });
       } else if (clickType === 'SINGLE_CLICK') {
         const { enableFlowExecutionBtn } = this.state;
@@ -165,51 +212,123 @@ class VisualEditor extends React.Component {
     this.props.setShowRightPanel({ showPanel: false });
   };
 
+  onErrorModalClosed = () => {
+    this.setState({ errorMessage: undefined });
+  };
+
+  onRowSelected = (row, index) => {
+    this.setState({ showRun: true });
+    //scroll to selection
+    setTimeout(() => {
+      const scrollIndex = document.querySelectorAll(
+        '.nlp-results-highlight .highlight',
+      )[index].offsetTop;
+      document.querySelector('.nlp-results-highlight').scrollTop =
+        scrollIndex - 200;
+    }, 500);
+  };
+
   getRHSPanel = () => {
-    const { selectedNodeId } = this.state;
+    const { selectedNodeId, showRun, execResults } = this.state;
+    const { selectedRow } = this.props;
+    if (!showRun) {
+      return (
+        <Provider store={store}>
+          <RHSPanel
+            nodeId={selectedNodeId}
+            canvasController={this.canvasController}
+          />
+        </Provider>
+      );
+    } else {
+      const { tabularData } = execResults;
+      const spans = tabularData.map((row) => {
+        return {
+          start: row.tuple_begin,
+          end: row.tuple_end,
+        };
+      });
+      const documentName = !selectedRow
+        ? tabularData[0].doc_name
+        : selectedRow.doc_name;
+      return (
+        <Provider store={store}>
+          <DocumentViewer documentName={documentName} spans={spans} />
+        </Provider>
+      );
+    }
+  };
+
+  getErrorModal = () => {
+    const { errorMessage, selectedNodeId } = this.state;
+    const { nodes } = this.props;
+    if (!errorMessage) {
+      return null;
+    }
+    const node = nodes.find((n) => n.nodeId === selectedNodeId);
+    const { label } = node;
+    return (
+      <Modal
+        alert={true}
+        open={true}
+        modalHeading={label}
+        primaryButtonText="OK"
+        size="sm"
+        onClick={this.onErrorModalClosed}
+      >
+        <div className="warning-modal">
+          <WarningAlt24 aria-label="Warning" className="warning-icon" />
+          <span>{errorMessage}</span>
+        </div>
+      </Modal>
+    );
+  };
+
+  getTabularView = () => {
+    const { execResults } = this.state;
+    const { tabularData, nodeId } = execResults;
+    const { nodes } = this.props;
+    const node = nodes.find((n) => n.nodeId === nodeId) || {};
+    const { label = '' } = node;
+
     return (
       <Provider store={store}>
-        <RHSPanel
-          nodeId={selectedNodeId}
-          canvasController={this.canvasController}
+        <TabularView
+          tabularData={tabularData}
+          label={label}
+          onRowSelected={this.onRowSelected}
         />
       </Provider>
     );
   };
 
-  getNotificationConfig = () => {
-    return {
-      action: 'notification',
-      label: 'Notifications',
-      notificationHeader: 'Notification Center',
-      notificationSubtitle: 'subtitle',
-      enable: true,
-      emptyMessage: "You don't have any notifications right now.",
-      clearAllMessage: 'Clear all',
-      keepOpen: true,
-    };
-  };
-
   render() {
-    const { showRightPanel } = this.props;
+    const { showBottomPanel, showRightPanel } = this.props;
+    const { errorMessage } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
+    const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
-    const notificationConfig = this.getNotificationConfig();
+    const errorModal = this.getErrorModal();
 
     return (
-      <div className="nlp-visual-editor">
-        <IntlProvider locale="en">
-          <CommonCanvas
-            canvasController={this.canvasController}
-            rightFlyoutContent={rightFlyoutContent}
-            showRightFlyout={showRightPanel}
-            clickActionHandler={this.onCanvasAreaClick}
-            editActionHandler={this.onEditCanvas}
-            toolbarConfig={toolbarConfig}
-            notificationConfig={notificationConfig}
-          />
-        </IntlProvider>
-      </div>
+      <>
+        <div className="nlp-visual-editor">
+          <IntlProvider locale="en">
+            <CommonCanvas
+              config={{ enableRightFlyoutUnderToolbar: true }}
+              canvasController={this.canvasController}
+              rightFlyoutContent={rightFlyoutContent}
+              showRightFlyout={showRightPanel}
+              clickActionHandler={this.onCanvasAreaClick}
+              editActionHandler={this.onEditCanvas}
+              toolbarConfig={toolbarConfig}
+              showBottomPanel={showBottomPanel}
+              bottomPanelContent={bottomContent}
+            />
+          </IntlProvider>
+          {errorModal}
+        </div>
+      </>
     );
   }
 }
@@ -217,6 +336,8 @@ class VisualEditor extends React.Component {
 const mapStateToProps = (state) => ({
   nodes: state.nodesReducer.nodes,
   pipelineId: state.nodesReducer.pipelineId,
+  selectedRow: state.nodesReducer.selectedRow,
+  showBottomPanel: state.nodesReducer.showBottomPanel,
   showRightPanel: state.nodesReducer.showRightPanel,
 });
 
@@ -224,6 +345,7 @@ const mapDispatchToProps = (dispatch) => ({
   deleteNodes: (ids) => dispatch(deleteNodes(ids)),
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
   setPipelineId: (data) => dispatch(setPipelineId(data)),
+  setShowBottomPanel: (doShow) => dispatch(setShowBottomPanel(doShow)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
