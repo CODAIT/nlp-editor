@@ -1,0 +1,15 @@
+.nlp-results-highlight {
+  white-space: pre-line;
+  overflow-y: auto;
+  height: calc(100% - 100px);
+  font-size: 1rem;
+  line-height: 1.2rem;
+  background-color: #fff;
+  padding: 0.7rem;
+  padding-right: 1rem;
+  border: 1px solid #e0e0e0;
+
+  .highlight {
+    background-color: yellow;
+  }
+}

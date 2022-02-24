@@ -11,7 +11,7 @@ export default class SequenceNode {
     if (!isValid) {
       return {
         isValid,
-        error: 'Sequence node missing some required parameters.',
+        error: 'Sequence node missing required parameters.',
       };
     }
     return { isValid: true };

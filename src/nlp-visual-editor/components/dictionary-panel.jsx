@@ -212,6 +212,15 @@ DictionaryPanel.propTypes = {
   nodeId: PropTypes.string.isRequired,
 };
 
+DictionaryPanel.defaultProps = {
+  items: [
+    'Software',
+    'Hardware',
+    'Global Business Services',
+    'Global Technology Services',
+  ],
+};
+
 const mapStateToProps = (state) => ({
   pipelineId: state.nodesReducer.pipelineId,
 });

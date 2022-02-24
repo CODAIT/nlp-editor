@@ -14,7 +14,7 @@ export default class RegexNode {
     if (!isValid) {
       return {
         isValid,
-        error: 'Regex node missing some required parameters.',
+        error: 'Regex node missing required parameters.',
       };
     }
 
