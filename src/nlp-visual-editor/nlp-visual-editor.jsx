@@ -81,12 +81,12 @@ class VisualEditor extends React.Component {
   };
 
   transformToXML = () => {
-    const { nodes } = this.props;
+    const { moduleName, nodes } = this.props;
     const { selectedNodeId } = this.state;
 
     ///Transform to XML and make request
     const node = nodes.find((n) => n.nodeId === selectedNodeId);
-    return this.jsonToXML.transform(node);
+    return this.jsonToXML.transform(node, moduleName);
   };
 
   validatePipeline = () => {
@@ -201,7 +201,6 @@ class VisualEditor extends React.Component {
       //if node is not clicked/selected do not enable run button
       this.setState({ enableFlowExecutionBtn: false });
     }
-    console.log('clickType', clickType);
   };
 
   onErrorModalClosed = () => {
@@ -323,6 +322,7 @@ class VisualEditor extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
+  moduleName: state.nodesReducer.moduleName,
   nodes: state.nodesReducer.nodes,
   pipelineId: state.nodesReducer.pipelineId,
   showDocumentViewer: state.nodesReducer.showDocumentViewer,

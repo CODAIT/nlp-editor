@@ -5,6 +5,7 @@ const initialState = {
   pipelineId: undefined,
   canvasController: undefined,
   errorMessage: undefined,
+  moduleName: 'elyraNLPCanvas',
   showRightPanel: false,
   showBottomPanel: false,
   showDocumentViewer: false,

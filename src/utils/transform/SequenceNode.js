@@ -1,8 +1,9 @@
 const js2xmlparser = require('js2xmlparser');
 
 export default class SequenceNode {
-  constructor(node) {
+  constructor(node, moduleName) {
     this.node = node;
+    this.moduleName = moduleName;
   }
 
   getInputConcepts() {
@@ -12,7 +13,7 @@ export default class SequenceNode {
       const { label } = node;
       inputConcepts.push({
         '@': {
-          module: '',
+          module: this.moduleName,
           name: label,
         },
       });
@@ -46,7 +47,7 @@ export default class SequenceNode {
       '@': { group: `${index + 1}`, min: '1', max: '1' },
       'col-ref': {
         '@': {
-          'input-concept-module': sequenceLabel,
+          'input-concept-module': this.moduleName,
           'input-concept-name': label,
           'input-field-name': label,
         },
