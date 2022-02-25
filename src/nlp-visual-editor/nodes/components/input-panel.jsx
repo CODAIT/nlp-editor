@@ -8,7 +8,9 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import './input-panel.scss';
 
-import { saveNlpNode } from '../../redux/slice';
+import { VlanIbm24 } from '@carbon/icons-react';
+
+import { saveNlpNode } from '../../../redux/slice';
 
 class InputPanel extends React.Component {
   constructor(props) {
@@ -110,7 +112,6 @@ class InputPanel extends React.Component {
             labelDescription="only .txt, .htm, .html files at 500mb or less"
             labelTitle="Upload files"
             size={'sm'}
-            multiple={true}
             onChange={this.onFilesSelected}
           />
         )}
@@ -130,6 +131,7 @@ class InputPanel extends React.Component {
             )}
           </div>
         )}
+        <VlanIbm24 aria-label="Document Viewer" className="doc-viewer-icon" />
         {children}
       </div>
     );

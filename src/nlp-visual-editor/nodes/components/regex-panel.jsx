@@ -14,10 +14,10 @@ import {
   Tab,
 } from 'carbon-components-react';
 
-import NlpResultsHighlight from '../views/components/nlp-results-highlight';
+import NlpResultsHighlight from '../../views/components/nlp-results-highlight';
 
 import './regex-panel.scss';
-import { saveNlpNode } from '../../redux/slice';
+import { saveNlpNode } from '../../../redux/slice';
 
 class RegexPanel extends React.Component {
   constructor(props) {

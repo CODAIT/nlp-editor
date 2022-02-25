@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
 import './tabular-view.scss';
 
 import { Tabs, Tab, DataTableSkeleton } from 'carbon-components-react';
 import TableResults from './components/table-results';
-
-import { setSelectedRow } from '../../redux/slice';
 
 class TabularView extends React.Component {
   getTableView = () => {
@@ -34,8 +31,4 @@ class TabularView extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  setSelectedRow: (row) => dispatch(setSelectedRow(row)),
-});
-
-export default connect(null, mapDispatchToProps)(TabularView);
+export default TabularView;

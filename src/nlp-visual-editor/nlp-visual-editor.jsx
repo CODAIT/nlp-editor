@@ -20,6 +20,7 @@ import {
   setPipelineId,
   setShowBottomPanel,
   setShowRightPanel,
+  setShowDocumentViewer,
 } from '../redux/slice';
 
 class VisualEditor extends React.Component {
@@ -34,6 +35,7 @@ class VisualEditor extends React.Component {
         nodeId: undefined,
       },
       errorMessage: undefined,
+      selectedRow: undefined,
     };
 
     this.canvasController = new CanvasController();
@@ -104,6 +106,7 @@ class VisualEditor extends React.Component {
 
   execute = (xml) => {
     this.props.setShowBottomPanel({ showPanel: true });
+    this.setState({ execResults: { tabularData: [] } }); // reset to show table skeleton
     const { selectedNodeId } = this.state;
 
     setTimeout(() => {
@@ -114,9 +117,8 @@ class VisualEditor extends React.Component {
       })
         .then((res) => res.json())
         .then((data) => {
-          //set as undefined to render DocumentViewer
+          //check if results came back
           this.setState({
-            showRun: true,
             execResults: {
               tabularData: data,
               nodeId: selectedNodeId,
@@ -182,34 +184,24 @@ class VisualEditor extends React.Component {
 
   onCanvasAreaClick = (source) => {
     const { clickType, objectType } = source;
-
+    let tmpState = {}; //optimize on the following conditionals
     if (objectType === 'node') {
       const { id } = source;
-      this.setState({ selectedNodeId: id });
+      tmpState = { ...tmpState, selectedNodeId: id };
       if (clickType === 'DOUBLE_CLICK') {
         //open props panel on double-click to edit node properties
-        this.setState({ showRun: false });
+        this.props.setShowDocumentViewer({ showViewer: false });
         this.props.setShowRightPanel({ showPanel: true });
       } else if (clickType === 'SINGLE_CLICK') {
-        const { enableFlowExecutionBtn } = this.state;
-        //enable to run a node
-        if (enableFlowExecutionBtn === false) {
-          //only set if false, we want to avoid a re-render
-          this.setState({ enableFlowExecutionBtn: true });
-        }
+        //only set if false, we want to avoid a re-render
+        tmpState = { ...tmpState, enableFlowExecutionBtn: true };
       }
+      this.setState({ ...tmpState });
     } else {
       //if node is not clicked/selected do not enable run button
       this.setState({ enableFlowExecutionBtn: false });
-      if (objectType === 'canvas') {
-        this.onPanelClose();
-      }
     }
     console.log('clickType', clickType);
-  };
-
-  onPanelClose = () => {
-    this.props.setShowRightPanel({ showPanel: false });
   };
 
   onErrorModalClosed = () => {
@@ -217,7 +209,8 @@ class VisualEditor extends React.Component {
   };
 
   onRowSelected = (row, index) => {
-    this.setState({ showRun: true });
+    this.props.setShowDocumentViewer({ showViewer: true });
+    this.setState({ selectedRow: row });
     //scroll to selection
     setTimeout(() => {
       const scrollIndex = document.querySelectorAll(
@@ -229,18 +222,9 @@ class VisualEditor extends React.Component {
   };
 
   getRHSPanel = () => {
-    const { selectedNodeId, showRun, execResults } = this.state;
-    const { selectedRow } = this.props;
-    if (!showRun) {
-      return (
-        <Provider store={store}>
-          <RHSPanel
-            nodeId={selectedNodeId}
-            canvasController={this.canvasController}
-          />
-        </Provider>
-      );
-    } else {
+    const { selectedNodeId, selectedRow, execResults } = this.state;
+    const { showDocumentViewer } = this.props;
+    if (showDocumentViewer) {
       const { tabularData } = execResults;
       const spans = tabularData.map((row) => {
         return {
@@ -257,6 +241,14 @@ class VisualEditor extends React.Component {
         </Provider>
       );
     }
+    return (
+      <Provider store={store}>
+        <RHSPanel
+          nodeId={selectedNodeId}
+          canvasController={this.canvasController}
+        />
+      </Provider>
+    );
   };
 
   getErrorModal = () => {
@@ -289,7 +281,7 @@ class VisualEditor extends React.Component {
     const { tabularData, nodeId } = execResults;
     const { nodes } = this.props;
     const node = nodes.find((n) => n.nodeId === nodeId) || {};
-    const { label = '' } = node;
+    const { label } = node;
 
     return (
       <Provider store={store}>
@@ -304,31 +296,28 @@ class VisualEditor extends React.Component {
 
   render() {
     const { showBottomPanel, showRightPanel } = this.props;
-    const { errorMessage } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
     const errorModal = this.getErrorModal();
 
     return (
-      <>
-        <div className="nlp-visual-editor">
-          <IntlProvider locale="en">
-            <CommonCanvas
-              config={{ enableRightFlyoutUnderToolbar: true }}
-              canvasController={this.canvasController}
-              rightFlyoutContent={rightFlyoutContent}
-              showRightFlyout={showRightPanel}
-              clickActionHandler={this.onCanvasAreaClick}
-              editActionHandler={this.onEditCanvas}
-              toolbarConfig={toolbarConfig}
-              showBottomPanel={showBottomPanel}
-              bottomPanelContent={bottomContent}
-            />
-          </IntlProvider>
-          {errorModal}
-        </div>
-      </>
+      <div className="nlp-visual-editor">
+        <IntlProvider locale="en">
+          <CommonCanvas
+            config={{ enableRightFlyoutUnderToolbar: true }}
+            canvasController={this.canvasController}
+            rightFlyoutContent={rightFlyoutContent}
+            showRightFlyout={showRightPanel}
+            clickActionHandler={this.onCanvasAreaClick}
+            editActionHandler={this.onEditCanvas}
+            toolbarConfig={toolbarConfig}
+            showBottomPanel={showBottomPanel}
+            bottomPanelContent={bottomContent}
+          />
+        </IntlProvider>
+        {errorModal}
+      </div>
     );
   }
 }
@@ -336,7 +325,7 @@ class VisualEditor extends React.Component {
 const mapStateToProps = (state) => ({
   nodes: state.nodesReducer.nodes,
   pipelineId: state.nodesReducer.pipelineId,
-  selectedRow: state.nodesReducer.selectedRow,
+  showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showBottomPanel: state.nodesReducer.showBottomPanel,
   showRightPanel: state.nodesReducer.showRightPanel,
 });
@@ -347,6 +336,7 @@ const mapDispatchToProps = (dispatch) => ({
   setPipelineId: (data) => dispatch(setPipelineId(data)),
   setShowBottomPanel: (doShow) => dispatch(setShowBottomPanel(doShow)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
+  setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VisualEditor);

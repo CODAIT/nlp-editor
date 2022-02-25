@@ -1,20 +1,33 @@
 .document-viewer {
   min-width: 500px;
   max-width: 500px;
-  padding: 0.5rem;
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #f4f4f4;
 
-  .title {
-    color: rgb(0, 29, 108);
-    font-size: 1.5rem;
-    display: inline-flex;
-    font-weight: 500;
-    padding: 0.7rem;
-    border-radius: 5px 5px 0px 0px;
-    background: -webkit-linear-gradient(top, #fafafa 0%, #dbdbdb 100%);
+  .header {
+    display: flex;
+    background-color: #e0e0e0;
+    padding: 0.8rem 0.5rem;
+
+    .title {
+      display: inline-flex;
+      align-items: center;
+      color: rgb(0, 67, 206);
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-left: 0.2rem;
+      flex-grow: 1;
+    }
+
+    .doc-viewer-icon {
+      fill: rgb(0, 67, 206);
+    }
+
+    .doc-viewer-close {
+      cursor: pointer;
+    }
   }
 
   .skeleton {
