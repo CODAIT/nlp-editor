@@ -14,7 +14,7 @@ class DictionaryPanel extends React.Component {
     super(props);
     this.state = {
       inputText: '',
-      items: props.items || [],
+      items: props.items,
       caseSensitivity: props.caseSensitivity || 'match',
       lemmaMatch: props.lemmaMatch || false,
       externalResourceChecked: props.externalResourceChecked || false,
@@ -213,12 +213,7 @@ DictionaryPanel.propTypes = {
 };
 
 DictionaryPanel.defaultProps = {
-  items: [
-    'Software',
-    'Hardware',
-    'Global Business Services',
-    'Global Technology Services',
-  ],
+  items: [],
 };
 
 const mapStateToProps = (state) => ({

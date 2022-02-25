@@ -1,4 +1,4 @@
-export default class SequenceNode {
+export default class InputNode {
   constructor(canvasController, pipelineId, nodeProps) {
     this.canvasController = canvasController;
     this.pipelineId = pipelineId;
@@ -7,13 +7,11 @@ export default class SequenceNode {
 
   validate() {
     const { isValid } = this.nodeProps;
-
     if (!isValid) {
       return {
         isValid,
-        error: 'Sequence node missing required parameters.',
+        error: 'You must upload a file as input to your rules.',
       };
     }
-    return { isValid: true };
   }
 }
