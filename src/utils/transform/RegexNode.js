@@ -1,8 +1,9 @@
 const js2xmlparser = require('js2xmlparser');
 
 export default class RegexNode {
-  constructor(node) {
+  constructor(node, moduleName) {
     this.node = node;
+    this.moduleName = moduleName;
   }
 
   getMatchingFlag() {
@@ -54,7 +55,7 @@ export default class RegexNode {
     const { min, max } = this.getRange();
     const jsonStructure = {
       '@': {
-        module: label,
+        module: this.moduleName,
         name: label,
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
         'xsi:noNamespaceSchemaLocation': 'schema/target_lang_spec.xsd',
@@ -62,7 +63,7 @@ export default class RegexNode {
       'input-concepts': {
         'input-concept': {
           '@': {
-            module: '',
+            module: this.moduleName,
             name: 'Document',
           },
         },
@@ -71,7 +72,7 @@ export default class RegexNode {
         'input-spec': {
           'input-span': {
             '@': {
-              'input-concept-module': '',
+              'input-concept-module': this.moduleName,
               'input-concept-name': 'Document',
               'input-field-name': 'text',
             },

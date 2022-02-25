@@ -1,8 +1,9 @@
 const js2xmlparser = require('js2xmlparser');
 
 export default class DictionaryNode {
-  constructor(node) {
+  constructor(node, moduleName) {
     this.node = node;
+    this.moduleName = moduleName;
   }
 
   transform() {
@@ -11,7 +12,7 @@ export default class DictionaryNode {
     const isCaseSensitive = caseSensitivity === 'match';
     const jsonStructure = {
       '@': {
-        module: label,
+        module: this.moduleName,
         name: label,
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
         'xsi:noNamespaceSchemaLocation': 'schema/target_lang_spec.xsd',
@@ -19,7 +20,7 @@ export default class DictionaryNode {
       'input-concepts': {
         'input-concept': {
           '@': {
-            module: '',
+            module: this.moduleName,
             name: 'Document',
           },
         },
@@ -28,7 +29,7 @@ export default class DictionaryNode {
         'input-spec': {
           'input-span': {
             '@': {
-              'input-concept-module': '',
+              'input-concept-module': this.moduleName,
               'input-concept-name': 'Document',
               'input-field-name': 'text',
             },
@@ -48,7 +49,7 @@ export default class DictionaryNode {
               'lemma-match': lemmaMatch,
               external: externalResourceChecked,
             },
-            'dict-name': label,
+            'dict-name': `${label}_dict`,
           },
         },
       },
