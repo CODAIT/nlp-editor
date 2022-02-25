@@ -1,15 +1,12 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { SkeletonText } from 'carbon-components-react';
+import { Close24, Document24 } from '@carbon/icons-react';
 import NlpResultsHighlight from './components/nlp-results-highlight';
 import './document-viewer.scss';
 
-/*
-const spans = [
-      { start: 163, end: 171 },
-      { start: 1456, end: 1464 },
-    ];
-*/
+import { setShowRightPanel } from '../../redux/slice';
 
 class DocumentViewer extends React.Component {
   constructor(props) {
@@ -39,7 +36,20 @@ class DocumentViewer extends React.Component {
       <div className="document-viewer">
         {textResults && (
           <>
-            <div className="title">Document - {documentName}</div>
+            <div className="header">
+              <Document24
+                aria-label="Document Viewer"
+                className="doc-viewer-icon"
+              />
+              <div className="title">Document - {documentName}</div>
+              <Close24
+                aria-label="Document Viewer"
+                className="doc-viewer-close"
+                onClick={() =>
+                  this.props.setShowRightPanel({ showPanel: false })
+                }
+              />
+            </div>
             <NlpResultsHighlight textToHighlight={textResults} spans={spans} />
           </>
         )}
@@ -49,4 +59,8 @@ class DocumentViewer extends React.Component {
   }
 }
 
-export default DocumentViewer;
+const mapDispatchToProps = (dispatch) => ({
+  setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
+});
+
+export default connect(null, mapDispatchToProps)(DocumentViewer);

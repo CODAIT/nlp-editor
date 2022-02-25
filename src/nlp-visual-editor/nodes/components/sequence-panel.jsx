@@ -9,8 +9,8 @@ import {
 } from 'carbon-components-react';
 import './sequence-panel.scss';
 
-import { getImmediateUpstreamNodes } from '../../utils';
-import { saveNlpNode } from '../../redux/slice';
+import { getImmediateUpstreamNodes } from '../../../utils';
+import { saveNlpNode } from '../../../redux/slice';
 
 class SequencePanel extends React.Component {
   constructor(props) {

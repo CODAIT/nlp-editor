@@ -28,7 +28,7 @@ const uploadFile = (file) => {
 const tabularResults = (req) => {
   console.log('retrieving tabular results');
   const { name } = req.query;
-  const path = __dirname + `/data/result.json`;
+  const path = __dirname + `/data/results-singledoc.json`;
   let data = [];
   try {
     data = fs.readFileSync(path, 'utf8');

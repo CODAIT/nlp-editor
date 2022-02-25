@@ -5,9 +5,9 @@ const initialState = {
   pipelineId: undefined,
   canvasController: undefined,
   errorMessage: undefined,
-  selectedRow: undefined,
   showRightPanel: false,
   showBottomPanel: false,
+  showDocumentViewer: false,
 };
 
 const nodesSlice = createSlice({
@@ -26,6 +26,13 @@ const nodesSlice = createSlice({
       const { showPanel } = action.payload;
       state.showRightPanel = showPanel;
     },
+    setShowDocumentViewer: (state, action) => {
+      const { showViewer } = action.payload;
+      state.showDocumentViewer = showViewer;
+      if (showViewer) {
+        state.showRightPanel = true;
+      }
+    },
     deleteNodes: (state, action) => {
       const { ids = [] } = action.payload;
       const newNodes = state.nodes.filter((n) => {
@@ -36,10 +43,6 @@ const nodesSlice = createSlice({
     setErrorMessage: (state, action) => {
       const { message } = action.payload;
       state.errorMessage = message;
-    },
-    setSelectedRow: (state, action) => {
-      const { row } = action.payload;
-      state.selectedRow = row;
     },
     saveNlpNode: (state, action) => {
       //stores or replaces node.
@@ -59,8 +62,8 @@ export const {
   saveNlpNode,
   setErrorMessage,
   setPipelineId,
-  setSelectedRow,
   setShowBottomPanel,
   setShowRightPanel,
+  setShowDocumentViewer,
 } = nodesSlice.actions;
 export default nodesSlice.reducer;

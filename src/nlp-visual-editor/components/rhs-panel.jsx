@@ -5,13 +5,14 @@ import { Button, TextInput } from 'carbon-components-react';
 import { Edit16 } from '@carbon/icons-react';
 
 import './rhs-panel.scss';
-import InputPanel from './input-panel';
-import RegexPanel from './regex-panel';
-//import ProximityPanel from './proximity-panel';
-import DictionaryPanel from './dictionary-panel';
-import SequencePanel from './sequence-panel';
+import {
+  InputPanel,
+  RegexPanel,
+  DictionaryPanel,
+  SequencePanel,
+} from '../nodes/components';
 
-import { saveNlpNode } from '../../redux/slice';
+import { saveNlpNode, setShowRightPanel } from '../../redux/slice';
 
 class RHSPanel extends React.Component {
   constructor(props) {
@@ -127,6 +128,13 @@ class RHSPanel extends React.Component {
           <span className="description">{description}</span>
         </div>
         {panelContents}
+        <Button
+          kind="secondary"
+          className="rhs-button-cancel"
+          onClick={() => this.props.setShowRightPanel({ showPanel: false })}
+        >
+          Cancel
+        </Button>
       </div>
     );
   }
@@ -143,6 +151,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+  setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RHSPanel);

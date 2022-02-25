@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 
 import './dictionary-panel.scss';
 
-import { saveNlpNode } from '../../redux/slice';
+import { saveNlpNode } from '../../../redux/slice';
 
 class DictionaryPanel extends React.Component {
   constructor(props) {
