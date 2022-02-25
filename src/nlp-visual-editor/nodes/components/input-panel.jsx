@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children, isValidElement, cloneElement } from 'react';
 import {
   Button,
   FileUploader,
@@ -7,8 +7,6 @@ import {
 import { connect } from 'react-redux';
 import axios from 'axios';
 import './input-panel.scss';
-
-import { VlanIbm24 } from '@carbon/icons-react';
 
 import { saveNlpNode } from '../../../redux/slice';
 
@@ -59,20 +57,16 @@ class InputPanel extends React.Component {
     }
   };
 
-  saveParameters = () => {
-    const { saveNlpNode, ...rest } = this.props;
+  getFileNames = () => {
+    const fileNames = [];
     const { files } = this.state;
-    const fileList = Array.from(files);
-    const fileNames = fileList.map((f) => {
-      return { name: f.name };
-    });
 
-    const node = {
-      ...rest,
-      files: fileNames,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const { name } = file;
+      fileNames.push(name);
+    }
+    return fileNames;
   };
 
   getFileUploadList = () => {
@@ -96,13 +90,55 @@ class InputPanel extends React.Component {
     return fileItems;
   };
 
-  render() {
-    const { children, isValid } = this.props;
+  validateParameters = () => {
     const { files } = this.state;
+
+    const errorMessage =
+      files.length === 0 ? 'You must select a file to upload.' : undefined;
+
+    this.setState({ errorMessage });
+    return errorMessage;
+  };
+
+  saveParameters = () => {
+    const errorMessage = this.validateParameters();
+    const { saveNlpNode, children, ...rest } = this.props;
+    const { files } = this.state;
+    const fileList = Array.from(files);
+    const fileNames = fileList.map((f) => {
+      return { name: f.name };
+    });
+
+    if (!errorMessage) {
+      const node = {
+        ...rest,
+        files: fileNames,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+    }
+  };
+
+  handleChildComponents = () => {
+    const { children } = this.props;
+    const childrenWithProps = Children.map(children, (child) => {
+      if (isValidElement(child)) {
+        return cloneElement(child, { onClick: this.saveParameters });
+      }
+      return child;
+    });
+    return childrenWithProps;
+  };
+
+  render() {
+    const { isValid } = this.props;
+    const { files, errorMessage } = this.state;
     const showFileControl = files.length === 0;
     const fileItems = this.getFileUploadList();
+    const children = this.handleChildComponents();
     return (
       <div className="input-panel">
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
         {showFileControl && (
           <FileUploader
             accept={['.txt', '.htm', '.html']}
@@ -131,7 +167,6 @@ class InputPanel extends React.Component {
             )}
           </div>
         )}
-        <VlanIbm24 aria-label="Document Viewer" className="doc-viewer-icon" />
         {children}
       </div>
     );

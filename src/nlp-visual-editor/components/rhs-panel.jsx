@@ -36,11 +36,9 @@ class RHSPanel extends React.Component {
     const { canvasController } = this.props;
     switch (type) {
       case 'input':
-        return <InputPanel {...node} />;
+        return <InputPanel {...node} children={buttons} />;
       case 'regex':
         return <RegexPanel {...node} children={buttons} />;
-      /*case 'proximity':
-        return <ProximityPanel />;*/
       case 'dictionary':
         return <DictionaryPanel {...node} children={buttons} />;
       case 'sequence':
