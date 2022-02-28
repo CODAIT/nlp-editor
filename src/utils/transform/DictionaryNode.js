@@ -6,10 +6,40 @@ export default class DictionaryNode {
     this.moduleName = moduleName;
   }
 
+  getEntries = () => {
+    const { items } = this.node;
+    const entries = [];
+    items.forEach((item) => {
+      entries.push(item);
+    });
+    return entries;
+  };
+
+  getDictionaryWords = () => {
+    const { label } = this.node;
+    const entries = this.getEntries();
+    const jsonStructure = {
+      '@': {
+        name: `${label}_dict`,
+        type: 'static',
+        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+        'xsi:noNamespaceSchemaLocation': 'schema/dict.xsd',
+      },
+      entries: {
+        entry: entries,
+      },
+      languages: {
+        lang: 'en',
+      },
+    };
+
+    return js2xmlparser.parse('dictionary', jsonStructure);
+  };
+
   transform() {
     const { caseSensitivity, externalResourceChecked, label, lemmaMatch } =
       this.node;
-    const fieldName = label.toLowerCase();
+    const fieldName = label;
     const isCaseSensitive = caseSensitivity === 'match';
     const jsonStructure = {
       '@': {
@@ -55,6 +85,11 @@ export default class DictionaryNode {
         },
       },
     };
-    return js2xmlparser.parse('concept', jsonStructure);
+    const dictionary = js2xmlparser.parse('concept', jsonStructure);
+    const words = this.getDictionaryWords();
+    return [
+      { xml: dictionary, label },
+      { xml: words, label: `${label}_dict` },
+    ];
   }
 }

@@ -51,7 +51,7 @@ export default class RegexNode {
 
   transform() {
     const { label, regexInput: pattern } = this.node;
-    const fieldName = label.toLowerCase();
+    const fieldName = label;
     const matchingFlag = this.getMatchingFlag();
     const { min, max } = this.getRange();
     const jsonStructure = {
@@ -104,6 +104,9 @@ export default class RegexNode {
         },
       };
     }
-    return js2xmlparser.parse('concept', jsonStructure);
+    return {
+      xml: js2xmlparser.parse('concept', jsonStructure),
+      label,
+    };
   }
 }

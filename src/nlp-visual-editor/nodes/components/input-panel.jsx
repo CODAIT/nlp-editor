@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import './input-panel.scss';
 
-import { saveNlpNode } from '../../../redux/slice';
+import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
 class InputPanel extends React.Component {
   constructor(props) {
@@ -103,7 +103,7 @@ class InputPanel extends React.Component {
 
   saveParameters = () => {
     const errorMessage = this.validateParameters();
-    const { saveNlpNode, children, ...rest } = this.props;
+    const { saveNlpNode, setShowRightPanel, children, ...rest } = this.props;
     const { files } = this.state;
     const fileList = Array.from(files);
     const fileNames = fileList.map((f) => {
@@ -117,6 +117,7 @@ class InputPanel extends React.Component {
         isValid: true,
       };
       this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
     }
   };
 
@@ -184,6 +185,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+  setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputPanel);

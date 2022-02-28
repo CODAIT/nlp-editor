@@ -7,27 +7,44 @@ import { Tabs, Tab, DataTableSkeleton } from 'carbon-components-react';
 import TableResults from './components/table-results';
 
 class TabularView extends React.Component {
-  getTableView = () => {
-    const { tabularData, label, onRowSelected } = this.props;
-    if (!tabularData || tabularData.length === 0) {
+  getTable = (name) => {
+    const { annotations = {}, docName, onRowSelected } = this.props;
+    const data = annotations[name];
+    if (data.length === 0) {
       return <DataTableSkeleton showHeader={false} showToolbar={false} />;
     }
     return (
-      <Tabs type="container" light={true}>
-        <Tab id="idRegex" label={label}>
-          <TableResults
-            tabularData={tabularData}
-            label={label}
-            onRowSelected={onRowSelected}
-          />
-        </Tab>
-      </Tabs>
+      <TableResults
+        tabularData={data}
+        label={name}
+        docName={docName}
+        onRowSelected={onRowSelected}
+      />
     );
   };
 
+  getTabs = () => {
+    const { names } = this.props;
+    const tabs = [];
+    names.forEach((name) => {
+      const table = this.getTable(name);
+      const tabId = `${name.toLowerCase()}_id`;
+      tabs.push(
+        <Tab id={tabId} key={tabId} label={name}>
+          {table}
+        </Tab>,
+      );
+    });
+    return tabs;
+  };
+
   render() {
-    const tableView = this.getTableView();
-    return <div className="tabular-view">{tableView}</div>;
+    const tabs = this.getTabs();
+    return (
+      <div className="tabular-view">
+        <Tabs light={true}>{tabs}</Tabs>
+      </div>
+    );
   }
 }
 

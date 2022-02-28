@@ -12,7 +12,7 @@ import DataTable, {
   TableRow,
 } from 'carbon-components-react';
 
-const TableResults = ({ tabularData, label, onRowSelected }) => {
+const TableResults = ({ tabularData, label, docName = '', onRowSelected }) => {
   const mockedHeaders = ['Document', `${label} (Span)`];
   return (
     <div className="table-results">
@@ -29,15 +29,11 @@ const TableResults = ({ tabularData, label, onRowSelected }) => {
         <TableBody>
           {tabularData.map((row, index) => (
             <TableRow
-              key={row.tuple_id}
+              key={`row_${index}`}
               onClick={() => onRowSelected(row, index)}
             >
-              <TableCell key={row['doc_name'] + index}>
-                {row['doc_name']}
-              </TableCell>
-              <TableCell key={row['fieldName'] + index}>
-                {row['fieldName']}
-              </TableCell>
+              <TableCell key={`doc-name_${index}`}>{docName}</TableCell>
+              <TableCell key={`row-text_${index}`}>{row['text']}</TableCell>
             </TableRow>
           ))}
         </TableBody>

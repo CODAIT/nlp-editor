@@ -29,7 +29,7 @@ const createFolder = (folderName) => {
 const uploadFile = (path, file) => {
   console.log(`uploading file ${file.name}`);
   //we rename the file, the runtime will look for input.txt
-  const uploadPath = `${path}/input.txt`;
+  const uploadPath = `${path}/payload.txt`;
   file.mv(uploadPath, (err) => {
     if (err) {
       return res.status(500).send({ message: 'File upload failed', code: 200 });
@@ -117,8 +117,49 @@ app.post('/api/run', (req, res) => {
   //move zipfile to be executed
   moveZipFile(tmpFolder, zipFileName);
 
-  const tabularData = tabularResults(req);
-  res.status(200).send(tabularData);
+  res
+    .status(200)
+    .send({ message: 'Execution submitted successfully.', id: workingId });
+});
+
+const formatResults = ({ annotations, instrumentationInfo }) => {
+  const { numAnnotationsPerType } = instrumentationInfo;
+  const annonNames = numAnnotationsPerType.map((n) => n.annotationType);
+  let annonResults = {};
+  annonNames.forEach((name) => {
+    const items = [];
+    const annotation = annotations[name];
+    annotation.forEach((elem) => {
+      const attr = Object.keys(elem)[0];
+      const { location, text } = elem[attr];
+      const { begin: start, end } = location;
+      items.push({ start, end, text });
+    });
+    annonResults = { ...annonResults, [name]: items };
+  });
+  return { annotations: annonResults, names: annonNames };
+};
+
+app.get('/api/results', function (req, res) {
+  const { workingId } = req.query;
+  const file = __dirname + '/run-aql-result' + `/${workingId}.json`;
+  if (!fs.existsSync(file)) {
+    //no file present, assume that runtime is still in progress
+    return res.status(200).send({ status: 'in-progress' });
+  }
+
+  //read contents of file
+  let fileContents = fs.readFileSync(file, 'utf8');
+  const parsedContents = JSON.parse(fileContents);
+
+  // execution returned errors
+  if (parsedContents.hasOwnProperty('AqlTaskError')) {
+    const message = parsedContents['AqlTaskError'];
+    return res.status(200).send({ status: 'error', message });
+  }
+
+  const results = formatResults(parsedContents);
+  return res.status(200).send({ status: 'success', ...results });
 });
 
 app.get('/api/document', function (req, res) {
