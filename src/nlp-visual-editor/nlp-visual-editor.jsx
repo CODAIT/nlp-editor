@@ -3,7 +3,7 @@ import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
 import shortUUID from 'short-uuid';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
-import { Button, Modal } from 'carbon-components-react';
+import { Button, Loading, Modal } from 'carbon-components-react';
 import { Play32, WarningAlt24 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
@@ -30,12 +30,10 @@ class VisualEditor extends React.Component {
     super(props);
 
     this.state = {
+      isLoading: false,
       selectedNodeId: undefined,
       enableFlowExecutionBtn: false,
-      execResults: {
-        tabularData: [],
-        nodeId: undefined,
-      },
+      execResults: undefined,
       errorMessage: undefined,
       selectedRow: undefined,
     };
@@ -72,38 +70,50 @@ class VisualEditor extends React.Component {
         );
       });
     }
-
-    //check if new row in table was selected, render DocumentViewer
-    const { selectedRow } = this.props;
-    if (
-      selectedRow &&
-      prevProps.selectedRow &&
-      selectedRow.tuple_id !== prevProps.selectedRow.tuple_id
-    ) {
-      this.setState({ selectedNodeId: undefined });
-    }
   };
 
   transformToXML = () => {
-    const { moduleName, nodes } = this.props;
+    const { moduleName, nodes, pipelineId } = this.props;
     const { selectedNodeId } = this.state;
     const payload = [];
 
-    ///Transform to XML and make request
-    const node = nodes.find((n) => n.nodeId === selectedNodeId);
-    const xml = this.jsonToXML.transform(node, moduleName);
-    payload.push({ xml, label: node.label });
+    let upstreamNodeIds = this.canvasController
+      .getUpstreamNodes([selectedNodeId], pipelineId)
+      .nodes[pipelineId].reverse();
+
+    upstreamNodeIds.forEach((id) => {
+      const node = nodes.find((n) => n.nodeId === id);
+      if (node.type !== 'input') {
+        const results = this.jsonToXML.transform(node, moduleName);
+        if (!Array.isArray(results)) {
+          const { xml, label } = results;
+          payload.push({ xml, label });
+        } else {
+          results.forEach((result) => {
+            const { xml, label } = result;
+            payload.push({ xml, label });
+          });
+        }
+      }
+    });
     return payload;
   };
 
   validatePipeline = () => {
     const { nodes, pipelineId } = this.props;
     const { selectedNodeId } = this.state;
-    // clear any previous messages
 
-    const node = nodes.find((n) => n.nodeId === selectedNodeId);
-    const response = this.nodeValidator.validate(pipelineId, node);
-    const { isValid } = response;
+    let upstreamNodeIds = this.canvasController
+      .getUpstreamNodes([selectedNodeId], pipelineId)
+      .nodes[pipelineId].reverse();
+
+    let response = {};
+    const isValid = upstreamNodeIds.every((id) => {
+      const node = nodes.find((n) => n.nodeId === id);
+      response = this.nodeValidator.validate(pipelineId, node);
+      const { isValid } = response;
+      return isValid;
+    });
     if (!isValid) {
       const { error } = response;
       this.setState({ errorMessage: error });
@@ -111,32 +121,59 @@ class VisualEditor extends React.Component {
     return isValid;
   };
 
+  fetchResults = () => {
+    const { workingId } = this.props;
+    const url = `/api/results?workingId=${workingId}`;
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        const { status } = data;
+        if (status === 'in-progress') {
+          //TODO - do nothing, let it run
+        } else if (status === 'success') {
+          const { annotations = {}, names = [] } = data;
+          clearInterval(this.timer);
+          let state = { isLoading: false };
+          if (names.length === 0) {
+            state = {
+              ...state,
+              errorMessage: 'No matches were found in the input document.',
+            };
+          }
+          this.setState({
+            ...state,
+            execResults: { annotations, names },
+          });
+        } else if (status === 'error') {
+          const { message } = data;
+          clearInterval(this.timer);
+          this.setState({
+            isLoading: false,
+            errorMessage: message,
+          });
+        }
+      });
+  };
+
   execute = (payload) => {
     const { workingId } = this.props;
-    const { selectedNodeId } = this.state;
     this.props.setShowBottomPanel({ showPanel: true });
-    this.setState({ execResults: { tabularData: [] } }); // reset to show table skeleton
+    this.setState({ isLoading: true });
 
-    setTimeout(() => {
-      fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          workingId,
-          payload,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          //check if results came back
-          this.setState({
-            execResults: {
-              tabularData: data,
-              nodeId: selectedNodeId,
-            },
-          });
-        });
-    }, 1000);
+    fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workingId,
+        payload,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        //poll for results at 1 sec interval
+        this.timer = setInterval(this.fetchResults, 1000);
+      });
   };
 
   runPipeline = () => {
@@ -194,6 +231,7 @@ class VisualEditor extends React.Component {
 
   onCanvasAreaClick = (source) => {
     const { clickType, objectType } = source;
+    const { nodes } = this.props;
     let tmpState = {}; //optimize on the following conditionals
     if (objectType === 'node') {
       const { id } = source;
@@ -203,8 +241,9 @@ class VisualEditor extends React.Component {
         this.props.setShowDocumentViewer({ showViewer: false });
         this.props.setShowRightPanel({ showPanel: true });
       } else if (clickType === 'SINGLE_CLICK') {
-        //only set if false, we want to avoid a re-render
-        tmpState = { ...tmpState, enableFlowExecutionBtn: true };
+        const node = nodes.find((n) => n.nodeId === id);
+        const enableFlowExecutionBtn = node.type !== 'input';
+        tmpState = { ...tmpState, enableFlowExecutionBtn };
       }
       this.setState({ ...tmpState });
     } else {
@@ -218,7 +257,8 @@ class VisualEditor extends React.Component {
   };
 
   onRowSelected = (row, index) => {
-    this.props.setShowDocumentViewer({ showViewer: true });
+    console.log(row);
+    /*this.props.setShowDocumentViewer({ showViewer: true });
     this.setState({ selectedRow: row });
     //scroll to selection
     setTimeout(() => {
@@ -227,7 +267,7 @@ class VisualEditor extends React.Component {
       )[index].offsetTop;
       document.querySelector('.nlp-results-highlight').scrollTop =
         scrollIndex - 200;
-    }, 500);
+    }, 500);*/
   };
 
   getRHSPanel = () => {
@@ -287,16 +327,21 @@ class VisualEditor extends React.Component {
 
   getTabularView = () => {
     const { execResults } = this.state;
-    const { tabularData, nodeId } = execResults;
+    if (!execResults) {
+      return null;
+    }
+    const { annotations, names } = execResults;
+    //get the input document name
     const { nodes } = this.props;
-    const node = nodes.find((n) => n.nodeId === nodeId) || {};
-    const { label } = node;
+    const node = nodes.find((n) => n.type === 'input') || {};
+    const { name } = node.files[0];
 
     return (
       <Provider store={store}>
         <TabularView
-          tabularData={tabularData}
-          label={label}
+          annotations={annotations}
+          names={names}
+          docName={name}
           onRowSelected={this.onRowSelected}
         />
       </Provider>
@@ -305,6 +350,7 @@ class VisualEditor extends React.Component {
 
   render() {
     const { showBottomPanel, showRightPanel } = this.props;
+    const { isLoading } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
@@ -328,6 +374,11 @@ class VisualEditor extends React.Component {
           />
         </IntlProvider>
         {errorModal}
+        <Loading
+          description="Loading NLP results"
+          withOverlay={true}
+          active={isLoading}
+        />
       </div>
     );
   }

@@ -1,6 +1,5 @@
 .tabular-view {
-  //padding: 1.5rem 1rem;
-  background-color: #f4f4f4;
+  padding: 0.5rem 0rem;
   height: 100%;
 
   .bx--tab-content {
@@ -10,14 +9,6 @@
       overflow-y: auto;
       min-height: 280px;
       max-height: 280px;
-    }
-  }
-
-  .bx--tabs--scrollable__nav {
-    li {
-      border-width: 0 1px 0px 1px;
-      border-style: solid;
-      border-color: #e0e0e0;
     }
   }
 }

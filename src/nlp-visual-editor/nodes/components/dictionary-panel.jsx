@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 
 import './dictionary-panel.scss';
 
-import { saveNlpNode } from '../../../redux/slice';
+import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
 class DictionaryPanel extends React.Component {
   constructor(props) {
@@ -100,6 +100,7 @@ class DictionaryPanel extends React.Component {
         isValid: true,
       };
       this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
     }
   };
 
@@ -222,6 +223,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+  setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DictionaryPanel);

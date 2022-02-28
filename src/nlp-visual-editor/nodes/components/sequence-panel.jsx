@@ -10,7 +10,7 @@ import {
 import './sequence-panel.scss';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
-import { saveNlpNode } from '../../../redux/slice';
+import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
 class SequencePanel extends React.Component {
   constructor(props) {
@@ -90,6 +90,7 @@ class SequencePanel extends React.Component {
         isValid: true,
       };
       this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
     }
   };
 
@@ -161,6 +162,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+  setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SequencePanel);

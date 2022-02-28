@@ -13,12 +13,12 @@ import {
 } from 'carbon-components-react';
 
 import './regex-panel.scss';
-import { saveNlpNode } from '../../../redux/slice';
+import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
-    const { saveNlpNode, children, ...rest } = props;
+    const { saveNlpNode, setShowRightPanel, children, ...rest } = props;
     this.state = {
       ...rest,
     };
@@ -76,6 +76,7 @@ class RegexPanel extends React.Component {
         isValid: true,
       };
       this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
     }
   };
 
@@ -293,6 +294,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+  setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RegexPanel);

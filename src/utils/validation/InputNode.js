@@ -13,5 +13,6 @@ export default class InputNode {
         error: 'You must upload a file as input to your rules.',
       };
     }
+    return { isValid: true };
   }
 }

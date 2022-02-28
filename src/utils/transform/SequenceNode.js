@@ -14,7 +14,7 @@ export default class SequenceNode {
       inputConcepts.push({
         '@': {
           module: this.moduleName,
-          name: label.toLowerCase(),
+          name: label,
         },
       });
     });
@@ -30,7 +30,7 @@ export default class SequenceNode {
       const { label } = node;
       fields.push({
         '@': {
-          name: label.toLowerCase(),
+          name: label,
           group: index + 1,
           hide: 'yes',
           type: 'Span',
@@ -66,7 +66,6 @@ export default class SequenceNode {
         .replace(`<?xml version='1.0'?>`, '');
     }
     const temp = `${atomItemXML}${tokenGapItem || ''}`;
-    console.log(temp);
     return temp;
   }
 
@@ -92,7 +91,7 @@ export default class SequenceNode {
     const sequence = this.getSequence();
     const jsonStructure = {
       '@': {
-        module: label,
+        module: this.moduleName,
         name: label,
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
         'xsi:noNamespaceSchemaLocation': 'schema/target_lang_spec.xsd',
@@ -114,6 +113,9 @@ export default class SequenceNode {
       },
     };
     const xml = js2xmlparser.parse('concept', jsonStructure);
-    return xml.replace(`<sequence/>`, `<sequence>${sequence}</sequence>`);
+    return {
+      xml: xml.replace(`<sequence/>`, `<sequence>${sequence}</sequence>`),
+      label,
+    };
   }
 }
