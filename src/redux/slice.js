@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   nodes: [],
   pipelineId: undefined,
+  workingId: undefined,
   canvasController: undefined,
   errorMessage: undefined,
   moduleName: 'elyraNLPCanvas',
@@ -18,6 +19,10 @@ const nodesSlice = createSlice({
     setPipelineId: (state, action) => {
       const { pipelineId } = action.payload;
       state.pipelineId = pipelineId;
+    },
+    setWorkingId: (state, action) => {
+      const { workingId } = action.payload;
+      state.workingId = workingId;
     },
     setShowBottomPanel: (state, action) => {
       const { showPanel } = action.payload;
@@ -63,6 +68,7 @@ export const {
   saveNlpNode,
   setErrorMessage,
   setPipelineId,
+  setWorkingId,
   setShowBottomPanel,
   setShowRightPanel,
   setShowDocumentViewer,

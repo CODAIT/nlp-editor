@@ -36,6 +36,7 @@ class InputPanel extends React.Component {
   };
 
   onUploadFiles = async (e) => {
+    const { workingId } = this.props;
     e.preventDefault();
     const formData = new FormData();
     const { files } = this.state;
@@ -43,7 +44,7 @@ class InputPanel extends React.Component {
       const file = files[i];
       formData.append('attach_file', file);
     }
-
+    formData.append('workingId', workingId);
     try {
       const res = await axios.post('/api/upload', formData, {
         headers: {
@@ -177,8 +178,12 @@ InputPanel.defaultProps = {
   files: [],
 };
 
+const mapStateToProps = (state) => ({
+  workingId: state.nodesReducer.workingId,
+});
+
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
 });
 
-export default connect(null, mapDispatchToProps)(InputPanel);
+export default connect(mapStateToProps, mapDispatchToProps)(InputPanel);

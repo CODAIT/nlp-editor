@@ -9,6 +9,7 @@ export default class DictionaryNode {
   transform() {
     const { caseSensitivity, externalResourceChecked, label, lemmaMatch } =
       this.node;
+    const fieldName = label.toLowerCase();
     const isCaseSensitive = caseSensitivity === 'match';
     const jsonStructure = {
       '@': {
@@ -38,7 +39,7 @@ export default class DictionaryNode {
         'output-spec': {
           field: {
             '@': {
-              name: label, //node name
+              name: fieldName, //node name lowercase
             },
           },
         },

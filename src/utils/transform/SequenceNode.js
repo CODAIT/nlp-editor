@@ -14,7 +14,7 @@ export default class SequenceNode {
       inputConcepts.push({
         '@': {
           module: this.moduleName,
-          name: label,
+          name: label.toLowerCase(),
         },
       });
     });
@@ -30,7 +30,7 @@ export default class SequenceNode {
       const { label } = node;
       fields.push({
         '@': {
-          name: label,
+          name: label.toLowerCase(),
           group: index + 1,
           hide: 'yes',
           type: 'Span',
