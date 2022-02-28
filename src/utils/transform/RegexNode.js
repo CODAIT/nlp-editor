@@ -51,6 +51,7 @@ export default class RegexNode {
 
   transform() {
     const { label, regexInput: pattern } = this.node;
+    const fieldName = label.toLowerCase();
     const matchingFlag = this.getMatchingFlag();
     const { min, max } = this.getRange();
     const jsonStructure = {
@@ -81,7 +82,7 @@ export default class RegexNode {
         'output-spec': {
           field: {
             '@': {
-              name: label, //node name
+              name: fieldName, //node name lowercase
             },
           },
         },

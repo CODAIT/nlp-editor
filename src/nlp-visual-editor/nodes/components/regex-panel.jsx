@@ -12,8 +12,6 @@ import {
   TextArea,
 } from 'carbon-components-react';
 
-import NlpResultsHighlight from '../../views/components/nlp-results-highlight';
-
 import './regex-panel.scss';
 import { saveNlpNode } from '../../../redux/slice';
 

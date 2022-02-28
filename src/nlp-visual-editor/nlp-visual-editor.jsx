@@ -1,6 +1,7 @@
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
+import shortUUID from 'short-uuid';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
 import { Button, Modal } from 'carbon-components-react';
 import { Play32, WarningAlt24 } from '@carbon/icons-react';
@@ -18,6 +19,7 @@ import {
   deleteNodes,
   saveNlpNode,
   setPipelineId,
+  setWorkingId,
   setShowBottomPanel,
   setShowRightPanel,
   setShowDocumentViewer,
@@ -46,10 +48,12 @@ class VisualEditor extends React.Component {
   }
 
   componentDidMount() {
+    const workingId = shortUUID.generate();
     const id = this.canvasController.getPrimaryPipelineId();
     this.props.setPipelineId({
       pipelineId: id,
     });
+    this.props.setWorkingId({ workingId });
   }
 
   componentDidUpdate = (prevProps) => {
@@ -83,10 +87,13 @@ class VisualEditor extends React.Component {
   transformToXML = () => {
     const { moduleName, nodes } = this.props;
     const { selectedNodeId } = this.state;
+    const payload = [];
 
     ///Transform to XML and make request
     const node = nodes.find((n) => n.nodeId === selectedNodeId);
-    return this.jsonToXML.transform(node, moduleName);
+    const xml = this.jsonToXML.transform(node, moduleName);
+    payload.push({ xml, label: node.label });
+    return payload;
   };
 
   validatePipeline = () => {
@@ -104,16 +111,20 @@ class VisualEditor extends React.Component {
     return isValid;
   };
 
-  execute = (xml) => {
+  execute = (payload) => {
+    const { workingId } = this.props;
+    const { selectedNodeId } = this.state;
     this.props.setShowBottomPanel({ showPanel: true });
     this.setState({ execResults: { tabularData: [] } }); // reset to show table skeleton
-    const { selectedNodeId } = this.state;
 
     setTimeout(() => {
       fetch('/api/run', {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: xml,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workingId,
+          payload,
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -134,9 +145,8 @@ class VisualEditor extends React.Component {
       return false;
     }
 
-    const xml = this.transformToXML();
-    this.execute(xml);
-    console.log(xml);
+    const payload = this.transformToXML();
+    this.execute(payload);
   };
 
   getToolbar = () => {
@@ -304,7 +314,9 @@ class VisualEditor extends React.Component {
       <div className="nlp-visual-editor">
         <IntlProvider locale="en">
           <CommonCanvas
-            config={{ enableRightFlyoutUnderToolbar: true }}
+            config={{
+              enableRightFlyoutUnderToolbar: true,
+            }}
             canvasController={this.canvasController}
             rightFlyoutContent={rightFlyoutContent}
             showRightFlyout={showRightPanel}
@@ -328,12 +340,14 @@ const mapStateToProps = (state) => ({
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showBottomPanel: state.nodesReducer.showBottomPanel,
   showRightPanel: state.nodesReducer.showRightPanel,
+  workingId: state.nodesReducer.workingId,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   deleteNodes: (ids) => dispatch(deleteNodes(ids)),
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
   setPipelineId: (data) => dispatch(setPipelineId(data)),
+  setWorkingId: (data) => dispatch(setWorkingId(data)),
   setShowBottomPanel: (doShow) => dispatch(setShowBottomPanel(doShow)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
