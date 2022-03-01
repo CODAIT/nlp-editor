@@ -117,15 +117,18 @@ class InputPanel extends React.Component {
         isValid: true,
       };
       this.props.saveNlpNode({ node });
-      this.props.setShowRightPanel({ showPanel: false });
     }
+  };
+
+  onSavePane = () => {
+    this.props.setShowRightPanel({ showPanel: false });
   };
 
   handleChildComponents = () => {
     const { children } = this.props;
     const childrenWithProps = Children.map(children, (child) => {
       if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.saveParameters });
+        return cloneElement(child, { onClick: this.onSavePane });
       }
       return child;
     });
