@@ -1,5 +1,3 @@
-const js2xmlparser = require('js2xmlparser');
-
 import { DictionaryNode, RegexNode, SequenceNode } from './transform';
 
 export default function JsonToXML() {
