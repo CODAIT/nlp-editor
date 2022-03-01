@@ -5,19 +5,20 @@ import './nlp-results-highlight.scss';
 const NlpResultsHighlight = ({ textToHighlight, spans }) => {
   const textLength = textToHighlight.length;
   const chunks = [];
-  const lastIndex = 0;
+  let lastIndex = 0;
   spans.forEach((span) => {
     const { start, end, color } = span;
     if (lastIndex < start) {
-      const text = textToHighlight.substr(lastIndex, start);
+      const text = textToHighlight.substring(lastIndex, start);
       chunks.push({ text, start: lastIndex, end: start, highlight: false });
     }
-    const text = textToHighlight.substr(start, end - start);
+    const text = textToHighlight.substring(start, end);
     chunks.push({ text, start, end, highlight: true, color });
+    lastIndex = end;
   });
   if (lastIndex < textLength) {
     //get the last section after the last span
-    const text = textToHighlight.substr(lastIndex, textLength - 1);
+    const text = textToHighlight.substring(lastIndex, textLength - 1);
     chunks.push({
       text,
       start: lastIndex,

@@ -13,10 +13,13 @@ class DocumentViewer extends React.Component {
   };
 
   getHighlightSpans = () => {
-    const { inputDocument, tabularResults = {} } = this.props;
+    const { tabularResults = {} } = this.props;
     const { annotations, names = [] } = tabularResults;
     let spans = [];
     names.forEach((name, index) => {
+      if (index > 0) {
+        return; //TODO: need to fix highlight bug
+      }
       const color = this.getHighlightColor(index);
       const res = annotations[name].map((t) => {
         const { start, end } = t;
