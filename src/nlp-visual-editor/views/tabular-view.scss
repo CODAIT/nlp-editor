@@ -1,14 +1,27 @@
 .tabular-view {
-  padding: 0.5rem 0rem;
+  padding-top: 0.5rem;
   height: 100%;
 
   .bx--tab-content {
     padding: 0;
+  }
 
-    .bx--data-table-content {
-      overflow-y: auto;
-      min-height: 280px;
-      max-height: 280px;
+  .no-matches {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.16px;
+    line-height: 18px;
+    padding: 2rem 1.5rem;
+    display: flex;
+
+    .info-icon {
+      color: rgb(0, 67, 206);
+    }
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      padding-left: 0.5rem;
     }
   }
 }

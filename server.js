@@ -13,6 +13,8 @@ app.use(jsonParser);
 
 app.use(express.static(path.join(__dirname, 'build')));
 
+const tempFolder = __dirname + '/temp';
+
 const createFolder = (folderName) => {
   console.log(`creating folder ${folderName}`);
   try {
@@ -62,7 +64,7 @@ const moveZipFile = (tmpFolder, fileName) => {
   });
 };
 
-const tabularResults = (req) => {
+/*const tabularResults = (req) => {
   console.log('retrieving tabular results');
   const { name } = req.query;
   const path = __dirname + `/data/results-singledoc.json`;
@@ -73,7 +75,7 @@ const tabularResults = (req) => {
     console.error(err);
   }
   return data;
-};
+};*/
 
 app.post('/api/upload', (req, res) => {
   const { workingId } = req.body;
@@ -81,10 +83,10 @@ app.post('/api/upload', (req, res) => {
   const filesToUpload = req.files.attach_file;
 
   //create a tmp filder to work in, if it does not exists
-  const tmpFolder = __dirname + '/temp';
-  createFolder(tmpFolder);
+  //const tmpFolder = __dirname + '/temp';
+  createFolder(tempFolder);
   //create working folder for this session.
-  const workingFolder = `${tmpFolder}/${workingId}`;
+  const workingFolder = `${tempFolder}/${workingId}`;
   createFolder(workingFolder);
 
   if (filesToUpload.length > 0) {
@@ -102,24 +104,30 @@ app.post('/api/upload', (req, res) => {
 app.post('/api/run', (req, res) => {
   console.log('executing pipeline');
   const { workingId, payload } = req.body;
-  const tmpFolder = __dirname + '/temp' + `/${workingId}`;
+  const workingFolder = `${tempFolder}/${workingId}`;
 
   //write files to temp folder
   payload.forEach((node) => {
     const { label, xml } = node;
-    createNodeFile(tmpFolder, `${label}.xml`, xml);
+    createNodeFile(workingFolder, `${label}.xml`, xml);
   });
 
   //zip tempfolder
   const zipFileName = `${workingId}.zip`;
-  createZipArchive(tmpFolder, zipFileName);
+  createZipArchive(workingFolder, zipFileName);
 
   //move zipfile to be executed
-  moveZipFile(tmpFolder, zipFileName);
+  moveZipFile(workingFolder, zipFileName);
 
-  res
-    .status(200)
-    .send({ message: 'Execution submitted successfully.', id: workingId });
+  //read document to render in UI
+  const docPath = `${workingFolder}/payload.txt`;
+  const document = fs.readFileSync(docPath, 'utf8');
+
+  res.status(200).send({
+    message: 'Execution submitted successfully.',
+    id: workingId,
+    document,
+  });
 });
 
 const formatResults = ({ annotations, instrumentationInfo }) => {
@@ -160,18 +168,6 @@ app.get('/api/results', function (req, res) {
 
   const results = formatResults(parsedContents);
   return res.status(200).send({ status: 'success', ...results });
-});
-
-app.get('/api/document', function (req, res) {
-  const { name } = req.query;
-  console.log('retrieving document - ', name);
-  const path = __dirname + `/data/documents/${name}`;
-  try {
-    let data = fs.readFileSync(path, 'utf8');
-    res.status(200).send(data);
-  } catch (err) {
-    console.error(err);
-  }
 });
 
 app.get('/', function (req, res) {

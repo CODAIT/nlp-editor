@@ -6,6 +6,8 @@ const initialState = {
   workingId: undefined,
   canvasController: undefined,
   errorMessage: undefined,
+  tabularResults: undefined,
+  inputDocument: undefined,
   moduleName: 'elyraNLPCanvas',
   showRightPanel: false,
   showBottomPanel: false,
@@ -60,12 +62,22 @@ const nodesSlice = createSlice({
       const nodeList = state.nodes.filter((n) => n.nodeId !== nodeId);
       state.nodes = nodeList.concat(updatedNode);
     },
+    setInputDocument: (state, action) => {
+      const { document } = action.payload;
+      state.inputDocument = document;
+    },
+    setTabularResults: (state, action) => {
+      const { annotations, names } = action.payload;
+      state.tabularResults = { annotations, names };
+    },
   },
 });
 
 export const {
   deleteNodes,
   saveNlpNode,
+  setInputDocument,
+  setTabularResults,
   setErrorMessage,
   setPipelineId,
   setWorkingId,
