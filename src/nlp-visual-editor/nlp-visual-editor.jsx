@@ -18,7 +18,9 @@ import JsonToXML from '../utils/JsonToXML';
 import {
   deleteNodes,
   saveNlpNode,
+  setInputDocument,
   setPipelineId,
+  setTabularResults,
   setWorkingId,
   setShowBottomPanel,
   setShowRightPanel,
@@ -33,9 +35,7 @@ class VisualEditor extends React.Component {
       isLoading: false,
       selectedNodeId: undefined,
       enableFlowExecutionBtn: false,
-      execResults: undefined,
       errorMessage: undefined,
-      selectedRow: undefined,
     };
 
     this.canvasController = new CanvasController();
@@ -140,10 +140,8 @@ class VisualEditor extends React.Component {
               errorMessage: 'No matches were found in the input document.',
             };
           }
-          this.setState({
-            ...state,
-            execResults: { annotations, names },
-          });
+          this.setState({ ...state });
+          this.props.setTabularResults(data);
         } else if (status === 'error') {
           const { message } = data;
           clearInterval(this.timer);
@@ -170,7 +168,9 @@ class VisualEditor extends React.Component {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        const { document } = data;
+        this.props.setInputDocument({ document });
+        this.props.setShowDocumentViewer({ showViewer: true });
         //poll for results at 1 sec interval
         this.timer = setInterval(this.fetchResults, 1000);
       });
@@ -258,35 +258,24 @@ class VisualEditor extends React.Component {
 
   onRowSelected = (row, index) => {
     console.log(row);
-    /*this.props.setShowDocumentViewer({ showViewer: true });
-    this.setState({ selectedRow: row });
+    this.props.setShowDocumentViewer({ showViewer: true });
     //scroll to selection
     setTimeout(() => {
       const scrollIndex = document.querySelectorAll(
-        '.nlp-results-highlight .highlight',
+        '.nlp-results-highlight span',
       )[index].offsetTop;
       document.querySelector('.nlp-results-highlight').scrollTop =
         scrollIndex - 200;
-    }, 500);*/
+    }, 500);
   };
 
   getRHSPanel = () => {
-    const { selectedNodeId, selectedRow, execResults } = this.state;
+    const { selectedNodeId } = this.state;
     const { showDocumentViewer } = this.props;
     if (showDocumentViewer) {
-      const { tabularData } = execResults;
-      const spans = tabularData.map((row) => {
-        return {
-          start: row.tuple_begin,
-          end: row.tuple_end,
-        };
-      });
-      const documentName = !selectedRow
-        ? tabularData[0].doc_name
-        : selectedRow.doc_name;
       return (
         <Provider store={store}>
-          <DocumentViewer documentName={documentName} spans={spans} />
+          <DocumentViewer />
         </Provider>
       );
     }
@@ -326,24 +315,14 @@ class VisualEditor extends React.Component {
   };
 
   getTabularView = () => {
-    const { execResults } = this.state;
-    if (!execResults) {
+    const { tabularResults } = this.props;
+    if (!tabularResults) {
       return null;
     }
-    const { annotations, names } = execResults;
-    //get the input document name
-    const { nodes } = this.props;
-    const node = nodes.find((n) => n.type === 'input') || {};
-    const { name } = node.files[0];
 
     return (
       <Provider store={store}>
-        <TabularView
-          annotations={annotations}
-          names={names}
-          docName={name}
-          onRowSelected={this.onRowSelected}
-        />
+        <TabularView onRowSelected={this.onRowSelected} />
       </Provider>
     );
   };
@@ -388,6 +367,7 @@ const mapStateToProps = (state) => ({
   moduleName: state.nodesReducer.moduleName,
   nodes: state.nodesReducer.nodes,
   pipelineId: state.nodesReducer.pipelineId,
+  tabularResults: state.nodesReducer.tabularResults,
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showBottomPanel: state.nodesReducer.showBottomPanel,
   showRightPanel: state.nodesReducer.showRightPanel,
@@ -396,9 +376,11 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   deleteNodes: (ids) => dispatch(deleteNodes(ids)),
+  setInputDocument: (document) => dispatch(setInputDocument(document)),
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
-  setPipelineId: (data) => dispatch(setPipelineId(data)),
-  setWorkingId: (data) => dispatch(setWorkingId(data)),
+  setPipelineId: (id) => dispatch(setPipelineId(id)),
+  setTabularResults: (data) => dispatch(setTabularResults(data)),
+  setWorkingId: (id) => dispatch(setWorkingId(id)),
   setShowBottomPanel: (doShow) => dispatch(setShowBottomPanel(doShow)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
