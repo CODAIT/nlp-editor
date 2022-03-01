@@ -147,15 +147,16 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
 
 app.get('/api/results', function (req, res) {
   const { workingId } = req.query;
-  const file = `${systemTdataFolder}/run-aql-result/${workingId}.json`;
+  const resultFileName = `${workingId}-result.json`;
+  const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
   if (!fs.existsSync(file)) {
     //no file present, assume that runtime is still in progress
-    console.log(`results file ${workingId}.json not found.`);
+    console.log(`results file ${resultFileName} not found.`);
     return res.status(200).send({ status: 'in-progress' });
   }
 
   //read contents of file
-  console.log(`results file ${workingId}.json found.`);
+  console.log(`results file ${resultFileName} found.`);
   let fileContents = fs.readFileSync(file, 'utf8');
   const parsedContents = JSON.parse(fileContents);
 
@@ -168,7 +169,7 @@ app.get('/api/results', function (req, res) {
   const results = formatResults(parsedContents);
 
   //delete file since we read it's contents
-  console.log(`deleting file ${workingId}.json`);
+  console.log(`deleting file ${resultFileName}`);
   fs.unlinkSync(file);
   return res.status(200).send({ status: 'success', ...results });
 });
