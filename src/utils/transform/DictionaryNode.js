@@ -51,7 +51,7 @@ export default class DictionaryNode {
       'input-concepts': {
         'input-concept': {
           '@': {
-            module: this.moduleName,
+            module: '',
             name: 'Document',
           },
         },
@@ -60,7 +60,7 @@ export default class DictionaryNode {
         'input-spec': {
           'input-span': {
             '@': {
-              'input-concept-module': this.moduleName,
+              'input-concept-module': '',
               'input-concept-name': 'Document',
               'input-field-name': 'text',
             },
