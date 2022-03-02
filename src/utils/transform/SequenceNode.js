@@ -57,13 +57,13 @@ export default class SequenceNode {
       const { min, max } = tokens;
       tokenGapItem = { '@': { min, max } };
     }
-    const atomItemXML = js2xmlparser
-      .parse('atom', atomItem)
-      .replace(`<?xml version='1.0'?>`, '');
+    const atomItemXML = js2xmlparser.parse('atom', atomItem, {
+      declaration: { include: false },
+    });
     if (tokenGapItem) {
-      tokenGapItem = js2xmlparser
-        .parse('token-gap', tokenGapItem)
-        .replace(`<?xml version='1.0'?>`, '');
+      tokenGapItem = js2xmlparser.parse('token-gap', tokenGapItem, {
+        declaration: { include: false },
+      });
     }
     const temp = `${atomItemXML}${tokenGapItem || ''}`;
     return temp;
@@ -112,7 +112,9 @@ export default class SequenceNode {
         },
       },
     };
-    const xml = js2xmlparser.parse('concept', jsonStructure);
+    const xml = js2xmlparser.parse('concept', jsonStructure, {
+      declaration: { encoding: 'UTF-8' },
+    });
     return {
       xml: xml.replace(`<sequence/>`, `<sequence>${sequence}</sequence>`),
       label,
