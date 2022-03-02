@@ -33,7 +33,9 @@ export default class DictionaryNode {
       },
     };
 
-    return js2xmlparser.parse('dictionary', jsonStructure);
+    return js2xmlparser.parse('dictionary', jsonStructure, {
+      declaration: { encoding: 'UTF-8' },
+    });
   };
 
   transform() {
@@ -85,7 +87,9 @@ export default class DictionaryNode {
         },
       },
     };
-    const dictionary = js2xmlparser.parse('concept', jsonStructure);
+    const dictionary = js2xmlparser.parse('concept', jsonStructure, {
+      declaration: { encoding: 'UTF-8' },
+    });
     const words = this.getDictionaryWords();
     return [
       { xml: dictionary, label },

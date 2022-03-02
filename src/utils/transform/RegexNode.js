@@ -105,7 +105,9 @@ export default class RegexNode {
       };
     }
     return {
-      xml: js2xmlparser.parse('concept', jsonStructure),
+      xml: js2xmlparser.parse('concept', jsonStructure, {
+        declaration: { encoding: 'UTF-8' },
+      }),
       label,
     };
   }

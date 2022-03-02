@@ -27,6 +27,9 @@ import {
   setShowDocumentViewer,
 } from '../redux/slice';
 
+const TIMER_TICK = 3000; // 3 secs
+const TIMER_TRIES = 20;
+
 class VisualEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -43,6 +46,7 @@ class VisualEditor extends React.Component {
 
     this.nodeValidator = new NodeValidator(this.canvasController);
     this.jsonToXML = new JsonToXML();
+    this.tickCounter = 0;
   }
 
   componentDidMount() {
@@ -130,8 +134,17 @@ class VisualEditor extends React.Component {
         const { status } = data;
         if (status === 'in-progress') {
           //TODO - do nothing, let it run
+          if (this.tickCounter >= TIMER_TRIES) {
+            this.tickCounter = 0; //reset counter
+            clearInterval(this.timer);
+            this.setState({
+              isLoading: false,
+              errorMessage: 'No results were generated, try running again.',
+            });
+          }
+          this.tickCounter += 1;
         } else if (status === 'success') {
-          const { annotations = {}, names = [] } = data;
+          const { names = [] } = data;
           clearInterval(this.timer);
           let state = { isLoading: false };
           if (names.length === 0) {
@@ -171,8 +184,8 @@ class VisualEditor extends React.Component {
         const { document } = data;
         this.props.setInputDocument({ document });
         this.props.setShowDocumentViewer({ showViewer: true });
-        //poll for results at 1 sec interval
-        this.timer = setInterval(this.fetchResults, 1000);
+        //poll for results at specific interval
+        this.timer = setInterval(this.fetchResults, TIMER_TICK);
       });
   };
 
