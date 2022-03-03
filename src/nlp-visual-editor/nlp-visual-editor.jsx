@@ -14,6 +14,7 @@ import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import JsonToXML from '../utils/JsonToXML';
+import { generateNodeName } from '../utils';
 
 import {
   deleteNodes,
@@ -28,7 +29,7 @@ import {
 } from '../redux/slice';
 
 const TIMER_TICK = 3000; // 3 secs
-const TIMER_TRIES = 20;
+const TIMER_TRIES = 40; // 2 minutes
 
 class VisualEditor extends React.Component {
   constructor(props) {
@@ -226,6 +227,7 @@ class VisualEditor extends React.Component {
   };
 
   onEditCanvas = (data, command) => {
+    const { nodes } = this.props;
     const { editType, selectedObjectIds } = data;
     if (editType === 'deleteSelectedObjects') {
       this.props.setShowRightPanel({ showPanel: false });
@@ -235,9 +237,16 @@ class VisualEditor extends React.Component {
       const { newNode } = data;
       const { id: nodeId, description, label, parameters } = newNode;
       const { type } = parameters;
+      const generatedLabel = generateNodeName(type, label, nodes);
       this.props.saveNlpNode({
         //set isValid false, we'll check when user opens modal to save values
-        node: { label, nodeId, type, description, isValid: false },
+        node: {
+          label: generatedLabel,
+          nodeId,
+          type,
+          description,
+          isValid: false,
+        },
       });
     }
   };

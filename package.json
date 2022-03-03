@@ -1,5 +1,5 @@
 {
-  "name": "nlp_visual_editor_canvas",
+  "name": "nlp-canvas-prototype",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
