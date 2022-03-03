@@ -12,6 +12,8 @@ import {
   SequencePanel,
 } from '../nodes/components';
 
+import { isNodeLabelValid } from '../../utils';
+
 import { saveNlpNode, setShowRightPanel } from '../../redux/slice';
 
 class RHSPanel extends React.Component {
@@ -20,6 +22,7 @@ class RHSPanel extends React.Component {
     this.state = {
       editLabel: false,
       label: null,
+      invalidLabelMessage: undefined,
     };
   }
 
@@ -64,7 +67,7 @@ class RHSPanel extends React.Component {
 
   getTitleComponent = () => {
     const node = this.getNodeProps();
-    const { editLabel } = this.state;
+    const { editLabel, invalidLabelMessage } = this.state;
     const label = this.state.label === null ? node.label : this.state.label;
     if (!editLabel) {
       return (
@@ -87,6 +90,8 @@ class RHSPanel extends React.Component {
         hideLabel
         type="text"
         size="sm"
+        invalid={invalidLabelMessage !== undefined}
+        invalidText={invalidLabelMessage}
         onChange={(e) => {
           this.setState({ label: e.target.value });
         }}
@@ -103,9 +108,14 @@ class RHSPanel extends React.Component {
 
   onSaveLabel = () => {
     const { label } = this.state;
-    const { nodeId } = this.props;
-    this.setState({ editLabel: false });
-    this.props.saveNlpNode({ node: { label, nodeId } });
+    const { nodeId, nodes } = this.props;
+    const { isValid, message } = isNodeLabelValid(label, nodes);
+    if (isValid) {
+      this.setState({ editLabel: false, invalidLabelMessage: undefined });
+      this.props.saveNlpNode({ node: { label, nodeId } });
+    } else {
+      this.setState({ invalidLabelMessage: message });
+    }
   };
 
   getNodeProps = () => {

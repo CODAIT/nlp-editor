@@ -142,7 +142,10 @@ class RegexPanel extends React.Component {
             invalid={errorMessage !== undefined}
             invalidText={errorMessage}
             onChange={(e) => {
-              this.setState({ regexInput: e.target.value });
+              this.setState({
+                regexInput: e.target.value,
+                errorMessage: undefined,
+              });
             }}
           />
           <RadioButtonGroup
