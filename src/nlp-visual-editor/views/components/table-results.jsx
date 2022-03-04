@@ -2,11 +2,10 @@ import React from 'react';
 
 import './table-results.scss';
 
-import DataTable, {
+import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableHeader,
   TableRow,
