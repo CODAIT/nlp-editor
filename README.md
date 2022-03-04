@@ -6,7 +6,7 @@ Prototype - Visual Editor for creating NLP rules
 
 ```
 
-git clone git@github.ibm.com:zocourto/nlp-canvas-prototype.git
+git clone git@github.com:elyra-ai/nlp-canvas-private.git
 
 ```
 
