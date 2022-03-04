@@ -23,7 +23,6 @@ import {
   setPipelineId,
   setTabularResults,
   setWorkingId,
-  setShowBottomPanel,
   setShowRightPanel,
   setShowDocumentViewer,
 } from '../redux/slice';
@@ -134,7 +133,6 @@ class VisualEditor extends React.Component {
       .then((data) => {
         const { status } = data;
         if (status === 'in-progress') {
-          //TODO - do nothing, let it run
           if (this.tickCounter >= TIMER_TRIES) {
             this.tickCounter = 0; //reset counter
             clearInterval(this.timer);
@@ -169,7 +167,6 @@ class VisualEditor extends React.Component {
 
   execute = (payload) => {
     const { workingId } = this.props;
-    this.props.setShowBottomPanel({ showPanel: true });
     this.setState({ isLoading: true });
 
     fetch('/api/run', {
@@ -195,6 +192,8 @@ class VisualEditor extends React.Component {
     if (!isValid) {
       return false;
     }
+
+    this.props.setTabularResults(undefined);
 
     const payload = this.transformToXML();
     this.execute(payload);
@@ -278,17 +277,30 @@ class VisualEditor extends React.Component {
     this.setState({ errorMessage: undefined });
   };
 
-  onRowSelected = (row, index) => {
-    console.log(row);
+  onRowSelected = (row) => {
+    const { indexResult } = row;
     this.props.setShowDocumentViewer({ showViewer: true });
+
+    //remove any previously highlighted selection
+    const prevSelectedElement = document.querySelector(
+      '.nlp-results-highlight .selected',
+    );
+    if (prevSelectedElement) {
+      prevSelectedElement.classList.remove('selected');
+    }
+
     //scroll to selection
+    const clickedElement = document.querySelectorAll(
+      '.nlp-results-highlight span[style]',
+    )[indexResult];
+    const scrollIndex = clickedElement.offsetTop;
+    document.querySelector('.nlp-results-highlight').scrollTop =
+      scrollIndex - 200;
+
+    //highlight in yellow the selected element
     setTimeout(() => {
-      const scrollIndex = document.querySelectorAll(
-        '.nlp-results-highlight span',
-      )[index].offsetTop;
-      document.querySelector('.nlp-results-highlight').scrollTop =
-        scrollIndex - 200;
-    }, 500);
+      clickedElement.classList.add('selected');
+    }, 200);
   };
 
   getRHSPanel = () => {
@@ -337,11 +349,6 @@ class VisualEditor extends React.Component {
   };
 
   getTabularView = () => {
-    const { tabularResults } = this.props;
-    if (!tabularResults) {
-      return null;
-    }
-
     return (
       <Provider store={store}>
         <TabularView onRowSelected={this.onRowSelected} />
@@ -350,7 +357,7 @@ class VisualEditor extends React.Component {
   };
 
   render() {
-    const { showBottomPanel, showRightPanel } = this.props;
+    const { showBottomPanel, showRightPanel, tabularResults } = this.props;
     const { isLoading } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const bottomContent = this.getTabularView();
@@ -370,7 +377,7 @@ class VisualEditor extends React.Component {
             clickActionHandler={this.onCanvasAreaClick}
             editActionHandler={this.onEditCanvas}
             toolbarConfig={toolbarConfig}
-            showBottomPanel={showBottomPanel}
+            showBottomPanel={tabularResults !== undefined}
             bottomPanelContent={bottomContent}
           />
         </IntlProvider>
@@ -391,7 +398,6 @@ const mapStateToProps = (state) => ({
   pipelineId: state.nodesReducer.pipelineId,
   tabularResults: state.nodesReducer.tabularResults,
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
-  showBottomPanel: state.nodesReducer.showBottomPanel,
   showRightPanel: state.nodesReducer.showRightPanel,
   workingId: state.nodesReducer.workingId,
 });
@@ -403,7 +409,6 @@ const mapDispatchToProps = (dispatch) => ({
   setPipelineId: (id) => dispatch(setPipelineId(id)),
   setTabularResults: (data) => dispatch(setTabularResults(data)),
   setWorkingId: (id) => dispatch(setWorkingId(id)),
-  setShowBottomPanel: (doShow) => dispatch(setShowBottomPanel(doShow)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
 });

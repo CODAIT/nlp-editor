@@ -4,7 +4,7 @@ import { Information24 } from '@carbon/icons-react';
 
 import './tabular-view.scss';
 
-import { Tabs, Tab } from 'carbon-components-react';
+import { Tabs, Tab, TabsSkeleton } from 'carbon-components-react';
 import TableResults from './components/table-results';
 
 class TabularView extends React.Component {
@@ -39,6 +39,9 @@ class TabularView extends React.Component {
 
   getTabs = () => {
     const { tabularResults } = this.props;
+    if (!tabularResults) {
+      return <TabsSkeleton />;
+    }
     const { names } = tabularResults;
     const tabs = [];
     names.forEach((name) => {
@@ -50,16 +53,12 @@ class TabularView extends React.Component {
         </Tab>,
       );
     });
-    return tabs;
+    return <Tabs light={true}>{tabs}</Tabs>;
   };
 
   render() {
     const tabs = this.getTabs();
-    return (
-      <div className="tabular-view">
-        <Tabs light={true}>{tabs}</Tabs>
-      </div>
-    );
+    return <div className="tabular-view">{tabs}</div>;
   }
 }
 

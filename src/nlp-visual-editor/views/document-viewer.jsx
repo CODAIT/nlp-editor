@@ -9,7 +9,7 @@ import { setShowRightPanel } from '../../redux/slice';
 
 class DocumentViewer extends React.Component {
   getHighlightColor = (index) => {
-    return ['yellow', 'aqua', 'green', 'red'][index];
+    return ['cyan', 'chartreuse', 'gold', 'orangered'][index];
   };
 
   getHighlightSpans = () => {
@@ -17,9 +17,6 @@ class DocumentViewer extends React.Component {
     const { annotations, names = [] } = tabularResults;
     let spans = [];
     names.forEach((name, index) => {
-      if (index > 0) {
-        return; //TODO: need to fix highlight bug
-      }
       const color = this.getHighlightColor(index);
       const res = annotations[name].map((t) => {
         const { start, end } = t;

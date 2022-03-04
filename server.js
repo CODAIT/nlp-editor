@@ -96,6 +96,10 @@ app.post('/api/run', (req, res) => {
   const { workingId, payload } = req.body;
   const workingFolder = `${tempFolder}/${workingId}`;
 
+  fs.readdirSync(workingFolder)
+    .filter((f) => f.endsWith('.xml'))
+    .forEach((f) => fs.unlinkSync(`${workingFolder}/${f}`));
+
   //write files to temp folder
   payload.forEach((node) => {
     const { label, xml } = node;
@@ -113,13 +117,6 @@ app.post('/api/run', (req, res) => {
   const docPath = `${workingFolder}/payload.txt`;
   const document = fs.readFileSync(docPath, 'utf8');
 
-  //delete temp working folder
-  /*fs.rm(workingFolder, { recursive: true, force: true }, (err) => {
-    if (err) {
-      console.error(err.message);
-    }
-  });*/
-
   res.status(200).send({
     message: 'Execution submitted successfully.',
     id: workingId,
@@ -127,10 +124,17 @@ app.post('/api/run', (req, res) => {
   });
 });
 
+const deleteFile = (file, resultFileName) => {
+  //delete file since we read it's contents
+  console.log(`deleting file ${resultFileName}`);
+  fs.unlinkSync(file);
+};
+
 const formatResults = ({ annotations, instrumentationInfo }) => {
   const { numAnnotationsPerType } = instrumentationInfo;
   const annonNames = numAnnotationsPerType.map((n) => n.annotationType);
   let annonResults = {};
+  let indexResult = 0;
   annonNames.forEach((name) => {
     const items = [];
     const annotation = annotations[name];
@@ -138,7 +142,7 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
       const attr = Object.keys(elem)[0];
       const { location, text } = elem[attr];
       const { begin: start, end } = location;
-      items.push({ start, end, text });
+      items.push({ start, end, text, indexResult: indexResult++ });
     });
     annonResults = { ...annonResults, [name]: items };
   });
@@ -163,14 +167,13 @@ app.get('/api/results', function (req, res) {
   // execution returned errors
   if (parsedContents.hasOwnProperty('AqlTaskError')) {
     const message = parsedContents['AqlTaskError'];
+    deleteFile(file, resultFileName);
     return res.status(200).send({ status: 'error', message });
   }
 
   const results = formatResults(parsedContents);
 
-  //delete file since we read it's contents
-  console.log(`deleting file ${resultFileName}`);
-  fs.unlinkSync(file);
+  deleteFile(file, resultFileName);
   return res.status(200).send({ status: 'success', ...results });
 });
 

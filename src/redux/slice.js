@@ -10,7 +10,6 @@ const initialState = {
   inputDocument: undefined,
   moduleName: 'elyraNLPCanvas',
   showRightPanel: false,
-  showBottomPanel: false,
   showDocumentViewer: false,
 };
 
@@ -25,10 +24,6 @@ const nodesSlice = createSlice({
     setWorkingId: (state, action) => {
       const { workingId } = action.payload;
       state.workingId = workingId;
-    },
-    setShowBottomPanel: (state, action) => {
-      const { showPanel } = action.payload;
-      state.showBottomPanel = showPanel;
     },
     setShowRightPanel: (state, action) => {
       const { showPanel } = action.payload;
@@ -67,8 +62,13 @@ const nodesSlice = createSlice({
       state.inputDocument = document;
     },
     setTabularResults: (state, action) => {
-      const { annotations, names } = action.payload;
-      state.tabularResults = { annotations, names };
+      const { payload } = action;
+      if (!payload) {
+        state.tabularResults = undefined;
+      } else {
+        const { annotations, names } = payload;
+        state.tabularResults = { annotations, names };
+      }
     },
   },
 });
@@ -81,7 +81,6 @@ export const {
   setErrorMessage,
   setPipelineId,
   setWorkingId,
-  setShowBottomPanel,
   setShowRightPanel,
   setShowDocumentViewer,
 } = nodesSlice.actions;
