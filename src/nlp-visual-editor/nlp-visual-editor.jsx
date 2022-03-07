@@ -222,9 +222,10 @@ class VisualEditor extends React.Component {
     const tmpNodes = nodes.filter((n) => n.type !== 'input');
     const inputNode = nodes.find((n) => n.type === 'input');
     const newInputNode = { ...inputNode, files: [], isValid: false };
+    newNodes = nodes.length >= 0 ? tmpNodes.concat([newInputNode]) : [];
     const data = {
       flow,
-      nodes: tmpNodes.concat([newInputNode]),
+      nodes: newNodes,
     };
     fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
   };

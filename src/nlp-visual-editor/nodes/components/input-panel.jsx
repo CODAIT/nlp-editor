@@ -8,7 +8,11 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import './input-panel.scss';
 
-import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
+import {
+  saveNlpNode,
+  setShowRightPanel,
+  setTabularResults,
+} from '../../../redux/slice';
 
 class InputPanel extends React.Component {
   constructor(props) {
@@ -29,6 +33,8 @@ class InputPanel extends React.Component {
       }
     }
     this.setState({ files: newFiles });
+    //hides the bottom panel
+    this.props.setTabularResults(undefined);
     this.props.saveNlpNode({
       node: { nodeId, files: newFiles, isValid: false },
     });
@@ -103,8 +109,14 @@ class InputPanel extends React.Component {
 
   saveParameters = () => {
     const errorMessage = this.validateParameters();
-    const { saveNlpNode, setShowRightPanel, children, workingId, ...rest } =
-      this.props;
+    const {
+      saveNlpNode,
+      setShowRightPanel,
+      setTabularResults,
+      children,
+      workingId,
+      ...rest
+    } = this.props;
     const { files } = this.state;
     const fileList = Array.from(files);
     const fileNames = fileList.map((f) => {
@@ -190,6 +202,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
+  setTabularResults: (data) => dispatch(setTabularResults(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputPanel);
