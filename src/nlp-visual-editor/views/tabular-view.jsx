@@ -38,7 +38,12 @@ class TabularView extends React.Component {
   };
 
   getTabs = () => {
-    const { tabularResults } = this.props;
+    const { tabularResults, nodes } = this.props;
+    const hasFile = nodes.find((n) => n.type === 'input');
+    if (hasFile && hasFile.files.length === 0) {
+      //user removed the selected file to scan a different file, no tabular results to render
+      return null;
+    }
     if (!tabularResults) {
       return <TabsSkeleton />;
     }
