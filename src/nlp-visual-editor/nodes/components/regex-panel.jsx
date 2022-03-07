@@ -18,7 +18,7 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
-    const { saveNlpNode, setShowRightPanel, children, ...rest } = props;
+    const { saveNlpNode, setShowRightPanel, children, label, ...rest } = props;
     this.state = {
       ...rest,
     };
@@ -291,13 +291,9 @@ RegexPanel.defaultProps = {
   errorMessage: undefined,
 };
 
-const mapStateToProps = (state) => ({
-  pipelineId: state.nodesReducer.pipelineId,
-});
-
 const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RegexPanel);
+export default connect(null, mapDispatchToProps)(RegexPanel);

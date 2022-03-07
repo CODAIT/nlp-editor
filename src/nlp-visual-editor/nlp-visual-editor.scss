@@ -28,4 +28,19 @@
       font-size: 1rem;
     }
   }
+
+  label {
+    .upload-button {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+
+    svg {
+      margin-left: 0.5rem;
+    }
+  }
 }
