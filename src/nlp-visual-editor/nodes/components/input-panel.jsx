@@ -19,6 +19,7 @@ class InputPanel extends React.Component {
 
   onFileRemoved = (fileName, evt) => {
     const { files } = this.state;
+    const { nodeId } = this.props;
     const newFiles = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -28,6 +29,9 @@ class InputPanel extends React.Component {
       }
     }
     this.setState({ files: newFiles });
+    this.props.saveNlpNode({
+      node: { nodeId, files: newFiles, isValid: false },
+    });
   };
 
   onFilesSelected = (e) => {
@@ -46,11 +50,7 @@ class InputPanel extends React.Component {
     }
     formData.append('workingId', workingId);
     try {
-      const res = await axios.post('/api/upload', formData, {
-        headers: {
-          accepts: 'text/html',
-        },
-      });
+      const res = await axios.post('/api/upload', formData);
       this.saveParameters();
     } catch (ex) {
       //TODO handle error
@@ -81,7 +81,7 @@ class InputPanel extends React.Component {
         <FileUploaderItem
           onDelete={this.onFileRemoved.bind(this, name)}
           size={'sm'}
-          status={isValid ? 'complete' : 'edit'}
+          status={'edit'}
           name={name}
           key={name}
         />,
@@ -103,7 +103,8 @@ class InputPanel extends React.Component {
 
   saveParameters = () => {
     const errorMessage = this.validateParameters();
-    const { saveNlpNode, setShowRightPanel, children, ...rest } = this.props;
+    const { saveNlpNode, setShowRightPanel, children, workingId, ...rest } =
+      this.props;
     const { files } = this.state;
     const fileList = Array.from(files);
     const fileNames = fileList.map((f) => {

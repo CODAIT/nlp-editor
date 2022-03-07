@@ -1,10 +1,16 @@
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
+import axios from 'axios';
 import shortUUID from 'short-uuid';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
 import { Button, Loading, Modal } from 'carbon-components-react';
-import { Play32, WarningAlt24 } from '@carbon/icons-react';
+import {
+  Play32,
+  WarningAlt24,
+  DocumentDownload32,
+  Upload16,
+} from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
 import TabularView from './views/tabular-view';
@@ -15,6 +21,7 @@ import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import JsonToXML from '../utils/JsonToXML';
 import { generateNodeName } from '../utils';
+import fileDownload from 'js-file-download';
 
 import {
   deleteNodes,
@@ -199,16 +206,95 @@ class VisualEditor extends React.Component {
     this.execute(payload);
   };
 
+  setPipelineFlow = ({ flow, nodes }) => {
+    const { primary_pipeline: pipelineId } = flow;
+    this.canvasController.setPipelineFlow(flow);
+    this.props.setPipelineId({ pipelineId });
+    nodes.forEach((node) => {
+      this.props.saveNlpNode({ node });
+    });
+  };
+
+  savePipeline = () => {
+    const { nodes } = this.props;
+    const flow = this.canvasController.getPipelineFlow();
+    //reset the input node, when importing we need to prompt user to select document
+    const tmpNodes = nodes.filter((n) => n.type !== 'input');
+    const inputNode = nodes.find((n) => n.type === 'input');
+    const newInputNode = { ...inputNode, files: [], isValid: false };
+    const data = {
+      flow,
+      nodes: tmpNodes.concat([newInputNode]),
+    };
+    fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
+  };
+
+  onFlowSelected = async (e) => {
+    const { workingId } = this.props;
+    const { files } = e.target;
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      formData.append('attach_file', file);
+    }
+    formData.append('workingId', workingId);
+    try {
+      const { data } = await axios.post('/api/uploadflow', formData);
+      this.setPipelineFlow(data);
+    } catch (ex) {
+      //TODO handle error
+      console.log(ex);
+    }
+  };
+
   getToolbar = () => {
     const { enableFlowExecutionBtn } = this.state;
     return [
       { action: 'palette', label: 'Palette', enable: true },
       { divider: true },
       {
+        action: 'save',
+        tooltip: 'Save NLP Flow',
+        jsx: (
+          <>
+            <Button
+              id={'btn-save'}
+              size="field"
+              kind="ghost"
+              iconDescription="Save document"
+              renderIcon={DocumentDownload32}
+              onClick={this.savePipeline}
+            >
+              Save
+            </Button>
+          </>
+        ),
+      },
+      {
+        action: 'upload',
+        tooltip: 'Upload NLP Flow',
+        jsx: (
+          <>
+            <label className="bx--btn bx--btn--md bx--btn--ghost">
+              Upload
+              <input
+                type="file"
+                id="btn-upload"
+                className="upload-button"
+                name="upload"
+                accept=".json"
+                onChange={this.onFlowSelected}
+              />
+              <Upload16 />
+            </label>
+          </>
+        ),
+      },
+      {
         action: 'run',
         tooltip: 'Run NLP rule',
         jsx: (
-          <div className="toolbar-run-button">
+          <>
             <Button
               id={'btn-run'}
               size="field"
@@ -219,7 +305,7 @@ class VisualEditor extends React.Component {
             >
               Run
             </Button>
-          </div>
+          </>
         ),
       },
     ];
@@ -227,7 +313,10 @@ class VisualEditor extends React.Component {
 
   onEditCanvas = (data, command) => {
     const { nodes } = this.props;
-    const { editType, selectedObjectIds } = data;
+    const { editType, editSource, selectedObjectIds } = data;
+    if (editSource === 'toolbar' && editType === 'save') {
+      return console.log('saving pipeline');
+    }
     if (editType === 'deleteSelectedObjects') {
       this.props.setShowRightPanel({ showPanel: false });
       this.setState({ selectedNodeId: undefined });
@@ -357,7 +446,7 @@ class VisualEditor extends React.Component {
   };
 
   render() {
-    const { showBottomPanel, showRightPanel, tabularResults } = this.props;
+    const { showRightPanel, tabularResults } = this.props;
     const { isLoading } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const bottomContent = this.getTabularView();

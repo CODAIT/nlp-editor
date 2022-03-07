@@ -33,14 +33,17 @@ const createFolder = (folderName) => {
   }
 };
 
-const uploadFile = (path, file) => {
+const uploadFile = (path, file, filename = 'payload.txt') => {
   console.log(`uploading file to temp folder ${file.name}`);
   //we rename the file, the runtime will look for input.txt
-  const uploadPath = `${path}/payload.txt`;
-  file.mv(uploadPath, (err) => {
-    if (err) {
-      return res.status(500).send({ message: 'File upload failed', code: 200 });
-    }
+  const uploadPath = `${path}/${filename}`;
+  return new Promise((resolve, reject) => {
+    file.mv(uploadPath, (err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
+    });
   });
 };
 
@@ -69,7 +72,7 @@ const moveZipFile = (tmpFolder, fileName) => {
   });
 };
 
-app.post('/api/upload', (req, res) => {
+app.post('/api/upload', async (req, res) => {
   const { workingId } = req.body;
   console.log(`uploading files to ${workingId}`);
   const filesToUpload = req.files.attach_file;
@@ -80,15 +83,43 @@ app.post('/api/upload', (req, res) => {
   const workingFolder = `${tempFolder}/${workingId}`;
   createFolder(workingFolder);
 
-  if (filesToUpload.length > 0) {
-    for (let i = 0; i < filesToUpload.length; i++) {
-      const file = filesToUpload[i];
-      uploadFile(workingFolder, file);
+  try {
+    if (filesToUpload.length > 0) {
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i];
+        await uploadFile(workingFolder, file);
+      }
+    } else {
+      await uploadFile(workingFolder, req.files.attach_file);
     }
-  } else {
-    uploadFile(workingFolder, req.files.attach_file);
+    res.status(200).send({ message: 'Files Uploaded' });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ message: 'File upload failed' });
   }
-  res.status(200).send({ message: 'Files Uploaded', code: 200 });
+});
+
+app.post('/api/uploadflow', async (req, res) => {
+  const { workingId } = req.body;
+  console.log(`uploading flow to ${workingId}`);
+  const filesToUpload = req.files.attach_file;
+
+  //create a tmp folder to work in, if it does not exists
+  createFolder(tempFolder);
+  //create working folder for this session.
+  const workingFolder = `${tempFolder}/${workingId}`;
+  createFolder(workingFolder);
+
+  try {
+    await uploadFile(workingFolder, req.files.attach_file, 'inputflow.json');
+    const doc = fs.readFileSync(`${workingFolder}/inputflow.json`, 'utf8');
+    const document = JSON.parse(doc);
+    deleteFile(`${workingFolder}/inputflow.json`, `inputflow.json`);
+    res.status(200).send({ ...document });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ message: 'File upload failed' });
+  }
 });
 
 app.post('/api/run', (req, res) => {

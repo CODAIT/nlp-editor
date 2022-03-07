@@ -43,10 +43,6 @@ const nodesSlice = createSlice({
       });
       state.nodes = newNodes;
     },
-    setErrorMessage: (state, action) => {
-      const { message } = action.payload;
-      state.errorMessage = message;
-    },
     saveNlpNode: (state, action) => {
       //stores or replaces node.
       const { node } = action.payload;
@@ -78,7 +74,6 @@ export const {
   saveNlpNode,
   setInputDocument,
   setTabularResults,
-  setErrorMessage,
   setPipelineId,
   setWorkingId,
   setShowRightPanel,
