@@ -1,12 +1,7 @@
 import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  NumberInput,
-  RadioButton,
-  RadioButtonGroup,
-  TextArea,
-} from 'carbon-components-react';
+import { TextArea } from 'carbon-components-react';
 import './sequence-panel.scss';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
@@ -16,14 +11,17 @@ class SequencePanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      pattern: '',
-      upstreamNodes: [],
+      pattern: this.props.pattern,
+      upstreamNodes: this.props.upstreamNodes,
     };
   }
 
   componentDidMount() {
-    const { pattern, upstreamNodes } = this.constructPattern();
-    this.setState({ pattern, upstreamNodes });
+    let { pattern, upstreamNodes } = this.props;
+    if (pattern === '') {
+      ({ pattern, upstreamNodes } = this.constructPattern());
+      this.setState({ pattern, upstreamNodes });
+    }
   }
 
   constructPattern = () => {
@@ -99,42 +97,6 @@ class SequencePanel extends React.Component {
     const { pattern } = this.state;
     return (
       <div className="sequence-panel">
-        <div className="sequence-token">
-          {/*<RadioButtonGroup
-            legendText="Separator"
-            name="rdSeparator"
-            defaultSelected="rd1"
-          >
-            <RadioButton labelText="Between" value="rd1" id="rd1" />
-            <RadioButton labelText="Exactly" value="rd2" id="rd2" />
-          </RadioButtonGroup>
-          <div className="token-controls">
-            <NumberInput
-              id="rangeNumFrom"
-              min={0}
-              max={99}
-              value={0}
-              size="sm"
-              label="tokens from"
-              hideLabel
-              invalidText="Number is not valid"
-              className="number-range"
-            />
-            <span>to</span>
-            <NumberInput
-              id="rangeNumTo"
-              min={0}
-              max={99}
-              value={0}
-              size="sm"
-              label="tokens to"
-              hideLabel
-              invalidText="Number is not valid"
-              className="number-range"
-            />
-            <span>tokens</span>
-          </div>*/}
-        </div>
         <TextArea
           id="inputPattern"
           labelText="Sequence pattern"
@@ -153,6 +115,11 @@ class SequencePanel extends React.Component {
 
 SequencePanel.propTypes = {
   pattern: PropTypes.string,
+};
+
+SequencePanel.defaultProps = {
+  pattern: '',
+  upstreamNodes: [],
 };
 
 const mapStateToProps = (state) => ({

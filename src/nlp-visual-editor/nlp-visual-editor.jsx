@@ -272,17 +272,17 @@ class VisualEditor extends React.Component {
         ),
       },
       {
-        action: 'upload',
-        tooltip: 'Upload NLP Flow',
+        action: 'open',
+        tooltip: 'Open NLP Flow',
         jsx: (
           <>
             <label className="bx--btn bx--btn--md bx--btn--ghost">
-              Upload
+              Open
               <input
                 type="file"
-                id="btn-upload"
-                className="upload-button"
-                name="upload"
+                id="btn-open"
+                className="open-button"
+                name="open"
                 accept=".json"
                 onChange={this.onFlowSelected}
               />
