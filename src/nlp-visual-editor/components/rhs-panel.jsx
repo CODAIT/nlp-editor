@@ -26,8 +26,8 @@ class RHSPanel extends React.Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.nodeId !== nextProps.nodeId) {
+  componentDidUpdate(prevProps) {
+    if (this.props.nodeId !== prevProps.nodeId) {
       //chaging panes, reset state
       this.setState({ editLabel: false, label: null });
     }
