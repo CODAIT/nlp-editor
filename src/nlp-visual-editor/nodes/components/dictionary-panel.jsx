@@ -15,12 +15,25 @@ class DictionaryPanel extends React.Component {
     this.state = {
       inputText: '',
       items: props.items,
-      caseSensitivity: props.caseSensitivity || 'match',
-      lemmaMatch: props.lemmaMatch || false,
-      externalResourceChecked: props.externalResourceChecked || false,
+      caseSensitivity: props.caseSensitivity,
+      lemmaMatch: props.lemmaMatch,
+      externalResourceChecked: props.externalResourceChecked,
       itemsSelected: [],
       errorMessage: undefined,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.nodeId !== prevProps.nodeId) {
+      const { items, caseSensitivity, lemmaMatch, externalResourceChecked } =
+        this.props;
+      this.setState({
+        items,
+        caseSensitivity,
+        lemmaMatch,
+        externalResourceChecked,
+      });
+    }
   }
 
   getListItems = () => {
@@ -214,7 +227,10 @@ DictionaryPanel.propTypes = {
 };
 
 DictionaryPanel.defaultProps = {
+  caseSensitivity: 'match',
   items: [],
+  lemmaMatch: false,
+  externalResourceChecked: false,
 };
 
 const mapStateToProps = (state) => ({

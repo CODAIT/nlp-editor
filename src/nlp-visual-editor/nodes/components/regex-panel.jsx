@@ -8,7 +8,6 @@ import {
   NumberInput,
   RadioButton,
   RadioButtonGroup,
-  SkeletonText,
   TextArea,
 } from 'carbon-components-react';
 
@@ -22,6 +21,14 @@ class RegexPanel extends React.Component {
     this.state = {
       ...rest,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.nodeId !== prevProps.nodeId) {
+      const { saveNlpNode, setShowRightPanel, children, label, ...rest } =
+        this.props;
+      this.setState({ ...rest });
+    }
   }
 
   fetchResults = () => {
