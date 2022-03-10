@@ -263,7 +263,7 @@
       "type": "sequence",
       "description": "Connect your extractors for execution",
       "isValid": true,
-      "pattern": "(<Metric.Metric>)<Token>{0,0}(<Preposition.Preposition>)<Token>{1,2}(<Division.Division>)",
+      "pattern": "(<Metric.Metric>)<Token>{0,0}(<Preposition.Preposition>)<Token>{0,2}(<Division.Division>)",
       "upstreamNodes": [
         { "label": "Metric", "nodeId": "d88d7167-3b2c-427a-9b50-27049feb904d" },
         {
@@ -277,7 +277,7 @@
       ],
       "tokens": [
         { "min": "0", "max": "0" },
-        { "min": "1", "max": "2" }
+        { "min": "0", "max": "2" }
       ]
     },
     {
