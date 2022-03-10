@@ -387,7 +387,7 @@
       "type": "sequence",
       "description": "Connect your extractors for execution",
       "isValid": true,
-      "pattern": "(<Division.Division>)<Token>{1,2}(<Metric.Metric>)<Token>{1,2}(<Preposition.Preposition>)",
+      "pattern": "(<Division.Division>)<Token>{1,2}(<Metric.Metric>)<Token>{0,2}(<Preposition.Preposition>)",
       "upstreamNodes": [
         {
           "label": "Division",
@@ -401,7 +401,7 @@
       ],
       "tokens": [
         { "min": "1", "max": "2" },
-        { "min": "1", "max": "2" }
+        { "min": "0", "max": "2" }
       ]
     },
     {
