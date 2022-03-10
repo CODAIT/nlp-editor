@@ -10,6 +10,7 @@ import {
   RegexPanel,
   DictionaryPanel,
   SequencePanel,
+  UnionPanel,
 } from '../nodes/components';
 
 import { isNodeLabelValid } from '../../utils';
@@ -44,6 +45,14 @@ class RHSPanel extends React.Component {
         return <RegexPanel {...node} children={buttons} />;
       case 'dictionary':
         return <DictionaryPanel {...node} children={buttons} />;
+      case 'union':
+        return (
+          <UnionPanel
+            {...node}
+            children={buttons}
+            canvasController={canvasController}
+          />
+        );
       case 'sequence':
         return (
           <SequencePanel

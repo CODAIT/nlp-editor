@@ -97,6 +97,7 @@ class VisualEditor extends React.Component {
       if (node.type !== 'input') {
         const results = this.jsonToXML.transform(node, moduleName);
         if (!Array.isArray(results)) {
+          //dictionaries return a list
           const { xml, label } = results;
           payload.push({ xml, label });
         } else {

@@ -42,6 +42,20 @@ class SequencePanel extends React.Component {
     return { pattern, upstreamNodes };
   };
 
+  parsePattern = () => {
+    const { pattern, upstreamNodes } = this.state;
+    const newList = [];
+    const nodeList = pattern.match(/\(<.+?(?=\.)/g);
+    if (nodeList) {
+      nodeList.forEach((n) => {
+        const nodeName = n.substring(2, n.length);
+        const { nodeId } = upstreamNodes.find((n) => n.label === nodeName);
+        newList.push({ label: nodeName, nodeId });
+      });
+    }
+    return newList;
+  };
+
   getTokens = () => {
     const { pattern } = this.state;
     const tokens = [];
@@ -70,7 +84,7 @@ class SequencePanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { pattern, upstreamNodes } = this.state;
+    const { pattern } = this.state;
     const { nodeId } = this.props;
 
     let errorMessage =
@@ -80,6 +94,7 @@ class SequencePanel extends React.Component {
 
     if (!errorMessage) {
       const tokens = this.getTokens();
+      const upstreamNodes = this.parsePattern();
       const node = {
         nodeId,
         pattern,
@@ -89,6 +104,7 @@ class SequencePanel extends React.Component {
       };
       this.props.saveNlpNode({ node });
       this.props.setShowRightPanel({ showPanel: false });
+      this.parsePattern();
     }
   };
 
