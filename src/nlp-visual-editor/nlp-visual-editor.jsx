@@ -26,6 +26,7 @@ import fileDownload from 'js-file-download';
 import {
   deleteNodes,
   saveNlpNode,
+  setNlpNodes,
   setInputDocument,
   setPipelineId,
   setTabularResults,
@@ -211,9 +212,7 @@ class VisualEditor extends React.Component {
     const { primary_pipeline: pipelineId } = flow;
     this.canvasController.setPipelineFlow(flow);
     this.props.setPipelineId({ pipelineId });
-    nodes.forEach((node) => {
-      this.props.saveNlpNode({ node });
-    });
+    this.props.setNlpNodes({ nodes });
   };
 
   savePipeline = () => {
@@ -232,7 +231,9 @@ class VisualEditor extends React.Component {
   };
 
   onFlowSelected = async (e) => {
-    const { workingId } = this.props;
+    //create a new workingId, treat it as a new session
+    const workingId = shortUUID.generate();
+    this.props.setWorkingId({ workingId });
     const { files } = e.target;
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
@@ -497,6 +498,7 @@ const mapDispatchToProps = (dispatch) => ({
   deleteNodes: (ids) => dispatch(deleteNodes(ids)),
   setInputDocument: (document) => dispatch(setInputDocument(document)),
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
+  setNlpNodes: (nodes) => dispatch(setNlpNodes(nodes)),
   setPipelineId: (id) => dispatch(setPipelineId(id)),
   setTabularResults: (data) => dispatch(setTabularResults(data)),
   setWorkingId: (id) => dispatch(setWorkingId(id)),

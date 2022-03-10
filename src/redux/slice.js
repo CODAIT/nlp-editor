@@ -53,6 +53,11 @@ const nodesSlice = createSlice({
       const nodeList = state.nodes.filter((n) => n.nodeId !== nodeId);
       state.nodes = nodeList.concat(updatedNode);
     },
+    setNlpNodes: (state, action) => {
+      // called when saved pipeline json is opened
+      const { nodes = [] } = action.payload;
+      state.nodes = nodes;
+    },
     setInputDocument: (state, action) => {
       const { document } = action.payload;
       state.inputDocument = document;
@@ -72,6 +77,7 @@ const nodesSlice = createSlice({
 export const {
   deleteNodes,
   saveNlpNode,
+  setNlpNodes,
   setInputDocument,
   setTabularResults,
   setPipelineId,

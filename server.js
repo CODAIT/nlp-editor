@@ -111,7 +111,7 @@ app.post('/api/uploadflow', async (req, res) => {
   createFolder(workingFolder);
 
   try {
-    await uploadFile(workingFolder, req.files.attach_file, 'inputflow.json');
+    await uploadFile(workingFolder, filesToUpload, 'inputflow.json');
     const doc = fs.readFileSync(`${workingFolder}/inputflow.json`, 'utf8');
     const document = JSON.parse(doc);
     deleteFile(`${workingFolder}/inputflow.json`, `inputflow.json`);
