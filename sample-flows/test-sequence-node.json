@@ -1,0 +1,292 @@
+{
+  "flow": {
+    "doc_type": "pipeline",
+    "version": "3.0",
+    "json_schema": "http://api.dataplatform.ibm.com/schemas/common-pipeline/pipeline-flow/pipeline-flow-v3-schema.json",
+    "id": "35d59731-365f-481d-ac5b-3242f17e3242",
+    "primary_pipeline": "e78e59ea-63c5-4fde-90fb-c3800122c079",
+    "pipelines": [
+      {
+        "id": "e78e59ea-63c5-4fde-90fb-c3800122c079",
+        "nodes": [
+          {
+            "id": "d88b8da4-b941-45d5-8ff9-bb6630d82f44",
+            "app_data": {
+              "ui_data": {
+                "label": "Input Documents_1",
+                "image": "/images/palette/nodes/input_document.svg",
+                "x_pos": 82,
+                "y_pos": 205,
+                "description": "Select documents to apply your NLP rules."
+              }
+            },
+            "outputs": [
+              {
+                "id": "outPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": -1 },
+                    "label": "Output Port"
+                  }
+                }
+              }
+            ],
+            "parameters": { "type": "input" }
+          },
+          {
+            "id": "d88d7167-3b2c-427a-9b50-27049feb904d",
+            "app_data": {
+              "ui_data": {
+                "label": "Metric",
+                "image": "/images/palette/nodes/dictionary.svg",
+                "x_pos": 327,
+                "y_pos": 119,
+                "description": "Phrases to be matched."
+              }
+            },
+            "inputs": [
+              {
+                "id": "inPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": 1 },
+                    "label": "Input Port"
+                  }
+                },
+                "links": [
+                  {
+                    "id": "16712335-7e47-48cf-954b-ec2864ef726f",
+                    "node_id_ref": "d88b8da4-b941-45d5-8ff9-bb6630d82f44",
+                    "port_id_ref": "outPort"
+                  }
+                ]
+              }
+            ],
+            "outputs": [
+              {
+                "id": "outPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": -1 },
+                    "label": "Output Port"
+                  }
+                }
+              }
+            ],
+            "parameters": { "type": "dictionary" }
+          },
+          {
+            "id": "dfe40d07-c154-467c-aab1-f17b13ac6122",
+            "app_data": {
+              "ui_data": {
+                "label": "Preposition",
+                "image": "/images/palette/nodes/dictionary.svg",
+                "x_pos": 319,
+                "y_pos": 212,
+                "description": "Phrases to be matched."
+              }
+            },
+            "inputs": [
+              {
+                "id": "inPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": 1 },
+                    "label": "Input Port"
+                  }
+                },
+                "links": [
+                  {
+                    "id": "d657e397-ee22-4559-b8ff-d12e376a195f",
+                    "node_id_ref": "d88b8da4-b941-45d5-8ff9-bb6630d82f44",
+                    "port_id_ref": "outPort"
+                  }
+                ]
+              }
+            ],
+            "outputs": [
+              {
+                "id": "outPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": -1 },
+                    "label": "Output Port"
+                  }
+                }
+              }
+            ],
+            "parameters": { "type": "dictionary" }
+          },
+          {
+            "id": "4cc4d6f5-a5ff-4c80-891e-f9c48285977e",
+            "app_data": {
+              "ui_data": {
+                "label": "Division",
+                "image": "/images/palette/nodes/dictionary.svg",
+                "x_pos": 318,
+                "y_pos": 311,
+                "description": "Phrases to be matched."
+              }
+            },
+            "inputs": [
+              {
+                "id": "inPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": 1 },
+                    "label": "Input Port"
+                  }
+                },
+                "links": [
+                  {
+                    "id": "24644a6a-32a2-4831-ad2a-71e76b43d829",
+                    "node_id_ref": "d88b8da4-b941-45d5-8ff9-bb6630d82f44",
+                    "port_id_ref": "outPort"
+                  }
+                ]
+              }
+            ],
+            "outputs": [
+              {
+                "id": "outPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 1, "max": -1 },
+                    "label": "Output Port"
+                  }
+                }
+              }
+            ],
+            "parameters": { "type": "dictionary" }
+          },
+          {
+            "id": "eba98361-462f-4332-9dc6-cf6e10c80bb3",
+            "app_data": {
+              "ui_data": {
+                "label": "RevenueOfDivision",
+                "image": "/images/palette/nodes/sequence.svg",
+                "x_pos": 636,
+                "y_pos": 204,
+                "description": "Connect your extractors for execution"
+              }
+            },
+            "inputs": [
+              {
+                "id": "inPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 2, "max": -1 },
+                    "label": "Input Port"
+                  }
+                },
+                "links": [
+                  {
+                    "id": "615ff95c-6db7-40d0-83b4-79fb15b111c1",
+                    "node_id_ref": "d88d7167-3b2c-427a-9b50-27049feb904d",
+                    "port_id_ref": "outPort"
+                  },
+                  {
+                    "id": "7d751bd8-ad13-45ce-9a84-51639e2df363",
+                    "node_id_ref": "dfe40d07-c154-467c-aab1-f17b13ac6122",
+                    "port_id_ref": "outPort"
+                  },
+                  {
+                    "id": "501476b8-682c-463e-ad32-73c11eec0ea3",
+                    "node_id_ref": "4cc4d6f5-a5ff-4c80-891e-f9c48285977e",
+                    "port_id_ref": "outPort"
+                  }
+                ]
+              }
+            ],
+            "outputs": [
+              {
+                "id": "outPort",
+                "app_data": {
+                  "ui_data": {
+                    "cardinality": { "min": 0, "max": -1 },
+                    "label": "Output Port"
+                  }
+                }
+              }
+            ],
+            "parameters": { "type": "sequence" }
+          }
+        ],
+        "app_data": { "ui_data": { "comments": [] } },
+        "runtime_ref": ""
+      }
+    ],
+    "schemas": []
+  },
+  "nodes": [
+    {
+      "label": "Metric",
+      "nodeId": "d88d7167-3b2c-427a-9b50-27049feb904d",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["Revenues"],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false
+    },
+    {
+      "label": "Preposition",
+      "nodeId": "dfe40d07-c154-467c-aab1-f17b13ac6122",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["from", "to"],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false
+    },
+    {
+      "label": "Division",
+      "nodeId": "4cc4d6f5-a5ff-4c80-891e-f9c48285977e",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": [
+        "Software",
+        "Hardware",
+        "Global Business Services",
+        "Global Technology Services"
+      ],
+      "caseSensitivity": "match",
+      "lemmaMatch": false,
+      "externalResourceChecked": false
+    },
+    {
+      "label": "RevenueOfDivision",
+      "nodeId": "eba98361-462f-4332-9dc6-cf6e10c80bb3",
+      "type": "sequence",
+      "description": "Connect your extractors for execution",
+      "isValid": true,
+      "pattern": "(<Metric.Metric>)<Token>{0,0}(<Preposition.Preposition>)<Token>{1,2}(<Division.Division>)",
+      "upstreamNodes": [
+        { "label": "Metric", "nodeId": "d88d7167-3b2c-427a-9b50-27049feb904d" },
+        {
+          "label": "Preposition",
+          "nodeId": "dfe40d07-c154-467c-aab1-f17b13ac6122"
+        },
+        {
+          "label": "Division",
+          "nodeId": "4cc4d6f5-a5ff-4c80-891e-f9c48285977e"
+        }
+      ],
+      "tokens": [
+        { "min": "0", "max": "0" },
+        { "min": "1", "max": "2" }
+      ]
+    },
+    {
+      "label": "Input Documents_1",
+      "nodeId": "d88b8da4-b941-45d5-8ff9-bb6630d82f44",
+      "type": "input",
+      "description": "Select documents to apply your NLP rules.",
+      "isValid": false,
+      "files": []
+    }
+  ]
+}
