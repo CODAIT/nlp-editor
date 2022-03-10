@@ -3,7 +3,7 @@ function isNodeLabelValid(label, existingNodes) {
     return { isValid: false, message: 'Name cannot be empty.' };
   }
   //node name cannot be called dictionary | regex, reserved word
-  if (['dictionary', 'regex'].includes(label.toLowerCase())) {
+  if (['dictionary', 'regex', 'union'].includes(label.toLowerCase())) {
     return {
       isValid: false,
       message: `${label} is a reserved word.`,

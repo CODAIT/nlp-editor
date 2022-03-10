@@ -159,11 +159,11 @@ class InputPanel extends React.Component {
         {errorMessage && <div className="error-message">{errorMessage}</div>}
         {showFileControl && (
           <FileUploader
-            accept={['.txt', '.htm', '.html']}
+            accept={['.txt']}
             buttonKind="primary"
             buttonLabel="Select files"
             filenameStatus="edit"
-            labelDescription="only .txt, .htm, .html files at 500mb or less"
+            labelDescription="only .txt files at 10mb or less"
             labelTitle="Upload files"
             size={'sm'}
             onChange={this.onFilesSelected}
