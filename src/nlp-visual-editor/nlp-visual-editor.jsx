@@ -243,10 +243,15 @@ class VisualEditor extends React.Component {
     formData.append('workingId', workingId);
     try {
       const { data } = await axios.post('/api/uploadflow', formData);
+      const { flow, nodes } = data;
+      if (flow === undefined || nodes === undefined) {
+        throw 'File does not conform to the Elyra NLP Tooling schema.';
+      }
       this.setPipelineFlow(data);
     } catch (ex) {
-      //TODO handle error
       console.log(ex);
+      const errorMessage = typeof ex === 'object' ? ex.toString() : ex;
+      this.setState({ errorMessage });
     }
   };
 
@@ -422,12 +427,12 @@ class VisualEditor extends React.Component {
       return null;
     }
     const node = nodes.find((n) => n.nodeId === selectedNodeId);
-    const { label } = node;
+    const heading = node ? node.label : 'Error';
     return (
       <Modal
         alert={true}
         open={true}
-        modalHeading={label}
+        modalHeading={heading}
         primaryButtonText="OK"
         size="sm"
         onClick={this.onErrorModalClosed}

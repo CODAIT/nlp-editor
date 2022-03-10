@@ -104,10 +104,13 @@ class RHSPanel extends React.Component {
         onChange={(e) => {
           this.setState({ label: e.target.value });
         }}
+        onBlur={this.onSaveLabel}
         onKeyDown={(e) => {
           const keyPressed = e.key || e.keyCode;
           if (keyPressed === 'Enter' || keyPressed === 13) {
             this.onSaveLabel();
+          } else if (keyPressed === 'Escape' || keyPressed === 27) {
+            this.setState({ editLabel: false, label: null });
           }
         }}
         value={label}
