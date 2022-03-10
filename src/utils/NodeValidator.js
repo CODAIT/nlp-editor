@@ -3,6 +3,7 @@ import {
   DictionaryNode,
   SequenceNode,
   RegexNode,
+  UnionNode,
 } from './validation';
 
 export default function NodeValidator(canvasController) {
@@ -22,6 +23,9 @@ export default function NodeValidator(canvasController) {
         break;
       case 'sequence':
         node = new SequenceNode(this.canvasController, pipelineId, nodeProps);
+        break;
+      case 'union':
+        node = new UnionNode(this.canvasController, pipelineId, nodeProps);
         break;
     }
     return node.validate();

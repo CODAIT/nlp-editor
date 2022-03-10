@@ -1,4 +1,9 @@
-import { DictionaryNode, RegexNode, SequenceNode } from './transform';
+import {
+  DictionaryNode,
+  RegexNode,
+  SequenceNode,
+  UnionNode,
+} from './transform';
 
 export default function JsonToXML() {
   this.transform = function (node, moduleName) {
@@ -13,6 +18,9 @@ export default function JsonToXML() {
         break;
       case 'sequence':
         obj = new SequenceNode(node, moduleName);
+        break;
+      case 'union':
+        obj = new UnionNode(node, moduleName);
         break;
     }
     return obj.transform();
