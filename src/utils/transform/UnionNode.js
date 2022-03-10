@@ -105,8 +105,6 @@ export default class UnionNode {
       declaration: { encoding: 'UTF-8' },
     });
 
-    console.log(xml);
-
     return {
       xml,
       label,
