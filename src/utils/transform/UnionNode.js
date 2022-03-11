@@ -1,11 +1,10 @@
 const js2xmlparser = require('js2xmlparser');
-
 import { store } from '../../redux/store';
+
 export default class UnionNode {
   constructor(node, moduleName) {
     this.node = node;
     this.moduleName = moduleName;
-    console.log(store.getState());
   }
 
   getChildUpstreamNodes = (nodeId) => {
@@ -24,11 +23,11 @@ export default class UnionNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': parentNodeLabel,
+          'input-field-name': parentNodeLabel.toLowerCase(),
         },
       },
     ]; //add the first field for the sequence node
-    upstreamNodes.forEach((node, index) => {
+    /*upstreamNodes.forEach((node, index) => {
       spans.push({
         '@': {
           'input-concept-module': this.moduleName,
@@ -36,7 +35,7 @@ export default class UnionNode {
           'input-field-name': node.label,
         },
       });
-    });
+    });*/
     return spans;
   };
 
@@ -51,7 +50,7 @@ export default class UnionNode {
         },
         'output-spec': {
           field: {
-            '@': { name: label, type: 'Span' },
+            '@': { name: label.toLowerCase(), type: 'Span' },
           },
         },
         'rule-spec': { 'concept-projection': {} },

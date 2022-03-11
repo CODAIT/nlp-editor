@@ -1,7 +1,10 @@
 const js2xmlparser = require('js2xmlparser');
+import { getImmediateDownstreamNodes } from '../index';
+import { store } from '../../redux/store';
 
 export default class SequenceNode {
-  constructor(node, moduleName) {
+  constructor(canvasController, node, moduleName) {
+    this.canvasController = canvasController;
     this.node = node;
     this.moduleName = moduleName;
   }
@@ -21,10 +24,26 @@ export default class SequenceNode {
     return inputConcepts;
   }
 
+  getOutputSpecName = () => {
+    const { label, nodeId } = this.node;
+    const { nodes, pipelineId } = store.getState()['nodesReducer'];
+    const pipelineLinks = this.canvasController.getLinks(pipelineId);
+    const downstreamNodes = getImmediateDownstreamNodes(nodeId, pipelineLinks);
+    if (downstreamNodes.length > 0) {
+      const downstreamNodeId = downstreamNodes[0];
+      const node = nodes.find((n) => n.nodeId === downstreamNodeId);
+      if (node.type === 'union') {
+        return node.label.toLowerCase();
+      }
+    }
+    return label;
+  };
+
   getFieldsList() {
-    const { label, upstreamNodes } = this.node;
+    const { upstreamNodes } = this.node;
+    const fieldName = this.getOutputSpecName();
     const fields = [
-      { '@': { name: label, group: '0', hide: 'no', type: 'Span' } },
+      { '@': { name: fieldName, group: '0', hide: 'no', type: 'Span' } },
     ]; //add the first field for the sequence node
     upstreamNodes.forEach((node, index) => {
       const { label } = node;

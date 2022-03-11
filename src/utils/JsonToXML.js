@@ -5,7 +5,8 @@ import {
   UnionNode,
 } from './transform';
 
-export default function JsonToXML() {
+export default function JsonToXML(canvasController) {
+  this.canvasController = canvasController;
   this.transform = function (node, moduleName) {
     const { type } = node;
     let obj;
@@ -14,10 +15,10 @@ export default function JsonToXML() {
         obj = new RegexNode(node, moduleName);
         break;
       case 'dictionary':
-        obj = new DictionaryNode(node, moduleName);
+        obj = new DictionaryNode(this.canvasController, node, moduleName);
         break;
       case 'sequence':
-        obj = new SequenceNode(node, moduleName);
+        obj = new SequenceNode(this.canvasController, node, moduleName);
         break;
       case 'union':
         obj = new UnionNode(node, moduleName);

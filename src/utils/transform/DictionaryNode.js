@@ -1,7 +1,10 @@
 const js2xmlparser = require('js2xmlparser');
+import { getImmediateDownstreamNodes } from '../index';
+import { store } from '../../redux/store';
 
 export default class DictionaryNode {
-  constructor(node, moduleName) {
+  constructor(canvasController, node, moduleName) {
+    this.canvasController = canvasController;
     this.node = node;
     this.moduleName = moduleName;
   }
@@ -13,6 +16,21 @@ export default class DictionaryNode {
       entries.push(item);
     });
     return entries;
+  };
+
+  getOutputSpecName = () => {
+    const { label, nodeId } = this.node;
+    const { nodes, pipelineId } = store.getState()['nodesReducer'];
+    const pipelineLinks = this.canvasController.getLinks(pipelineId);
+    const downstreamNodes = getImmediateDownstreamNodes(nodeId, pipelineLinks);
+    if (downstreamNodes.length > 0) {
+      const downstreamNodeId = downstreamNodes[0];
+      const node = nodes.find((n) => n.nodeId === downstreamNodeId);
+      if (node.type === 'union') {
+        return node.label.toLowerCase();
+      }
+    }
+    return label;
   };
 
   getDictionaryWords = () => {
@@ -41,7 +59,7 @@ export default class DictionaryNode {
   transform() {
     const { caseSensitivity, externalResourceChecked, label, lemmaMatch } =
       this.node;
-    const fieldName = label;
+    const fieldName = this.getOutputSpecName();
     const isCaseSensitive = caseSensitivity === 'match';
     const jsonStructure = {
       '@': {
