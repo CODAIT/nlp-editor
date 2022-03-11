@@ -26,6 +26,12 @@ function getImmediateUpstreamNodes(nodeId, links) {
   return upstreamNodes;
 }
 
+function getImmediateDownstreamNodes(nodeId, links) {
+  const upstreamLinks = links.filter((l) => l.srcNodeId === nodeId);
+  const upstreamNodes = upstreamLinks.map((l) => l.trgNodeId);
+  return upstreamNodes;
+}
+
 function generateNodeName(type, paletteLabel, existingNodes) {
   let tmpName = type === 'dictionary' ? 'MyDictionary' : paletteLabel;
   const nodesWithSameName = existingNodes.filter((n) =>
@@ -34,4 +40,9 @@ function generateNodeName(type, paletteLabel, existingNodes) {
   return `${tmpName}_${nodesWithSameName.length + 1}`;
 }
 
-export { isNodeLabelValid, getImmediateUpstreamNodes, generateNodeName };
+export {
+  isNodeLabelValid,
+  getImmediateUpstreamNodes,
+  getImmediateDownstreamNodes,
+  generateNodeName,
+};

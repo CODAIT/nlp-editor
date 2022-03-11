@@ -44,7 +44,13 @@ class RHSPanel extends React.Component {
       case 'regex':
         return <RegexPanel {...node} children={buttons} />;
       case 'dictionary':
-        return <DictionaryPanel {...node} children={buttons} />;
+        return (
+          <DictionaryPanel
+            {...node}
+            children={buttons}
+            canvasController={canvasController}
+          />
+        );
       case 'union':
         return (
           <UnionPanel

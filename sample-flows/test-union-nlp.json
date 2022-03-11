@@ -375,7 +375,7 @@
         },
         {
           "label": "RevenueOfDivision2",
-          "nodeId": "d35ee2de-ffed-4972-90db-5d978f8f836e"
+          "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e"
         }
       ],
       "overlapMatches": false,
@@ -387,16 +387,16 @@
       "type": "sequence",
       "description": "Connect your extractors for execution",
       "isValid": true,
-      "pattern": "(<Division.Division>)<Token>{1,2}(<Metric.Metric>)<Token>{0,2}(<Preposition.Preposition>)",
+      "pattern": "(<Metric.Metric>)<Token>{1,2}(<Preposition.Preposition>)<Token>{0,2}(<Division.Division>)",
       "upstreamNodes": [
-        {
-          "label": "Division",
-          "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394"
-        },
         { "label": "Metric", "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65" },
         {
           "label": "Preposition",
           "nodeId": "09e75964-1a81-4920-a5de-25da83dd97c8"
+        },
+        {
+          "label": "Division",
+          "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394"
         }
       ],
       "tokens": [

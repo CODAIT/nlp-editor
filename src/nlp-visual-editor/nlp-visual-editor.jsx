@@ -53,7 +53,7 @@ class VisualEditor extends React.Component {
     this.canvasController.setPipelineFlowPalette(nlpPalette);
 
     this.nodeValidator = new NodeValidator(this.canvasController);
-    this.jsonToXML = new JsonToXML();
+    this.jsonToXML = new JsonToXML(this.canvasController);
     this.tickCounter = 0;
   }
 

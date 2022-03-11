@@ -24,6 +24,13 @@ class SequencePanel extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.nodeId !== prevProps.nodeId) {
+      const { pattern, upstreamNodes } = this.props;
+      this.setState({ pattern, upstreamNodes });
+    }
+  }
+
   constructPattern = () => {
     const { canvasController, nodeId, pipelineId, nodes } = this.props;
     const pipelineLinks = canvasController.getLinks(pipelineId);
@@ -104,7 +111,6 @@ class SequencePanel extends React.Component {
       };
       this.props.saveNlpNode({ node });
       this.props.setShowRightPanel({ showPanel: false });
-      this.parsePattern();
     }
   };
 
