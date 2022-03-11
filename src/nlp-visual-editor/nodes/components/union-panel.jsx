@@ -2,7 +2,8 @@ import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { Checkbox, Dropdown } from 'carbon-components-react';
+import { Information24 } from '@carbon/icons-react';
+import { Button } from 'carbon-components-react';
 import './union-panel.scss';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
@@ -71,7 +72,7 @@ class UnionPanel extends React.Component {
     ];
   };
 
-  handleChildComponents = () => {
+  /*handleChildComponents = () => {
     const { children } = this.props;
     const childrenWithProps = Children.map(children, (child) => {
       if (isValidElement(child)) {
@@ -80,20 +81,22 @@ class UnionPanel extends React.Component {
       return child;
     });
     return childrenWithProps;
-  };
+  };*/
 
-  onMethodSelected = (selectedItem) => {
+  /*onMethodSelected = (selectedItem) => {
     const { id } = selectedItem;
     this.setState({ method: id });
-  };
+  };*/
 
   render() {
-    const { overlapMatches, method } = this.state;
-    const methodItems = this.getDdlMethodItems();
-    const children = this.handleChildComponents();
+    //const { overlapMatches, method } = this.state;
+    //const methodItems = this.getDdlMethodItems();
+    //const children = this.handleChildComponents();
     return (
       <div className="union-panel">
-        <Checkbox
+        <Information24 aria-label="Information" className="info-icon" />
+        <span>No configuration necessary.</span>
+        {/*<Checkbox
           labelText="Overlap matches"
           id="chkOverlapMatches"
           checked={overlapMatches}
@@ -112,8 +115,8 @@ class UnionPanel extends React.Component {
           onChange={({ selectedItem }) => {
             this.onMethodSelected(selectedItem);
           }}
-        />
-        {children}
+        />*/}
+        {/*children*/}
       </div>
     );
   }

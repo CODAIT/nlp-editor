@@ -1,6 +1,20 @@
 .union-panel {
-  .bx--dropdown__wrapper {
+  /*.bx--dropdown__wrapper {
     margin-top: 0.5rem;
     padding-left: 1.7rem;
+  }*/
+  display: flex;
+
+  .info-icon {
+    color: rgb(0, 67, 206);
+  }
+  span {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.16px;
+    line-height: 18px;
   }
 }
