@@ -9,7 +9,7 @@ import { setShowRightPanel } from '../../redux/slice';
 
 class DocumentViewer extends React.Component {
   getHighlightColor = (index) => {
-    return ['cyan', 'chartreuse', 'gold', 'orangered'][index];
+    return ['cyan', 'chartreuse', 'gold', 'orangered'][index % 4];
   };
 
   getHighlightSpans = () => {
