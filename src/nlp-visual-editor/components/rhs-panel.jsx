@@ -35,50 +35,26 @@ class RHSPanel extends React.Component {
   }
 
   getPanelContent(type) {
-    const buttons = this.getSaveButton();
     const node = this.getNodeProps();
-    const { canvasController } = this.props;
+    const { nodeId, canvasController } = this.props;
+    const nodeProps = { nodeId, canvasController };
     switch (type) {
       case 'input':
-        return <InputPanel {...node} children={buttons} />;
+        return <InputPanel {...node} />;
       case 'regex':
-        return <RegexPanel {...node} children={buttons} />;
+        return <RegexPanel {...node} />;
       case 'dictionary':
         return (
-          <DictionaryPanel
-            {...node}
-            children={buttons}
-            canvasController={canvasController}
-          />
+          <DictionaryPanel {...node} canvasController={canvasController} />
         );
       case 'union':
-        return (
-          <UnionPanel
-            {...node}
-            children={buttons}
-            canvasController={canvasController}
-          />
-        );
+        return <UnionPanel {...nodeProps} />;
       case 'sequence':
-        return (
-          <SequencePanel
-            {...node}
-            children={buttons}
-            canvasController={canvasController}
-          />
-        );
+        return <SequencePanel {...node} canvasController={canvasController} />;
       default:
         return null;
     }
   }
-
-  getSaveButton = () => {
-    return (
-      <Button kind="primary" className="rhs-buttons">
-        Save
-      </Button>
-    );
-  };
 
   getTitleComponent = () => {
     const node = this.getNodeProps();
@@ -154,13 +130,6 @@ class RHSPanel extends React.Component {
           <span className="description">{description}</span>
         </div>
         {panelContents}
-        <Button
-          kind="secondary"
-          className="rhs-button-cancel"
-          onClick={() => this.props.setShowRightPanel({ showPanel: false })}
-        >
-          Cancel
-        </Button>
       </div>
     );
   }

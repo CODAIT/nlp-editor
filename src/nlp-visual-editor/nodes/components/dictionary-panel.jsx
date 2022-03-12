@@ -1,6 +1,7 @@
-import React, { Children, isValidElement, cloneElement } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Checkbox, Dropdown, TextInput } from 'carbon-components-react';
+import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { Delete16 } from '@carbon/icons-react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -127,17 +128,6 @@ class DictionaryPanel extends React.Component {
     return errorMessage;
   };
 
-  handleChildComponents = () => {
-    const { children } = this.props;
-    const childrenWithProps = Children.map(children, (child) => {
-      if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.onSavePane });
-      }
-      return child;
-    });
-    return childrenWithProps;
-  };
-
   render() {
     const {
       inputText,
@@ -148,7 +138,6 @@ class DictionaryPanel extends React.Component {
     } = this.state;
     const optionItems = this.getListItems();
     const matchCaseItems = this.getDdlMatchCaseItems();
-    const children = this.handleChildComponents();
     return (
       <div className="dictionary-panel">
         <div
@@ -216,7 +205,12 @@ class DictionaryPanel extends React.Component {
           onChange={this.onChangeExternalResource}
           checked={externalResourceChecked}
         />
-        {children}
+        <RHSPanelButtons
+          onClosePanel={() => {
+            this.props.setShowRightPanel({ showPanel: false });
+          }}
+          onSavePanel={this.onSavePane}
+        />
       </div>
     );
   }

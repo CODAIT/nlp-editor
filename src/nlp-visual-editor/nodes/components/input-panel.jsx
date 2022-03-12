@@ -1,9 +1,10 @@
-import React, { Children, isValidElement, cloneElement } from 'react';
+import React from 'react';
 import {
   Button,
   FileUploader,
   FileUploaderItem,
 } from 'carbon-components-react';
+import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import './input-panel.scss';
@@ -77,7 +78,6 @@ class InputPanel extends React.Component {
   };
 
   getFileUploadList = () => {
-    const { isValid } = this.props;
     const fileItems = [];
     const { files } = this.state;
     for (let i = 0; i < files.length; i++) {
@@ -137,23 +137,12 @@ class InputPanel extends React.Component {
     this.props.setShowRightPanel({ showPanel: false });
   };
 
-  handleChildComponents = () => {
-    const { children } = this.props;
-    const childrenWithProps = Children.map(children, (child) => {
-      if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.onSavePane });
-      }
-      return child;
-    });
-    return childrenWithProps;
-  };
-
   render() {
     const { isValid } = this.props;
     const { files, errorMessage } = this.state;
     const showFileControl = files.length === 0;
     const fileItems = this.getFileUploadList();
-    const children = this.handleChildComponents();
+
     return (
       <div className="input-panel">
         {errorMessage && <div className="error-message">{errorMessage}</div>}
@@ -185,7 +174,12 @@ class InputPanel extends React.Component {
             )}
           </div>
         )}
-        {children}
+        <RHSPanelButtons
+          showSaveButton={false}
+          onClosePanel={() => {
+            this.props.setShowRightPanel({ showPanel: false });
+          }}
+        />
       </div>
     );
   }

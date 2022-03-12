@@ -2,6 +2,7 @@ import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { TextArea } from 'carbon-components-react';
+import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import './sequence-panel.scss';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
@@ -79,17 +80,6 @@ class SequencePanel extends React.Component {
     return tokens;
   };
 
-  handleChildComponents = () => {
-    const { children } = this.props;
-    const childrenWithProps = Children.map(children, (child) => {
-      if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.validateParameters });
-      }
-      return child;
-    });
-    return childrenWithProps;
-  };
-
   validateParameters = () => {
     const { pattern } = this.state;
     const { nodeId } = this.props;
@@ -115,7 +105,6 @@ class SequencePanel extends React.Component {
   };
 
   render() {
-    const children = this.handleChildComponents();
     const { pattern } = this.state;
     return (
       <div className="sequence-panel">
@@ -129,7 +118,12 @@ class SequencePanel extends React.Component {
             this.setState({ pattern: e.target.value });
           }}
         />
-        {children}
+        <RHSPanelButtons
+          onClosePanel={() => {
+            this.props.setShowRightPanel({ showPanel: false });
+          }}
+          onSavePanel={this.validateParameters}
+        />
       </div>
     );
   }
