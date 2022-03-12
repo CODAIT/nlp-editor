@@ -31,12 +31,11 @@
   .rhs-buttons {
     position: absolute;
     bottom: 0;
-    right: 0;
-  }
+    right: 8rem;
+    max-width: 8rem;
 
-  .rhs-button-cancel {
-    position: absolute;
-    bottom: 0;
-    right: 110px;
+    &.btn-close {
+      right: 0px;
+    }
   }
 }
