@@ -1,8 +1,9 @@
-import React, { Children, isValidElement, cloneElement } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { Checkbox, Dropdown } from 'carbon-components-react';
+import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import './union-panel.scss';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
@@ -71,17 +72,6 @@ class UnionPanel extends React.Component {
     ];
   };
 
-  handleChildComponents = () => {
-    const { children } = this.props;
-    const childrenWithProps = Children.map(children, (child) => {
-      if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.onSavePane });
-      }
-      return child;
-    });
-    return childrenWithProps;
-  };
-
   onMethodSelected = (selectedItem) => {
     const { id } = selectedItem;
     this.setState({ method: id });
@@ -90,7 +80,6 @@ class UnionPanel extends React.Component {
   render() {
     const { overlapMatches, method } = this.state;
     const methodItems = this.getDdlMethodItems();
-    const children = this.handleChildComponents();
     return (
       <div className="union-panel">
         <Checkbox
@@ -113,7 +102,12 @@ class UnionPanel extends React.Component {
             this.onMethodSelected(selectedItem);
           }}
         />
-        {children}
+        <RHSPanelButtons
+          showSaveButton={false}
+          onClosePanel={() => {
+            this.props.setShowRightPanel({ showPanel: false });
+          }}
+        />
       </div>
     );
   }

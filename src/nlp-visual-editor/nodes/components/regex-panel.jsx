@@ -1,4 +1,4 @@
-import React, { Children, isValidElement, cloneElement } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -10,6 +10,7 @@ import {
   RadioButtonGroup,
   TextArea,
 } from 'carbon-components-react';
+import RHSPanelButtons from '../../components/rhs-panel-buttons';
 
 import './regex-panel.scss';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
@@ -17,7 +18,7 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
-    const { saveNlpNode, setShowRightPanel, children, label, ...rest } = props;
+    const { saveNlpNode, setShowRightPanel, label, ...rest } = props;
     this.state = {
       ...rest,
     };
@@ -25,8 +26,7 @@ class RegexPanel extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-      const { saveNlpNode, setShowRightPanel, children, label, ...rest } =
-        this.props;
+      const { saveNlpNode, setShowRightPanel, label, ...rest } = this.props;
       this.setState({ ...rest });
     }
   }
@@ -47,17 +47,6 @@ class RegexPanel extends React.Component {
       { id: 'ignore', text: 'Ignore case' },
       { id: 'match-unicode', text: 'Match unicode (ignore case)' },
     ];
-  };
-
-  handleChildComponents = () => {
-    const { children } = this.props;
-    const childrenWithProps = Children.map(children, (child) => {
-      if (isValidElement(child)) {
-        return cloneElement(child, { onClick: this.validateParameters });
-      }
-      return child;
-    });
-    return childrenWithProps;
   };
 
   validateParameters = () => {
@@ -122,7 +111,6 @@ class RegexPanel extends React.Component {
 
   render() {
     const matchCaseItems = this.getDdlMatchCaseItems();
-    const children = this.handleChildComponents();
 
     const {
       regexInput,
@@ -273,7 +261,12 @@ class RegexPanel extends React.Component {
             />
           </div>
         </div>
-        {children}
+        <RHSPanelButtons
+          onClosePanel={() => {
+            this.props.setShowRightPanel({ showPanel: false });
+          }}
+          onSavePanel={this.validateParameters}
+        />
       </div>
     );
   }
