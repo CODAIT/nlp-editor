@@ -2,6 +2,9 @@
 
 Prototype - Visual Editor for creating NLP rules
 
+### Screenshot of Elyra NLP Visual Editor
+![Elyra_NLP](https://user-images.githubusercontent.com/81634386/158040876-7bb94cbd-7c4a-4b2c-b50f-7524985801c0.png)
+
 ### Clone repository
 
 ```
