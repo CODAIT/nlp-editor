@@ -208,13 +208,6 @@ class VisualEditor extends React.Component {
     this.execute(payload);
   };
 
-  setPipelineFlow = ({ flow, nodes }) => {
-    const { primary_pipeline: pipelineId } = flow;
-    this.canvasController.setPipelineFlow(flow);
-    this.props.setPipelineId({ pipelineId });
-    this.props.setNlpNodes({ nodes });
-  };
-
   savePipeline = () => {
     const { nodes } = this.props;
     const flow = this.canvasController.getPipelineFlow();
@@ -228,6 +221,14 @@ class VisualEditor extends React.Component {
       nodes: newNodes,
     };
     fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
+  };
+
+  setPipelineFlow = ({ flow, nodes }) => {
+    const { primary_pipeline: pipelineId } = flow;
+    this.props.setShowRightPanel({ showPanel: false });
+    this.canvasController.setPipelineFlow(flow);
+    this.props.setPipelineId({ pipelineId });
+    this.props.setNlpNodes({ nodes });
   };
 
   onFlowSelected = async (e) => {
