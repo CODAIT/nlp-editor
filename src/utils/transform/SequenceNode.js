@@ -33,7 +33,7 @@ export default class SequenceNode {
       const downstreamNodeId = downstreamNodes[0];
       const node = nodes.find((n) => n.nodeId === downstreamNodeId);
       if (node.type === 'union') {
-        return node.label.toLowerCase();
+        return node.label;
       }
     }
     return label;

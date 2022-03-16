@@ -23,7 +23,7 @@ export default class UnionNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': parentNodeLabel.toLowerCase(),
+          'input-field-name': parentNodeLabel,
         },
       },
     ]; //add the first field for the sequence node
@@ -50,7 +50,7 @@ export default class UnionNode {
         },
         'output-spec': {
           field: {
-            '@': { name: label.toLowerCase(), type: 'Span' },
+            '@': { name: label, type: 'Span' },
           },
         },
         'rule-spec': { 'concept-projection': {} },
