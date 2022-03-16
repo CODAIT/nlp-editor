@@ -70,7 +70,7 @@ class SequencePanel extends React.Component {
     const tokenList = pattern.match(/<Token.+?(?=\()/g);
     if (tokenList) {
       tokenList.forEach((str) => {
-        const strToken = str.match(/\d,\d/g);
+        const strToken = str.match(/\d,\d+/g);
         if (strToken) {
           const [min, max] = strToken[0].split(',');
           tokens.push({ min, max });
