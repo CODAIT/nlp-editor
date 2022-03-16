@@ -180,6 +180,18 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
   return { annotations: annonResults, names: annonNames };
 };
 
+const hasError = (fileContents) => {
+  if (fileContents.hasOwnProperty('AqlTaskError')) {
+    return fileContents['AqlTaskError'];
+  }
+  const { instrumentationInfo } = fileContents;
+  if (instrumentationInfo.hasOwnProperty('exceptionMessage')) {
+    let message = instrumentationInfo['exceptionMessage'];
+    message = message.substring(0, message.indexOf(':'));
+    return message;
+  }
+};
+
 app.get('/api/results', function (req, res) {
   const { workingId } = req.query;
   const resultFileName = `${workingId}-result.json`;
@@ -196,10 +208,11 @@ app.get('/api/results', function (req, res) {
   const parsedContents = JSON.parse(fileContents);
 
   // execution returned errors
-  if (parsedContents.hasOwnProperty('AqlTaskError')) {
-    const message = parsedContents['AqlTaskError'];
+  const errorMessage = hasError(parsedContents);
+  if (errorMessage) {
+    console.log('found error message', errorMessage);
     deleteFile(file, resultFileName);
-    return res.status(200).send({ status: 'error', message });
+    return res.status(200).send({ status: 'error', message: errorMessage });
   }
 
   const results = formatResults(parsedContents);
