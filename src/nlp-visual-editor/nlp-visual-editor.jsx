@@ -197,14 +197,18 @@ class VisualEditor extends React.Component {
   };
 
   runPipeline = () => {
+    console.time('validating nlp nodes');
     const isValid = this.validatePipeline();
+    console.timeEnd('validating nlp nodes');
     if (!isValid) {
       return false;
     }
 
     this.props.setTabularResults(undefined);
 
+    console.time('transforming nlp nodes to XML');
     const payload = this.transformToXML();
+    console.timeEnd('transforming nlp nodes to XML');
     this.execute(payload);
   };
 

@@ -20,6 +20,10 @@ const tempFolder = __dirname + '/temp';
 //const systemTdataFolder = `/app/Seer-Core/aql-processor`;
 const systemTdataFolder = `${__dirname}/Seer-Core/aql-processor`;
 
+//for debugging purpose, implementation assumes single user, single invokation
+//need to change to use session when scaling ex: running on multiple pods
+let systemTStartTime = undefined;
+
 const createFolder = (folderName) => {
   console.log(`creating folder ${folderName}`);
   try {
@@ -127,6 +131,7 @@ app.post('/api/run', (req, res) => {
   const { workingId, payload } = req.body;
   const workingFolder = `${tempFolder}/${workingId}`;
 
+  console.time('writing xml files');
   fs.readdirSync(workingFolder)
     .filter((f) => f.endsWith('.xml'))
     .forEach((f) => fs.unlinkSync(`${workingFolder}/${f}`));
@@ -136,13 +141,17 @@ app.post('/api/run', (req, res) => {
     const { label, xml } = node;
     createNodeFile(workingFolder, `${label}.xml`, xml);
   });
+  console.timeEnd('writing xml files');
 
   //zip tempfolder
+  console.time('creating+moving zip file');
   const zipFileName = `${workingId}.zip`;
   createZipArchive(workingFolder, zipFileName);
 
   //move zipfile to be executed
   moveZipFile(workingFolder, zipFileName);
+  systemTStartTime = new Date().getTime(); //debugging instrumentation
+  console.timeEnd('creating+moving zip file');
 
   //read document to render in UI
   const docPath = `${workingFolder}/payload.txt`;
@@ -201,8 +210,11 @@ app.get('/api/results', function (req, res) {
     console.log(`results file ${resultFileName} not found.`);
     return res.status(200).send({ status: 'in-progress' });
   }
+  console.log(
+    `SystemT execution time: ${new Date().getTime() - systemTStartTime} ms`,
+  );
 
-  //read contents of file
+  //result file was found - read contents of file
   console.log(`results file ${resultFileName} found.`);
   let fileContents = fs.readFileSync(file, 'utf8');
   const parsedContents = JSON.parse(fileContents);
