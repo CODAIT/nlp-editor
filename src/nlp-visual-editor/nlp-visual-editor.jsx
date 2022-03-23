@@ -230,6 +230,7 @@ class VisualEditor extends React.Component {
   setPipelineFlow = ({ flow, nodes }) => {
     const { primary_pipeline: pipelineId } = flow;
     this.props.setShowRightPanel({ showPanel: false });
+    this.props.setTabularResults(undefined); // hides tabular view pane
     this.canvasController.setPipelineFlow(flow);
     this.props.setPipelineId({ pipelineId });
     this.props.setNlpNodes({ nodes });
