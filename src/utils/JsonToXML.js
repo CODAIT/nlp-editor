@@ -3,6 +3,7 @@ import {
   RegexNode,
   SequenceNode,
   UnionNode,
+  LiteralNode
 } from './transform';
 
 export default function JsonToXML(canvasController) {
@@ -22,6 +23,8 @@ export default function JsonToXML(canvasController) {
         break;
       case 'union':
         obj = new UnionNode(node, moduleName);
+	  case 'literal':
+		obj = new LiteralNode(this.canvasController, node, moduleName);
         break;
     }
     return obj.transform();
