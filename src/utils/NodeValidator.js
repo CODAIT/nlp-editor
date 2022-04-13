@@ -4,6 +4,7 @@ import {
   SequenceNode,
   RegexNode,
   UnionNode,
+  LiteralNode,
 } from './validation';
 
 export default function NodeValidator(canvasController) {
@@ -26,6 +27,9 @@ export default function NodeValidator(canvasController) {
         break;
       case 'union':
         node = new UnionNode(this.canvasController, pipelineId, nodeProps);
+		break;
+	  case 'literal':
+		node = new LiteralNode(this.canvasController, pipelineId, nodeProps);
         break;
     }
     return node.validate();

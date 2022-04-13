@@ -11,6 +11,7 @@ import {
   DictionaryPanel,
   SequencePanel,
   UnionPanel,
+  LiteralPanel
 } from '../nodes/components';
 
 import { isNodeLabelValid } from '../../utils';
@@ -41,7 +42,9 @@ class RHSPanel extends React.Component {
     switch (type) {
       case 'input':
         return <InputPanel {...node} />;
-      case 'regex':
+	  case 'literal':
+		return <LiteralPanel {...node} />;	
+	  case 'regex':
         return <RegexPanel {...node} />;
       case 'dictionary':
         return (
