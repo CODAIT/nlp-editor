@@ -6,12 +6,8 @@
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
 # production
 /build
-
 /temp
 
 # misc
@@ -24,3 +20,24 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# PyBuilder
+target/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# PyCharm
+.idea/
+*.iml
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+/coverage
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
