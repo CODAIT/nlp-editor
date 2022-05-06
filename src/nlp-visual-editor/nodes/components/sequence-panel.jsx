@@ -40,12 +40,12 @@ class SequencePanel extends React.Component {
     const upstreamNodes = [];
     immediateNodes.forEach((id, index) => {
       const node = nodes.find((n) => n.nodeId === id);
-      const { label, nodeId } = node;
+      const { label, nodeId, type } = node;
       pattern += `(<${label}.${label}>)`;
       if (index < immediateNodes.length - 1) {
         pattern += `<Token>{1,2}`;
       }
-      upstreamNodes.push({ label, nodeId });
+      upstreamNodes.push({ label, nodeId, type });
     });
     return { pattern, upstreamNodes };
   };
@@ -57,8 +57,8 @@ class SequencePanel extends React.Component {
     if (nodeList) {
       nodeList.forEach((n) => {
         const nodeName = n.substring(2, n.length);
-        const { nodeId } = upstreamNodes.find((n) => n.label === nodeName);
-        newList.push({ label: nodeName, nodeId });
+        const { nodeId, type } = upstreamNodes.find((n) => n.label === nodeName);
+        newList.push({ label: nodeName, nodeId, type  });
       });
     }
     return newList;

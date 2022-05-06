@@ -68,10 +68,13 @@ export default class SequenceNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label,
+          'input-field-name': label
         },
       },
     };
+	if (node.type === 'literal') {
+		atomItem["col-ref"]["@"]["isLiteral"] = "yes";
+	}
     if (index < length - 1) {
       const { min, max } = tokens;
       tokenGapItem = { '@': { min, max } };
