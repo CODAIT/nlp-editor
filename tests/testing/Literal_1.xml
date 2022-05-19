@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<concept module="elyraNLPCanvas" name="Literal_1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema/target_lang_spec.xsd">
+    <input-concepts>
+        <input-concept module="" name="Document"/>
+    </input-concepts>
+    <rule>
+        <input-spec>
+            <input-span input-concept-module="" input-concept-name="Document" input-field-name="text"/>
+        </input-spec>
+        <output-spec>
+            <field name="Literal_1" group="0" hide="no" func-call="no" renamed="no" type="Span"/>
+        </output-spec>
+        <rule-spec>
+            <seq-pattern>
+                <pattern-spec>
+                    <sequence>
+                        <atom group="0" min="1" max="1">
+                            <dict-match entry="ibm" lemma-match="false"/>
+                        </atom>
+                    </sequence>
+                </pattern-spec>
+            </seq-pattern>
+        </rule-spec>
+    </rule>
+</concept>

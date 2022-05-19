@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<concept module="elyraNLPCanvas" name="Union_1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema/target_lang_spec.xsd">
+    <input-concepts>
+        <input-concept module="elyraNLPCanvas" name="Literal_2"/>
+        <input-concept module="elyraNLPCanvas" name="Literal_3"/>
+        <input-concept module="elyraNLPCanvas" name="Literal_4"/>
+        <input-concept module="elyraNLPCanvas" name="Literal_1"/>
+    </input-concepts>
+    <rule>
+        <input-spec>
+            <input-span input-concept-module="elyraNLPCanvas" input-concept-name="Literal_2" input-field-name="Literal_1"/>
+        </input-spec>
+        <output-spec>
+            <field name="Literal_1" hide="no" func-call="no" renamed="no" type="Span"/>
+        </output-spec>
+        <rule-spec>
+            <concept-projection/>
+        </rule-spec>
+    </rule>
+    <rule>
+        <input-spec>
+            <input-span input-concept-module="elyraNLPCanvas" input-concept-name="Literal_3" input-field-name="Literal_1"/>
+        </input-spec>
+        <output-spec>
+            <field name="Literal_1" hide="no" func-call="no" renamed="no" type="Span"/>
+        </output-spec>
+        <rule-spec>
+            <concept-projection/>
+        </rule-spec>
+    </rule>
+    <rule>
+        <input-spec>
+            <input-span input-concept-module="elyraNLPCanvas" input-concept-name="Literal_4" input-field-name="Literal_1"/>
+        </input-spec>
+        <output-spec>
+            <field name="Literal_1" hide="no" func-call="no" renamed="no" type="Span"/>
+        </output-spec>
+        <rule-spec>
+            <concept-projection/>
+        </rule-spec>
+    </rule>
+    <rule>
+        <input-spec>
+            <input-span input-concept-module="elyraNLPCanvas" input-concept-name="Literal_1" input-field-name="Literal_1"/>
+        </input-spec>
+        <output-spec>
+            <field name="Literal_1" hide="no" func-call="no" renamed="no" type="Span"/>
+        </output-spec>
+        <rule-spec>
+            <concept-projection/>
+        </rule-spec>
+    </rule>
+</concept>

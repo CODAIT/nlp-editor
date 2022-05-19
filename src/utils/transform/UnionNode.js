@@ -23,7 +23,7 @@ export default class UnionNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': parentNodeLabel,
+          'input-field-name': label//'Literal_1',
         },
       },
     ]; //add the first field for the sequence node
@@ -50,7 +50,12 @@ export default class UnionNode {
         },
         'output-spec': {
           field: {
-            '@': { name: label, type: 'Span' },
+            '@': { 
+				name: label, //"Literal_1", 
+				hide: "no",
+				"func-call": "no",
+				"renamed": "yes", 
+				type: 'Span' },
           },
         },
         'rule-spec': { 'concept-projection': {} },
@@ -102,6 +107,7 @@ export default class UnionNode {
 
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
+	  format: { doubleQuotes: true }
     });
 
     return {

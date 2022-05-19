@@ -23,6 +23,7 @@ export default function JsonToXML(canvasController) {
         break;
       case 'union':
         obj = new UnionNode(node, moduleName);
+		break;
 	  case 'literal':
 		obj = new LiteralNode(this.canvasController, node, moduleName);
         break;

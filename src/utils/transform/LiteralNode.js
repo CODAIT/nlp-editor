@@ -56,7 +56,12 @@ export default class LiteralNode {
         'output-spec': {
           field: {
             '@': {
-              name: 'match'
+				name: "Literal_1",
+				group: 0,
+				hide: "no",
+				"func-call":"no",
+				"renamed": "no",
+				type: "Span"
             },
           },
         },
@@ -66,6 +71,7 @@ export default class LiteralNode {
 				  'sequence': {
 					  'atom': {
 						  '@': {
+							'group': 0,
 							'min': 1,
 							'max': 1
 						  },
@@ -84,6 +90,7 @@ export default class LiteralNode {
     };
     const literal = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
+	  format: { doubleQuotes: true }
     });
     return [
       { xml: literal, label }
