@@ -322,6 +322,23 @@ class VisualEditor extends React.Component {
           </>
         ),
       },
+	  {
+        action: 'export',
+        tooltip: 'Export',
+        jsx: (
+          <>
+            <Button
+              id={'btn-run'}
+              size="field"
+              kind="ghost"
+              onClick={() => window.open(`/api/download/${this.props.pipelineId}`)}
+            >
+              Export
+            </Button>
+          </>
+        ),
+      },
+	  
     ];
   };
 

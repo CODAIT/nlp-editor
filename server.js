@@ -141,7 +141,32 @@ app.post('/api/uploadflow', async (req, res) => {
     res.status(500).send({ message: 'File upload failed' });
   }
 });
+app.get('/api/download/:workingId', (req, res) => {
+	const { workingId } = req.params;
+	const destinationPath = `${systemTdataFolder}/user-data-in/${workingId}.export-aql`;
+	fs.writeFileSync(destinationPath, "");
+	setTimeout( () => {
+		const resultFileName = `${workingId}.zip`;
+		const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
+		if (!fs.existsSync(file)) {
+			return res.status(200).send({ status: 'in-progress' });
+		}
+		
+		var stat = fs.statSync(file);
 
+		let fileContents = fs.createReadStream(file);
+		const fileType = 'application/zip';
+		res.writeHead(200, {
+			'Content-Type': fileType,
+			'Content-Length': stat.size
+		})
+		fileContents.on('close', () => {
+			deleteFile(`${systemTdataFolder}/run-aql-result/${resultFileName}`, resultFileName);
+			res.end();
+		})
+		fileContents.pipe(res);
+	}, 10000);
+})
 app.post('/api/run', (req, res) => {
   console.log('executing pipeline');
   const { workingId, payload } = req.body;
