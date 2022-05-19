@@ -331,6 +331,7 @@ class VisualEditor extends React.Component {
               id={'btn-run'}
               size="field"
               kind="ghost"
+			  disabled={this.props.tabularResults === undefined}
               onClick={() => window.open(`/api/download/${this.props.pipelineId}`)}
             >
               Export
