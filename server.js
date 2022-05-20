@@ -149,9 +149,9 @@ app.get('/api/download/:workingId', (req, res) => {
 	const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
 	const FIFTYSECONDSTIMEOUT = 100;
 	let counter = 0;
-	setInterval( () => {
+	const interval = setInterval( () => {
 		if( counter > FIFTYSECONDSTIMEOUT) {
-			clearInterval(this);
+			clearInterval(interval);
 			return res.status(400).send({ status: '' });
 		}
 
@@ -165,7 +165,7 @@ app.get('/api/download/:workingId', (req, res) => {
 				'Content-Length': stat.size
 			})
 			fileContents.on('close', () => {
-				clearInterval(this);
+				clearInterval(interval);
 				deleteFile(`${systemTdataFolder}/run-aql-result/${resultFileName}`, resultFileName);
 				res.end();
 			})
@@ -173,6 +173,12 @@ app.get('/api/download/:workingId', (req, res) => {
 		}
 		counter += 1;
 	}, 500);
+	req.on("close", function() {
+		clearInterval(interval);
+	});
+	req.on("end", function() {
+		clearInterval(interval);
+	});
 })
 
 app.post('/api/run', (req, res) => {
