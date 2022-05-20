@@ -6,8 +6,14 @@
 /.pnp
 .pnp.js
 
+/Seer-Core
+
+# testing
+/coverage
+
 # production
 /build
+
 /temp
 
 # misc
