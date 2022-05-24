@@ -36,7 +36,7 @@ import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import JsonToXML from '../utils/JsonToXML';
-import { generateNodeName } from '../utils';
+import { generateNodeName, getImmediateDownstreamNodes } from '../utils';
 import fileDownload from 'js-file-download';
 
 import {
@@ -110,11 +110,22 @@ class VisualEditor extends React.Component {
       .getUpstreamNodes([selectedNodeId], pipelineId)
       .nodes[pipelineId].reverse();
 
+	const objNodes = nodes.reduce((sum, curr) => {
+		sum[curr.nodeId] = {...{}, ...curr};
+		return sum;
+	}, {});
+
     upstreamNodeIds.forEach((id) => {
-      const node = nodes.find((n) => n.nodeId === id);
+      	let node = objNodes[id];
+		node.child = objNodes[ getImmediateDownstreamNodes(id, this.canvasController.getLinks(this.pipelineId))[0] ];
+		if(node.child && node.child.type === 'filter' && node.child.primary === id) {
+			node.child.secondary = objNodes[ node.child.secondary ];
+		}
       if (node.type !== 'input') {
         const results = this.jsonToXML.transform(node, moduleName);
-        if (!Array.isArray(results)) {
+		if( node.type === 'filter') {
+			// do nothing
+		} else if (!Array.isArray(results)) {
           //dictionaries return a list
           const { xml, label } = results;
           payload.push({ xml, label });

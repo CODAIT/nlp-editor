@@ -40,6 +40,8 @@ export default function JsonToXML(canvasController) {
       case 'union':
         obj = new UnionNode(node, moduleName);
 		break;
+	  case 'filter':
+		return;
 	  case 'literal':
 		obj = new LiteralNode(this.canvasController, node, moduleName);
         break;

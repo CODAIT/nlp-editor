@@ -106,6 +106,11 @@ export default class DictionaryNode {
           field: {
             '@': {
               name: fieldName, //node name lowercase
+			  group: 0,
+			  hide: "no",
+			  "func-call": "no",
+			  renamed:"no",
+			  type:"Span"
             },
           },
         },
@@ -123,6 +128,7 @@ export default class DictionaryNode {
     };
     const dictionary = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
+	  format: { doubleQuotes: true }
     });
     const words = this.getDictionaryWords();
     return [

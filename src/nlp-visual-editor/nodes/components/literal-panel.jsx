@@ -93,12 +93,6 @@ class LiteralPanel extends React.Component {
             onChange={(e) => {
               this.setState({ inputText: e.target.value });
             }}
-            onKeyDown={(e) => {
-              const keyPressed = e.key || e.keyCode;
-              if (keyPressed === 'Enter' || keyPressed === 13) {
-                this.onUpdateList();
-              }
-            }}
             value={inputText}
           />
         </div>
