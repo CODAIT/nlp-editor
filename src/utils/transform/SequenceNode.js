@@ -123,7 +123,7 @@ export default class SequenceNode {
   }
 
   transform() {
-    const { label } = this.node;
+    const { label, consolidate, consolidateTarget, consolidatePolicy } = this.node;
     const inputConcepts = this.getInputConcepts();
     const fieldList = this.getFieldsList();
     const sequence = this.getSequence();
@@ -150,6 +150,15 @@ export default class SequenceNode {
         },
       },
     };
+
+	if( consolidate ) {
+		jsonStructure['consolidation-spec'] = {
+			'@': {
+				target: consolidateTarget,
+				policy: consolidatePolicy
+			}
+		}
+	}
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
 	  format: { doubleQuotes: true }
