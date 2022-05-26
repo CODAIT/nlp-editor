@@ -88,7 +88,7 @@ class FilterPanel extends React.Component {
   }
 
   onSavePane = () => {
-    const {primary, filterType, funcName, secondary } =
+    const {primary, filterType, funcName, secondary, scope } =
       this.state;
     const { nodeId } = this.props;
 
@@ -119,7 +119,7 @@ class FilterPanel extends React.Component {
 			id="filterType"
 			size="sm"
 			light
-			initialSelectedItem={filterType.find(
+			initialSelectedItem={this.state.filterTypeItems.find(
 				(item) => this.state.filterType == item.id,
 			)}
 			label="Filter"
@@ -170,7 +170,7 @@ class FilterPanel extends React.Component {
 			id="funcName"
 			size="sm"
 			light
-			initialSelectedItem={functions.find(
+			initialSelectedItem={this.state.funcNameItems.find(
 				(item) => this.state.funcName == item.id,
 			)}
 			label="Filter"
