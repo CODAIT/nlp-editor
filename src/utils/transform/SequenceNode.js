@@ -151,50 +151,6 @@ export default class SequenceNode {
       },
     };
 
-	if( this.node.child && this.node.child.type === 'filter' && this.node.child.primary === this.node.nodeId) {
-		const predicate = this.node.child.filterType
-		const funcName = this.node.child.funcName;
-		const secondInput = this.node.child.secondary.label;
-		jsonStructure[predicate] = {
-			predicate: {
-				'function-call': {
-					'@': {'func-name': funcName},
-					arg: [{
-						'field-spec': {
-							'@': {
-								'input-field-name': fieldName,
-								'input-concept-name': fieldName,
-								'input-concept-module': this.moduleName
-							}
-						}
-					},{
-						'field-spec': {
-							'@': {
-								'input-field-name': secondInput,
-								'input-concept-name': secondInput,
-								'input-concept-module': this.moduleName
-							}
-						}
-					}]
-				}
-			}
-		};
-		jsonStructure['input-concepts']['input-concept'].push({
-			'@': {
-			  module: this.moduleName,
-			  name: secondInput,
-			},
-		  })
-	}
-
-	if( consolidate ) {
-		jsonStructure['consolidation-spec'] = {
-			'@': {
-				target: consolidateTarget,
-				policy: consolidatePolicy
-			}
-		}
-	}
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
 	  format: { doubleQuotes: true }

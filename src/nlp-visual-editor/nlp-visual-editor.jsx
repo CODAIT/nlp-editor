@@ -117,15 +117,9 @@ class VisualEditor extends React.Component {
 
     upstreamNodeIds.forEach((id) => {
       	let node = objNodes[id];
-		node.child = objNodes[ getImmediateDownstreamNodes(id, this.canvasController.getLinks(this.pipelineId))[0] ];
-		if(node.child && node.child.type === 'filter' && node.child.primary === id) {
-			node.child.secondary = objNodes[ node.child.secondary ];
-		}
       if (node.type !== 'input') {
         const results = this.jsonToXML.transform(node, moduleName);
-		if( node.type === 'filter') {
-			// do nothing
-		} else if (!Array.isArray(results)) {
+		if (!Array.isArray(results)) {
           //dictionaries return a list
           const { xml, label } = results;
           payload.push({ xml, label });

@@ -30,25 +30,6 @@ class SequencePanel extends React.Component {
     this.state = {
       pattern: this.props.pattern,
       upstreamNodes: this.props.upstreamNodes,
-	  consolidate: this.props.consolidate || false,
-	  consolidateTarget: this.props.consolidateTarget,
-	  consolidatePolicy: this.props.consolidatePolicy,
-	  consolidateMethod: [{
-		  id: 'ContainedWithin',
-		  text: 'Contained Within'
-	  }, {
-		id: 'NotContainedWithin',
-		text: 'Not Contained Within'
-	}, {
-		id: 'ContainsButNotEqual',
-		text: 'Contains But Not Equal'
-	}, {
-		id: 'Exactmatch',
-		text: 'Exact match'
-	}, {
-		id: 'LeftToRight',
-		text: 'Left To Right'
-	}]
     };
   }
 
@@ -116,7 +97,7 @@ class SequencePanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { pattern, consolidate, consolidatePolicy, consolidateTarget} = this.state;
+    const { pattern } = this.state;
     const { nodeId } = this.props;
 
     let errorMessage =
@@ -132,9 +113,6 @@ class SequencePanel extends React.Component {
         pattern,
         upstreamNodes,
         tokens,
-		consolidate,
-		consolidateTarget,
-		consolidatePolicy,
         isValid: true,
       };
       this.props.saveNlpNode({ node });
@@ -156,52 +134,6 @@ class SequencePanel extends React.Component {
             this.setState({ pattern: e.target.value });
           }}
         />
-
-		<hr/>
-		<Checkbox
-          labelText="Manage overlapping matches"
-          id="chkLemmaMatch"
-          onChange={(v) => {
-			  this.setState({
-				  consolidate: v
-			  });
-		  }}
-          checked={this.state.consolidate}
-        />
-
-		<Dropdown
-			id="output"
-			size="sm"
-			light
-			label="Output Column"
-			initialSelectedItem={this.state.upstreamNodes.find(
-				(item) => this.state.consolidateTarget == item.label,
-			)}
-			items={this.state.upstreamNodes}
-			itemToString={(item) => (item ? item.label : "")}
-			onChange={(e) => {
-				this.setState({
-					consolidateTarget: e.selectedItem.label
-				});
-			}}
-		/>	
-
-		<Dropdown
-			id="method"
-			size="sm"
-			light
-			label="Method"
-			initialSelectedItem={this.state.consolidateMethod.find(
-				(item) => this.state.consolidatePolicy == item.id,
-			)}
-			items={this.state.consolidateMethod}
-			itemToString={(item) => (item ? item.text : "")}
-			onChange={(e) => {
-				this.setState({
-					consolidatePolicy: e.selectedItem.id
-				});
-			}}
-		/>	
 		
         <RHSPanelButtons
           onClosePanel={() => {

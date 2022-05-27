@@ -21,4 +21,14 @@ import SequencePanel from './sequence-panel';
 import UnionPanel from './union-panel';
 import LiteralPanel from './literal-panel';
 import FilterPanel from './filter-panel';
-export { InputPanel, RegexPanel, DictionaryPanel, SequencePanel, UnionPanel, LiteralPanel, FilterPanel };
+import ConsolidatePanel from './consolidate-panel';
+export { 
+	InputPanel,
+	RegexPanel,
+	DictionaryPanel,
+	SequencePanel,
+	UnionPanel,
+	LiteralPanel,
+	FilterPanel,
+	ConsolidatePanel
+};
