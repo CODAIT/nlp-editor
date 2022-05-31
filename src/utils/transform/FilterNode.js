@@ -96,9 +96,61 @@ export default class SequenceNode {
 	};
 
 	/*
-
-
-
+	switch( scope ) {
+		case 'length':
+			> shorter than, longer than, equals
+				=> INPUT
+			> characters, tokens 
+			break;
+		case 'text':
+			?? matches, contains
+				> customized regular expression in
+					=> INPUT regular expression
+					=> case sensitivity **
+				> dictionary terms in
+					=> NODE (secondary)
+					=> case sensitivity *
+				> regular expression in
+					=> NODE (secondary)
+					=> case sensitivity **
+			break;
+		case 'range':
+			switch(funcName) {
+				case 'Overlaps':
+					https://pages.github.ibm.com/ai-foundation/watson-nlp-documentation/library-system-t/aql-ref-guide.html#overlaps
+					jsonStructure[predicate]['predicate']['function-call']['@']['func-name'] = funcName;
+					jsonStructure[predicate]['predicate']['function-call'].arg = [{}, {}];
+					break;
+				case 'Equals':
+					> column
+						=> NODE (secondary)
+					> constant
+						=> INPUT
+					https://pages.github.ibm.com/ai-foundation/watson-nlp-documentation/library-system-t/aql-ref-guide.html#equals
+					break;
+				case 'Contains':
+					=> NODE (secondary)
+					https://pages.github.ibm.com/ai-foundation/watson-nlp-documentation/library-system-t/aql-ref-guide.html#contains
+					break;
+				case 'StartsWith':
+				case 'EndsWith':
+					=> NODE (secondary)
+					break;
+				case 'OccursBefore':
+				case 'OccursAfter':
+					=> NODE (secondary)
+					> no limit
+					> between two
+						=> INPUT
+						=> INPUT
+						> characters/tokens
+					> exactly
+						=> INPUT
+						> characters/tokens
+					break;
+			}			
+			break;
+	}
 	*/
 		
     const xml = js2xmlparser.parse('concept', jsonStructure, {
