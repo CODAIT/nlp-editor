@@ -52,7 +52,7 @@ class ConsolidatePanel extends React.Component {
 		id: 'ContainsButNotEqual',
 		text: 'Contains But Not Equal'
 	}, {
-		id: 'Exactmatch',
+		id: 'ExactMatch',
 		text: 'Exact match'
 	}, {
 		id: 'LeftToRight',

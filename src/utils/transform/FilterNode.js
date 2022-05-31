@@ -25,7 +25,7 @@ export default class SequenceNode {
   }
 
   transform() {
-    const { label } = this.node;
+    const { label, scope } = this.node;
 	const predicate = this.node.filterType
 	const funcName = this.node.funcName;
 	const { nodes } = store.getState()['nodesReducer'];
@@ -94,6 +94,12 @@ export default class SequenceNode {
 			}
 		}
 	};
+
+	/*
+
+
+
+	*/
 		
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
