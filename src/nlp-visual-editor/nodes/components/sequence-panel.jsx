@@ -27,8 +27,15 @@ class SequencePanel extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-      const { pattern, upstreamNodes } = this.props;
-      this.setState({ pattern, upstreamNodes });
+      if (this.props.pattern === '') {
+        const { pattern, upstreamNodes } = this.constructPattern();
+        this.setState({ pattern, upstreamNodes });
+      } else {
+        this.setState({
+          pattern: this.props.pattern,
+          upstreamNodes: this.props.upstreamNodes,
+        });
+      }
     }
   }
 
