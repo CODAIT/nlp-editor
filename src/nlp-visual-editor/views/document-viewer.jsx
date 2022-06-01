@@ -35,8 +35,13 @@ class DocumentViewer extends React.Component {
     names.forEach((name, index) => {
       const color = this.getHighlightColor(index);
       const res = annotations[name].map((t) => {
-        const { start, end } = t;
-        return { start, end, color };
+		  if( t.attributes ) {
+			const { start, end } = Object.keys(t).filter( a => !['attributes','indexResults'].includes(a))[0];
+        	return { start, end, color };
+		  } else {
+			const { start, end } = t;
+        	return { start, end, color };
+		  }
       });
       spans = spans.concat(res);
     });

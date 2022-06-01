@@ -27,8 +27,43 @@ import {
   TableRow,
 } from 'carbon-components-react';
 
+const hasAttributeResult = (tabularData, docName) => {
+	return tabularData.map((row, index) => (
+		<TableRow
+		  key={`row_${index}`}
+		>
+		  <TableCell key={`doc-name_${index}`}>{docName}</TableCell>
+		  {
+		  	Object.keys(row).filter(k => !['attributes', 'indexResult'].includes(k)).map( key => (
+			  <TableCell key={`row-text_${key}_${index}`}>{row[key]['text']}</TableCell>
+			))
+		  }
+		</TableRow>
+	))
+}
+const noAttributes = (tabularData, docName) => {
+	return tabularData.map((row, index) => (
+		<TableRow
+		  key={`row_${index}`}
+		  onClick={() => onRowSelected(row, index)}
+		>
+		  <TableCell key={`doc-name_${index}`}>{docName}</TableCell>
+		  <TableCell key={`row-text_${index}`}>{row['text']}</TableCell>
+		</TableRow>
+	  ));
+}
+
 const TableResults = ({ tabularData, label, docName = '', onRowSelected }) => {
-  const mockedHeaders = ['Document', `${label} (Span)`];
+  const mockedHeaders = ['Document'];
+  let hasAttributtes = false;
+  if( tabularData[0].hasOwnProperty('attributes') ) {
+	  hasAttributtes = true;
+	  Object.keys(tabularData[0]).filter(k => !['attributes', 'indexResult'].includes(k) ).forEach( key => {
+		  mockedHeaders.push(key)
+	  })
+  } else {
+	  mockedHeaders.push(`${label} (Span)`);
+  }
   return (
     <div className="table-results">
       <Table size="sm">
@@ -42,15 +77,7 @@ const TableResults = ({ tabularData, label, docName = '', onRowSelected }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tabularData.map((row, index) => (
-            <TableRow
-              key={`row_${index}`}
-              onClick={() => onRowSelected(row, index)}
-            >
-              <TableCell key={`doc-name_${index}`}>{docName}</TableCell>
-              <TableCell key={`row-text_${index}`}>{row['text']}</TableCell>
-            </TableRow>
-          ))}
+          { !hasAttributtes ? noAttributes(tabularData, docName) : hasAttributeResult(tabularData, docName) }
         </TableBody>
       </Table>
     </div>
