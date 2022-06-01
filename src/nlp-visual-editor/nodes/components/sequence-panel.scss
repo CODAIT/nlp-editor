@@ -15,7 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 .sequence-panel{
-    
+    .attributes {
+		line-height: 30px;
+		.bx--checkbox-wrapper {
+			float: left;
+			padding: 0;
+		}
+	}
     .token-controls {
         display: flex;
         padding-left: 30px;

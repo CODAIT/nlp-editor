@@ -1,0 +1,137 @@
+IBM Reports 2010 Fourth-Quarter and Full-Year Results
+
+
+Tab navigation
+Press release 
+Related XML feeds 
+Contact(s) information 
+Related resources 
+
+--------------------------------------------------------------------------------
+
+ARMONK, N.Y. - 18 Jan 2011: 
+
+Fourth-Quarter 2010:
+
+Diluted earnings per share of $4.18, up 16 percent; 
+Record revenue of $29.0 billion, up 7 percent as reported and adjusting for currency; 
+Record net income of $5.3 billion, up 9 percent; 
+Pre-tax income of $7 billion, up 9 percent; 
+Gross profit margin of 49 percent, up 0.8 points; 
+Software revenue excluding divested PLM operations up 11 percent, 12 percent adjusting for currency; 7 percent including PLM; 
+Systems and Technology revenue up 21 percent, 22 percent adjusting for currency; 
+System z mainframe revenue up 69 percent; MIPS up 58 percent; 
+Services revenue up 2 percent as reported and adjusting for currency; 
+Services backlog of $142 billion, up $5 billion year over year and up $8 billion quarter to quarter; 
+Growth markets revenue up 15 percent, 13 percent adjusting for currency; 
+Business analytics revenue up 19 percent; 
+Free cash flow of $8.7 billion, up $1.5 billion. 
+Full-Year 2010:
+
+Diluted earnings per share of $11.52, up 15 percent and $0.52 ahead of high end of 2010 roadmap; 8th consecutive year of double-digit EPS growth; 
+Revenue of $99.9 billion, up 4 percent, up 3 percent adjusting for currency; up 5 percent, 4 percent adjusting for currency, excluding PLM operations; 
+Record net income of $14.8 billion, up 10 percent; 
+Record free cash flow of $16.3 billion, up $1.2 billion; 
+Gross profit margin of 46.1 percent, 7th consecutive year of increase. 
+Full-Year 2011:
+
+Expect GAAP EPS of at least $12.56 and operating (non-GAAP) EPS of at least $13.00, on track for 2015 roadmap. 
+IBM (NYSE: IBM) today announced fourth-quarter 2010 diluted earnings of $4.18 per share, compared with diluted earnings of $3.59 per share in the fourth quarter of 2009, an increase of 16 percent.
+
+Fourth-quarter net income was $5.3 billion compared with $4.8 billion in the fourth quarter of 2009, an increase of 9 percent. Total revenues for the fourth quarter of 2010 of $29.0 billion increased 7 percent (7 percent, adjusting for currency) from the fourth quarter of 2009.
+
+"We completed an outstanding year, with record profit and free cash flow, and exceeded the high end of our 2010 earnings per share roadmap objective," said Samuel J. Palmisano, IBM chairman, president and chief executive officer. "We also capped a decade in which our shift to high-value businesses, our global integration of IBM, our investment in research and development of almost $60 billion and our acquisition of 116 companies have helped us to nearly triple our EPS and return more than $100 billion to shareholders.
+
+"As IBM enters its second century, we will continue to focus on our long-term strategic initiatives -- growth markets, Smarter Planet Solutions, cloud and business analytics -- as we drive to achieve our new roadmap target of operating earnings per share of at least $20 in 2015."
+
+Full-Year 2011 Expectations
+
+IBM said that it expects to deliver full-year 2011 GAAP earnings per share of at least $12.56; and operating (non-GAAP) earnings per share of at least $13.00, which puts the company on track for the 2015 road map of at least $20 of operating (non-GAAP) earnings per share. The 2011 operating (non-GAAP) earnings exclude $0.44 per share for the amortization of purchased intangible assets, other acquisition-related charges and certain retirement-related costs that the company has defined as non-operating.
+
+The company announced in May 2010 that it would begin using operating (non-GAAP) earnings as the basis for its 2015 roadmap, quarterly earnings reporting and future EPS guidance.
+
+Geographic Regions
+
+The Americas' fourth-quarter revenues were $12.2 billion, an increase of 9 percent (9 percent, adjusting for currency) from the 2009 period. Revenues from Europe/Middle East/Africa were $9.5 billion, down 2 percent (up 4 percent, adjusting for currency). Asia-Pacific revenues increased 14 percent (7 percent, adjusting for currency) to $6.6 billion. OEM revenues were $784 million, up 21 percent compared with the 2009 fourth quarter.
+
+Growth Markets
+
+Revenues from the company's growth markets organization increased 15 percent (13 percent, adjusting for currency). Revenues in the BRIC countries - Brazil, Russia, India and China - increased 19 percent (17 percent, adjusting for currency), and a total of 50 growth market countries had double-digit revenue growth. For the full year, growth markets revenue represents 21 percent of IBM's total geographic revenue.
+
+Services
+
+Total Global Services revenues increased 2 percent (2 percent, adjusting for currency). Global Technology Services segment revenues increased 1 percent (1 percent, adjusting for currency) to $10.2 billion. Global Business Services segment revenues were up 4 percent (4 percent, adjusting for currency) at $4.8 billion.
+
+Global Services pre-tax income increased to $2.4 billion, up 3 percent year over year. Pre-tax income from Global Technology Services increased 6 percent; pre-tax margin increased to 15.8 percent. Global Business Services pre-tax income decreased 3 percent; pre-tax margin decreased to 15.0 percent.
+
+The estimated services backlog at December 31 was $142 billion, up $8 billion quarter to quarter ($7 billion, adjusting for currency), and $5 billion year over year at actual rates ($4 billion, adjusting for currency). IBM signed services contracts in the quarter of $22.1 billion, up 18 percent (18 percent, adjusting for currency), of which 19 contracts were greater than $100 million. Transactional signings were $8.0 billion, an increase of 8 percent (9 percent, adjusting for currency). Outsourcing signings were $14.1 billion, up 24 percent (23 percent, adjusting for currency).
+
+Software
+
+Revenues from the Software segment were $7.0 billion, an increase of 7 percent (8 percent, adjusting for currency), or 11 percent (12 percent, adjusting for currency) excluding the first-quarter 2010 divestiture of the Product Lifecycle Management operations (PLM), compared with the fourth quarter of 2009. Software pre-tax income of $3.2 billion increased 4 percent year over year.
+
+Revenues from IBM's key middleware products, which include WebSphere, Information Management, Tivoli, Lotus and Rational products, were $4.7 billion, an increase of 13 percent (15 percent, adjusting for currency) versus the fourth quarter of 2009. Operating systems revenues of $690 million increased 11 percent (12 percent, adjusting for currency) compared with the prior-year quarter.
+
+Revenues from the WebSphere family of software products increased 32 percent year over year. Information Management software revenues increased 10 percent. Revenues from Tivoli software increased 12 percent. Revenues from Lotus software decreased 3 percent, and Rational software increased 10 percent.
+
+Revenues from the company's business analytics operations across services and software segments increased 19 percent.
+
+Hardware
+
+Revenues from the Systems and Technology segment totaled $6.3 billion for the quarter, up 21 percent (22 percent, adjusting for currency) from the fourth quarter of 2009. Systems and Technology pre-tax income was $1.2 billion, an increase of 45 percent.
+
+Systems revenues increased 20 percent (21 percent, adjusting for currency). Revenues from System z mainframe server products increased 69 percent compared with the year-ago period. Total delivery of System z computing power, as measured in MIPS (millions of instructions per second), increased 58 percent. Revenues from System x increased 18 percent. Revenues from Power Systems increased 2 percent compared with the 2009 period; entry systems revenues were up 30 percent and mid-range systems grew 7 percent. Revenues from System Storage increased 8 percent, and revenues from Retail Store Solutions increased 26 percent year over year. Revenues from Microelectronics OEM increased 30 percent.
+
+Financing
+
+Global Financing segment revenues increased 1 percent (1 percent, adjusting for currency) in the fourth quarter to $628 million. Pre-tax income for the segment increased 14 percent to $567 million.
+
+***
+
+The company's total gross profit margin was 49.0 percent in the 2010 fourth quarter compared with 48.3 percent in the 2009 fourth-quarter period, with increases in Systems and Technology and Software.
+
+Total expense and other income increased 7 percent to $7.3 billion compared with the prior-year period. SG&A expense of $6.0 billion increased 7 percent year over year compared with prior-year expense. RD&E expense of $1.6 billion increased 8 percent compared with the year-ago period. Intellectual property and custom development income increased to $318 million compared with $313 million a year ago. Other (income) and expense was income of $42 million compared with prior-year income of $24 million. Interest expense increased to $102 million compared with $81 million in the prior year.
+
+Pre-tax income increased 9 percent to $7.0 billion. Pre-tax margin was 24.0 percent, up 0.5 points.
+
+IBM's tax rate was 24.4 percent, down 0.2 points year over year.
+
+Net income margin increased 0.4 points to 18.1 percent.
+
+The weighted-average number of diluted common shares outstanding in the fourth-quarter 2010 was 1.26 billion compared with 1.34 billion shares in the same period of 2009.
+
+Full-Year 2010 Results
+
+Net income for the year ended December 31, 2010 was $14.8 billion compared with $13.4 billion in the year-ago period, an increase of 10 percent. Diluted earnings were $11.52 per share compared with $10.01 per diluted share in 2009, an increase of 15 percent, the 8th consecutive year of double-digit EPS growth. Revenues for 2010 totaled $99.9 billion, an increase of 4 percent (3 percent, adjusting for currency), compared with $95.8 billion in 2009.
+
+From a geographic perspective, the Americas' full-year revenues were $42.0 billion, an increase of 5 percent (3 percent, adjusting for currency) from the 2009 period. Revenues from Europe/Middle East/Africa were $31.9 billion, a decrease of 2 percent (up 1 percent, adjusting for currency). Asia-Pacific revenues increased 12 percent (5 percent, adjusting for currency) to $23.2 billion. OEM revenues were $2.8 billion, up 23 percent compared with 2009.
+
+Revenues from the company's growth markets organization increased 16 percent (11 percent, adjusting for currency).
+
+Total Global Services revenues increased 3 percent (1 percent, adjusting for currency). Revenues from the Global Technology Services segment totaled $38.2 billion, an increase of 2 percent (1 percent, adjusting for currency) compared with 2009. Revenues from the Global Business Services segment were $18.2 billion, up 3 percent (2 percent, adjusting for currency). Total services signings were $57.7 billion. Software segment revenues in 2010 totaled $22.5 billion, an increase of 5 percent (5 percent, adjusting for currency). Systems and Technology segment revenues were $18.0 billion, an increase of 11 percent (11 percent, adjusting for currency). Global Financing segment revenues totaled $2.2 billion, a decrease of 3 percent (4 percent, adjusting for currency).
+
+The company's total gross profit margin was 46.1 percent in 2010 compared with 45.7 percent in 2009, with increases in Systems and Technology and Software. Overall gross profit margins improved year over year for the 7th consecutive year.
+
+The weighted-average number of diluted common shares outstanding in 2010 was 1.29 billion compared with 1.34 billion shares in 2009. As of December 31, 2010, there were 1.23 billion basic common shares outstanding.
+
+Debt, including Global Financing, totaled $28.6 billion, compared with $26.1 billion at year-end 2009. From a management segment view, Global Financing debt totaled $22.8 billion versus $22.4 billion at year-end 2009, resulting in a debt-to-equity ratio of 7.0 to 1. Non-global financing debt totaled $5.8 billion, an increase of $2.1 billion since year-end 2009, resulting in a debt-to-capitalization ratio of 22.6 percent from 16.0 percent.
+
+IBM ended 2010 with $11.7 billion of cash on hand and generated free cash flow of $16.3 billion excluding Global Financing receivables, up approximately $1.2 billion year over year. The company returned $18.6 billion to shareholders through $3.2 billion in dividends and $15.4 billion of share repurchases. The balance sheet remains strong, and the company is well positioned to support the business over the long term.
+
+Forward-Looking and Cautionary Statements
+
+Except for the historical information and discussions contained herein, statements contained in this release may constitute forward-looking statements within the meaning of the Private Securities Litigation Reform Act of 1995. Forward-looking statements are based on the company's current assumptions regarding future business and financial performance. These statements involve a number of risks, uncertainties and other factors that could cause actual results to differ materially, including the following: a downturn in economic environment and corporate IT spending budgets; the company's failure to meet growth and productivity objectives, a failure of the company's innovation initiatives; risks from investing in growth opportunities; failure of the company's intellectual property portfolio to prevent competitive offerings and the failure of the company to obtain necessary licenses; breaches of data security; fluctuations in revenue and purchases, impact of local legal, economic, political and health conditions; adverse effects from environmental matters, tax matters and the company's pension plans; ineffective internal controls; the company's use of accounting estimates; the company's ability to attract and retain key personnel and its reliance on critical skills; impact of relationships with critical suppliers; currency fluctuations and customer financing risks; impact of changes in market liquidity conditions and customer credit risk on receivables; reliance on third party distribution channels; the company's ability to successfully manage acquisitions and alliances; risk factors related to IBM securities; and other risks, uncertainties and factors discussed in the company's Form 10-Q, Form 10-K and in the company's other filings with the U.S. Securities and Exchange Commission (SEC) or in materials incorporated therein by reference. Any forward-looking statement in this release speaks only as of the date on which it is made. The company assumes no obligation to update or revise any forward-looking statements.
+
+Presentation of Information in this Press Release
+
+In an effort to provide investors with additional information regarding the company's results as determined by generally accepted accounting principles (GAAP), the company has also disclosed in this press release the following non-GAAP information which management believes provides useful information to investors:
+
+IBM results and expectations -
+
+presenting operating earnings per share expectations; 
+presenting non-global financing debt-to-capitalization ratio; 
+adjusting for free cash flow; 
+adjusting for currency (i.e., at constant currency); 
+excluding divested PLM operations. 
+The rationale for management's use of non-GAAP measures is included as part of the supplementary materials presented within the fourth-quarter earnings materials. These materials are available on the IBM investor relations Web site at www.ibm.com/investor and are being included in Attachment II ("Non-GAAP Supplementary Materials") to the Form 8-K that includes this press release and is being submitted today to the SEC.
+

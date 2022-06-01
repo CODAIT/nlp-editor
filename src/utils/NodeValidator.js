@@ -21,6 +21,8 @@ import {
   RegexNode,
   UnionNode,
   LiteralNode,
+  FilterNode,
+  ConsolidateNode
 } from './validation';
 
 export default function NodeValidator(canvasController) {
@@ -43,6 +45,12 @@ export default function NodeValidator(canvasController) {
         break;
       case 'union':
         node = new UnionNode(this.canvasController, pipelineId, nodeProps);
+		break;
+	  case 'filter':
+		node = new FilterNode(this.canvasController, pipelineId, nodeProps);
+		break;
+	  case 'consolidate':
+		node = new ConsolidateNode(this.canvasController, pipelineId, nodeProps);
 		break;
 	  case 'literal':
 		node = new LiteralNode(this.canvasController, pipelineId, nodeProps);
