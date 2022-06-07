@@ -90,11 +90,10 @@ class VisualEditor extends React.Component {
     if (names !== pipelineNames) {
       //if nodenames changed, update flow structure
       this.props.nodes.forEach((n) => {
-        const { nodeId, label, type } = n;
+        const { nodeId, label } = n;
         this.canvasController.setNodeLabel(
           nodeId,
           label,
-		  type,
           this.props.pipelineId,
         );
       });

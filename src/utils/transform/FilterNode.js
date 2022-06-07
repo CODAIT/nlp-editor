@@ -31,6 +31,13 @@ export default class SequenceNode {
 	const { nodes } = store.getState()['nodesReducer'];
 	const primaryInput = nodes.find(n => n.nodeId === this.node.primary);
 	const secondInput = nodes.find(n => n.nodeId === this.node.secondary);
+	let overrideSecondaryFilterInputName;
+	if( secondInput.type === 'filter') {
+		const filterParent = nodes.find(n => n.nodeId === secondInput.primary);
+		if( filterParent ) {
+			overrideSecondaryFilterInputName = filterParent.label;
+		}
+	}
 
     const jsonStructure = {
       '@': {
@@ -85,7 +92,7 @@ export default class SequenceNode {
 				},{
 					'field-spec': {
 						'@': {
-							'input-field-name': secondInput.label,
+							'input-field-name': overrideSecondaryFilterInputName || secondInput.label,
 							'input-concept-name': secondInput.label,
 							'input-concept-module': this.moduleName
 						}

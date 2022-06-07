@@ -36,8 +36,12 @@ class DocumentViewer extends React.Component {
       const color = this.getHighlightColor(index);
       const res = annotations[name].map((t) => {
 		  if( t.attributes ) {
-			const { start, end } = Object.keys(t).filter( a => !['attributes','indexResults'].includes(a))[0];
-        	return { start, end, color };
+			const outputs = Object.keys(t).filter( a => !['attributes','indexResult'].includes(a));
+			if( outputs.length === 1) {
+				const { start, end } = t[outputs[0]];
+				return { start, end, color };
+			}
+			// TODO: Rearchitect Highlighting when multiple outputs
 		  } else {
 			const { start, end } = t;
         	return { start, end, color };

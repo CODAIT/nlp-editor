@@ -50,7 +50,7 @@ class FilterPanel extends React.Component {
 		id: '',
 		text: 'equals'
 		}, {
-		id: '',
+		id: 'Contains',
 		text: 'contains'
 		}, {
 		id: '',

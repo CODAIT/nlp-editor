@@ -28,7 +28,6 @@ export default class SequenceNode {
     const { label, consolidateTarget, consolidatePolicy } = this.node;
 	const { nodes } = store.getState()['nodesReducer'];
 	const primaryInput = nodes.find(n => n.nodeId === this.node.primary);
-	debugger;
     const jsonStructure = {
       '@': {
         module: this.moduleName,
