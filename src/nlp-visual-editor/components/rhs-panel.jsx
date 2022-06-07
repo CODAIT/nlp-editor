@@ -60,9 +60,9 @@ class RHSPanel extends React.Component {
     switch (type) {
       case 'input':
         return <InputPanel {...node} />;
-	  case 'literal':
-		return <LiteralPanel {...node} />;	
-	  case 'regex':
+      case 'literal':
+        return <LiteralPanel {...node} />;
+      case 'regex':
         return <RegexPanel {...node} />;
 	  case 'filter':
 		return <FilterPanel {...node} canvasController={canvasController}  />;
@@ -144,6 +144,9 @@ class RHSPanel extends React.Component {
 
   render() {
     const node = this.getNodeProps();
+    if (!node) {
+      return <p>Select a node to edit its properties.</p>;
+    }
     const { description, type } = node;
     const panelContents = this.getPanelContent(type);
     const titleComponent = this.getTitleComponent();
