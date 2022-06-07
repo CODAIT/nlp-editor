@@ -63,14 +63,6 @@ class ConsolidatePanel extends React.Component {
     
   }
 
-  componentDidMount() {
-
-  }
-
-  componentDidUpdate(prevProps) {
-
-  }
-
   validateParameters = () => {
     const { consolidatePolicy, consolidateTarget} = this.state;
     const { nodeId } = this.props;
