@@ -146,7 +146,7 @@ class SequencePanel extends React.Component {
 	this.setState({upstreamNodes: localNodes, editId: false});
   }
   onSaveAttributeVisible(node, value) {
-	const localNodes = this.state.upstreamNodes;
+	const localNodes = JSON.parse( JSON.stringify(this.state.upstreamNodes));
 	const targetNode = localNodes.find(n => n.nodeId === node.nodeId);
 	targetNode.visible = value;
 	this.setState({upstreamNodes: localNodes});

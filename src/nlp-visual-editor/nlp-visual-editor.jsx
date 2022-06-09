@@ -36,7 +36,7 @@ import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import JsonToXML from '../utils/JsonToXML';
-import { generateNodeName, getImmediateDownstreamNodes } from '../utils';
+import { generateNodeName } from '../utils';
 import fileDownload from 'js-file-download';
 
 import {

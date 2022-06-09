@@ -25,30 +25,24 @@ import { setShowRightPanel } from '../../redux/slice';
 
 class DocumentViewer extends React.Component {
   getHighlightColor = (index) => {
-    return ['cyan', 'chartreuse', 'gold', 'orangered'][index % 4];
+    return ['#a6c8ff', 'chartreuse', 'gold', 'orangered'][index % 4];
   };
 
   getHighlightSpans = () => {
     const { tabularResults = {} } = this.props;
     const { annotations, names = [] } = tabularResults;
     let spans = [];
-    names.forEach((name, index) => {
-      const color = this.getHighlightColor(index);
-      const res = annotations[name].map((t) => {
-		  if( t.attributes ) {
-			const outputs = Object.keys(t).filter( a => !['attributes','indexResult'].includes(a));
-			if( outputs.length === 1) {
-				const { start, end } = t[outputs[0]];
-				return { start, end, color };
-			}
-			// TODO: Rearchitect Highlighting when multiple outputs
-		  } else {
-			const { start, end } = t;
-        	return { start, end, color };
-		  }
-      });
-      spans = spans.concat(res);
-    });
+
+	if( !this.props.documentAnnotation || !annotations ) {
+		return [];
+	}
+	const color = this.getHighlightColor(0);
+	const res = annotations[this.props.documentAnnotation].map((t) => {
+		const outputs = Object.keys(t);
+		const { start, end } = t[outputs[0]];
+		return { start, end, color };
+	});
+	spans = spans.concat(res);
 
     return spans.length > 0 ? spans : [];
   };
@@ -90,6 +84,7 @@ const mapStateToProps = (state) => ({
   inputDocument: state.nodesReducer.inputDocument,
   nodes: state.nodesReducer.nodes,
   tabularResults: state.nodesReducer.tabularResults,
+  documentAnnotation: state.nodesReducer.currentAnnotation
 });
 
 const mapDispatchToProps = (dispatch) => ({

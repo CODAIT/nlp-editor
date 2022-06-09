@@ -22,6 +22,7 @@ import './tabular-view.scss';
 
 import { Tabs, Tab, TabsSkeleton } from 'carbon-components-react';
 import TableResults from './components/table-results';
+import { setDocumentViewToAnnotation } from '../../redux/slice';
 
 class TabularView extends React.Component {
   getInputDocumentName = () => {
@@ -69,7 +70,7 @@ class TabularView extends React.Component {
       const table = this.getTable(name);
       const tabId = `${name.toLowerCase()}_id`;
       tabs.push(
-        <Tab id={tabId} key={tabId} label={name}>
+        <Tab id={tabId} key={tabId} label={name} onClick={() => this.props.setDocumentAnnotation(name)}>
           {table}
         </Tab>,
       );
@@ -88,4 +89,7 @@ const mapStateToProps = (state) => ({
   tabularResults: state.nodesReducer.tabularResults,
 });
 
-export default connect(mapStateToProps, null)(TabularView);
+const mapDispatchToProps = (dispatch) => ({
+	setDocumentAnnotation: (annotation) => dispatch( setDocumentViewToAnnotation(annotation))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(TabularView);

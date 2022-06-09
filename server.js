@@ -229,18 +229,17 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
   const { numAnnotationsPerType } = instrumentationInfo;
   const annonNames = numAnnotationsPerType.map((n) => n.annotationType);
   let annonResults = {};
-  let indexResult = 0;
   annonNames.forEach((name) => {
     const items = [];
     const annotation = annotations[name];
     annotation.forEach((elem) => {
-		const attributes = {attributes: true};
+		const attributes = {};
 			Object.keys(elem).forEach( key => {
 				const { location, text } = elem[key];
       			const { begin: start, end } = location;
 				attributes[key] = {start, end, text};
 			})
-			items.push({...attributes, indexResult: indexResult++});
+			items.push({...attributes});
     });
     annonResults = { ...annonResults, [name]: items };
   });
