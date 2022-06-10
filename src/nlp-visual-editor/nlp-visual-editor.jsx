@@ -35,6 +35,7 @@ import DocumentViewer from './views/document-viewer';
 import './nlp-visual-editor.scss';
 import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
+import { getImmediateUpstreamNodes } from '../utils';
 import JsonToXML from '../utils/JsonToXML';
 import { generateNodeName } from '../utils';
 import fileDownload from 'js-file-download';
@@ -343,7 +344,7 @@ class VisualEditor extends React.Component {
           </>
         ),
       },
-	  {
+      {
         action: 'export',
         tooltip: 'Export',
         jsx: (
@@ -352,17 +353,42 @@ class VisualEditor extends React.Component {
               id={'btn-run'}
               size="field"
               kind="ghost"
-			  disabled={this.props.tabularResults === undefined}
-              onClick={() => window.open(`/api/download/${this.props.pipelineId}`)}
+              disabled={this.props.tabularResults === undefined}
+              onClick={() =>
+                window.open(`/api/download/${this.props.pipelineId}`)
+              }
             >
               Export
             </Button>
           </>
         ),
       },
-	  
     ];
   };
+
+  updateUnionProperties(node) {
+    const pipelineLinks = this.canvasController.getLinks(
+      this.canvasController.getPrimaryPipelineId(),
+    );
+    const immediateNodes = getImmediateUpstreamNodes(
+      node.nodeId,
+      pipelineLinks,
+    );
+    const upstreamNodes = [];
+    immediateNodes.forEach((id, index) => {
+      const upstreamNode = this.props.nodes.find((n) => n.nodeId === id);
+      const { label, nodeId } = upstreamNode;
+      upstreamNodes.push({ label, nodeId });
+    });
+
+    //assume it's valid even if user has not interacted with input controls
+    const newNode = {
+      nodeId: node.nodeId,
+      upstreamNodes,
+      isValid: true,
+    };
+    this.props.saveNlpNode({ node: newNode });
+  }
 
   onEditCanvas = (data, command) => {
     const { nodes } = this.props;
@@ -374,6 +400,12 @@ class VisualEditor extends React.Component {
       this.props.setShowRightPanel({ showPanel: false });
       this.setState({ selectedNodeId: undefined });
       this.props.deleteNodes({ ids: selectedObjectIds });
+      // Make sure deleted nodes are reflected in union nodes
+      for (const node of nodes) {
+        if (node.type === 'union') {
+          this.updateUnionProperties(node);
+        }
+      }
     } else if (['createNode', 'createAutoNode'].includes(editType)) {
       const { newNode } = data;
       const { id: nodeId, description, label, parameters } = newNode;
@@ -389,6 +421,18 @@ class VisualEditor extends React.Component {
           isValid: false,
         },
       });
+    }
+    if (['linkNodes', 'deleteLink'].includes(editType)) {
+      // Automatically update union node properties when links are created / deleted.
+      const linkId = data.id ?? data.linkIds?.[0];
+      const link = this.canvasController.getLink(linkId);
+      const linkedNodes = [link.srcNodeId, link.trgNodeId];
+      for (const nodeId of linkedNodes) {
+        const node = nodes.find((n) => n.nodeId === nodeId);
+        if (node.type === 'union') {
+          this.updateUnionProperties(node);
+        }
+      }
     }
   };
 
