@@ -1,3 +1,19 @@
+/*
+
+Copyright 2022 Elyra Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 import React from 'react';
 import { connect } from 'react-redux';
 
@@ -9,21 +25,24 @@ import { setShowRightPanel } from '../../redux/slice';
 
 class DocumentViewer extends React.Component {
   getHighlightColor = (index) => {
-    return ['cyan', 'chartreuse', 'gold', 'orangered'][index % 4];
+    return ['#a6c8ff', 'chartreuse', 'gold', 'orangered'][index % 4];
   };
 
   getHighlightSpans = () => {
     const { tabularResults = {} } = this.props;
     const { annotations, names = [] } = tabularResults;
     let spans = [];
-    names.forEach((name, index) => {
-      const color = this.getHighlightColor(index);
-      const res = annotations[name].map((t) => {
-        const { start, end } = t;
-        return { start, end, color };
-      });
-      spans = spans.concat(res);
-    });
+
+	if( !this.props.documentAnnotation || !annotations ) {
+		return [];
+	}
+	const color = this.getHighlightColor(0);
+	const res = annotations[this.props.documentAnnotation].map((t) => {
+		const outputs = Object.keys(t);
+		const { start, end } = t[outputs[0]];
+		return { start, end, color };
+	});
+	spans = spans.concat(res);
 
     return spans.length > 0 ? spans : [];
   };
@@ -65,6 +84,7 @@ const mapStateToProps = (state) => ({
   inputDocument: state.nodesReducer.inputDocument,
   nodes: state.nodesReducer.nodes,
   tabularResults: state.nodesReducer.tabularResults,
+  documentAnnotation: state.nodesReducer.currentAnnotation
 });
 
 const mapDispatchToProps = (dispatch) => ({

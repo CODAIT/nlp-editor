@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@carbon/icons-react": "10.44.0",
-    "@elyra/canvas": "^12.10.1",
+    "@elyra/canvas": "12.12.3",
     "@reduxjs/toolkit": "^1.7.2",
     "adm-zip": "^0.5.9",
     "axios": "^0.26.0",

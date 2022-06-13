@@ -180,6 +180,7 @@ app.get('/api/download/:workingId', (req, res) => {
 		clearInterval(interval);
 	});
 })
+
 app.post('/api/run', (req, res) => {
   console.log('executing pipeline');
   const { workingId, payload } = req.body;
@@ -228,15 +229,17 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
   const { numAnnotationsPerType } = instrumentationInfo;
   const annonNames = numAnnotationsPerType.map((n) => n.annotationType);
   let annonResults = {};
-  let indexResult = 0;
   annonNames.forEach((name) => {
     const items = [];
     const annotation = annotations[name];
     annotation.forEach((elem) => {
-      const attr = Object.keys(elem)[0];
-      const { location, text } = elem[attr];
-      const { begin: start, end } = location;
-      items.push({ start, end, text, indexResult: indexResult++ });
+		const attributes = {};
+			Object.keys(elem).forEach( key => {
+				const { location, text } = elem[key];
+      			const { begin: start, end } = location;
+				attributes[key] = {start, end, text};
+			})
+			items.push({...attributes});
     });
     annonResults = { ...annonResults, [name]: items };
   });

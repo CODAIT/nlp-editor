@@ -27,6 +27,7 @@ const initialState = {
   moduleName: 'elyraNLPCanvas',
   showRightPanel: false,
   showDocumentViewer: false,
+  currentAnnotation: undefined
 };
 
 const nodesSlice = createSlice({
@@ -85,8 +86,12 @@ const nodesSlice = createSlice({
       } else {
         const { annotations, names } = payload;
         state.tabularResults = { annotations, names };
+		state.currentAnnotation = names[0];
       }
     },
+	setDocumentViewToAnnotation: (state, action) => {
+		state.currentAnnotation = action.payload;
+	}
   },
 });
 
@@ -100,5 +105,6 @@ export const {
   setWorkingId,
   setShowRightPanel,
   setShowDocumentViewer,
+  setDocumentViewToAnnotation,
 } = nodesSlice.actions;
 export default nodesSlice.reducer;

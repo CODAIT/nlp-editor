@@ -19,4 +19,7 @@ import RegexNode from './RegexNode';
 import SequenceNode from './SequenceNode';
 import UnionNode from './UnionNode';
 import LiteralNode from './LiteralNode';
-export { RegexNode, DictionaryNode, SequenceNode, UnionNode, LiteralNode };
+import FilterNode from './FilterNode';
+import ConsolidateNode from './ConsolidateNode';
+
+export { RegexNode, DictionaryNode, SequenceNode, UnionNode, LiteralNode, FilterNode, ConsolidateNode };

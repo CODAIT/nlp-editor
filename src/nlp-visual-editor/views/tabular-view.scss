@@ -21,6 +21,8 @@ limitations under the License.
   .bx--tab-content {
     padding: 0;
     outline: none;
+	overflow: auto;
+	height: calc(100% - 100px)
   }
 
   .no-matches {

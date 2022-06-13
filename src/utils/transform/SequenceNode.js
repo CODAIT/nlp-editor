@@ -41,18 +41,8 @@ export default class SequenceNode {
   }
 
   getOutputSpecName = () => {
-    const { label, nodeId } = this.node;
-    const { nodes, pipelineId } = store.getState()['nodesReducer'];
-    const pipelineLinks = this.canvasController.getLinks(pipelineId);
-    const downstreamNodes = getImmediateDownstreamNodes(nodeId, pipelineLinks);
-    if (downstreamNodes.length > 0) {
-      const downstreamNodeId = downstreamNodes[0];
-      const node = nodes.find((n) => n.nodeId === downstreamNodeId);
-      if (node.type === 'union') {
-        return node.label;
-      }
-    }
-    return label;
+    const { label, renamed } = this.node;
+    return renamed || label;
   };
 
   getFieldsList() {
@@ -62,12 +52,12 @@ export default class SequenceNode {
       { '@': { name: fieldName, group: '0', hide: 'no', type: 'Span' } },
     ]; //add the first field for the sequence node
     upstreamNodes.forEach((node, index) => {
-      const { label } = node;
+      const { label, renamed } = node;
       fields.push({
         '@': {
-          name: label,
+          name: renamed || label,
           group: index + 1,
-          hide: 'yes',
+          hide: !node.visible ? 'yes' : 'no', // attributes
           type: 'Span',
         },
       });
@@ -84,10 +74,13 @@ export default class SequenceNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label,
+          'input-field-name': label
         },
       },
     };
+	if (node.type === 'literal') {
+		atomItem["col-ref"]["@"]["isLiteral"] = "yes";
+	}
     if (index < length - 1) {
       const { min, max } = tokens;
       tokenGapItem = { '@': { min, max } };
@@ -120,7 +113,7 @@ export default class SequenceNode {
   }
 
   transform() {
-    const { label } = this.node;
+    const { label, consolidate, consolidateTarget, consolidatePolicy } = this.node;
     const inputConcepts = this.getInputConcepts();
     const fieldList = this.getFieldsList();
     const sequence = this.getSequence();
@@ -147,8 +140,10 @@ export default class SequenceNode {
         },
       },
     };
+
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
+	  format: { doubleQuotes: true }
     });
     return {
       xml: xml.replace(`<sequence/>`, `<sequence>${sequence}</sequence>`),
