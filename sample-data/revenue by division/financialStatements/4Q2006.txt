@@ -1,0 +1,79 @@
+IBM Reports 2006 Fourth-Quarter Results
+
+--------------------------------------------------------------------------------
+
+ARMONK, NY - 18 Jan 2007: 
+
+Total revenues of $26.3 billion, up 7 percent as reported; 
+Diluted earnings of $2.26 per share from continuing operations, up 12 percent as reported, or 7 percent compared with the fourth-quarter 2005, excluding pension curtailment charge; 
+Services signings of $17.8 billion, up 55 percent. 
+IBM today announced fourth-quarter 2006 diluted earnings of $2.26 per share from continuing operations, an increase of 12 percent as reported, compared with diluted earnings of $2.01 per share in the fourth quarter of 2005; the fourth-quarter 2005 diluted earnings include $0.10 per share for a one-time pretax curtailment charge of $267 million related to pension changes. Diluted earnings per share for the fourth-quarter 2006 grew 7 percent compared with the year-ago quarter of $2.11 per diluted share, without the one-time per share charge. Fourth-quarter 2006 diluted earnings per share include a $0.06 benefit as a result of a lower tax rate. 
+
+Fourth-quarter income from continuing operations was $3.5 billion compared with $3.2 billion in the fourth quarter of 2005, an increase of 8 percent. Income from continuing operations for the fourth quarter grew 2 percent compared with the fourth-quarter 2005 income from continuing operations of $3.4 billion, excluding the one-time charge. Total revenues for the fourth quarter of 2006 of $26.3 billion increased 7 percent (4 percent, adjusting for currency) from the fourth quarter of 2005.
+
+Samuel J. Palmisano, IBM chairman, president and chief executive officer, said: "IBM had a terrific quarter and a good year with record cash performance, profit and EPS, as well as record payouts to shareholders. We are well-positioned in the growth areas of a changing IT industry, focused on our evolving business model, and poised for long-term success for our clients and shareholders."
+
+From a geographic perspective, the Americas fourth-quarter revenues were $11.1 billion, an increase of 6 percent as reported (5 percent, adjusting for currency) from the 2005 period. Revenues from Europe/Middle East/Africa were $9.3 billion, up 11 percent (3 percent, adjusting for currency). Asia-Pacific revenues increased 7 percent (5 percent, adjusting for currency) to $4.8 billion. OEM revenues were $1.0 billion, down 3 percent compared with the 2005 fourth quarter.
+
+Revenues from the Software segment were $5.6 billion, an increase of 14 percent (11 percent, adjusting for currency) compared with the fourth quarter of 2005. Revenues from IBM's middleware brands, which include WebSphere, Information Management, Tivoli, Lotus and Rational products, were $4.4 billion, up 18 percent versus the fourth quarter of 2005. Operating systems revenues decreased 2 percent to $642 million compared with the prior-year quarter. Revenues from other software and services increased, which includes the Product Lifecycle Management portfolio of products.
+
+For the WebSphere family of software products, which facilitate customers' ability to manage a wide variety of business processes using open standards to interconnect applications, data and operating systems, revenues increased 22 percent. Revenues for Information Management software, which enables clients to leverage information on demand, increased 28 percent. Revenues from Tivoli software, infrastructure software that enables customers to centrally manage networks including security and storage capability, increased 25 percent, and revenues for Lotus software, which allows collaborating and messaging by customers in real-time communication and knowledge management, increased 30 percent year over year. Revenues from Rational software, integrated tools to improve the processes of software development, increased 12 percent compared with the year-ago quarter.
+
+For the Global Services business, segment revenues from Global Technology Services increased 7 percent (4 percent, adjusting for currency) to $8.6 billion, and segment revenues from Global Business Services increased 6 percent (3 percent, adjusting for currency) to $4.2 billion. IBM signed services contracts totaling $17.8 billion, up 55 percent year over year, and ended the full year with an estimated services backlog, including Strategic Outsourcing, Business Transformation Outsourcing, Global Business Services, Integrated Technology Services and Maintenance, of $116 billion, an increase of $5 billion from the prior-year period.
+
+Revenues from the Systems and Technology Group (S&TG) segment totaled $7.1 billion for the quarter, up 3 percent (flat, adjusting for currency). S&TG revenues from System z server products increased 5 percent compared with the year-ago period. Total delivery of System z computing power, which is measured in MIPS (millions of instructions per second), increased 6 percent. Revenues from the System p UNIX server products increased 4 percent compared with the 2005 period. Revenues from the System x servers increased 7 percent, and revenues from the System i servers decreased 10 percent. Revenues from Microelectronics decreased 6 percent and revenues from System Storage increased 9 percent.
+
+Global Financing segment revenues increased 3 percent (flat, adjusting for currency) in the fourth quarter to $620 million.
+
+The company's total gross profit margin was 44.6 percent in the 2006 fourth quarter compared with 44.1 percent in the 2005 period.
+
+Total expense and other income increased 11 percent to $6.9 billion compared with the prior-year period. SG&A expense increased 7 percent to $5.6 billion. RD&E expense increased 9 percent compared with the year-ago period. Intellectual property and custom development income increased to $241 million compared with $228 million a year ago. Other (income) and expense contributed income of $150 million in the fourth quarter of 2006 versus income of $334 million in the fourth quarter of 2005. In the fourth quarter of last year, gains on real estate transactions were unusually high due to several large transactions compared with real estate activity in the fourth quarter of this year, resulting in a decrease of $140 million year to year.
+
+IBM's effective tax rate in the fourth-quarter 2006 was 28.0 percent compared with 29.5 percent in the fourth quarter of 2005. The decrease in the tax rate was caused by the favorable effect of several items in the quarter, including the retroactive reinstatement of the U.S. research tax credit and changes in the mix of income in various tax jurisdictions.
+
+For total operations, net income for the fourth-quarter 2006 was $3.5 billion, or $2.31 per diluted share, which included a gain from discontinued operations related to country tax settlements of $76 million, compared with the fourth quarter of 2005 net income of $3.2 billion, or $1.99 per diluted share, which included a gain from discontinued operations of $3 million and a charge for the cumulative effect of the FASB Interpretation No. 47 accounting change of $36 million.
+
+Share repurchases totaled approximately $1.4 billion in the fourth quarter. The weighted-average number of diluted common shares outstanding in the fourth-quarter 2006 was 1.53 billion compared with 1.60 billion shares in the same period of 2005.
+
+Full-Year 2006 Results
+
+Total revenue of $91.4 billion, up 4 percent excluding the divested PC business; 
+Income from continuing operations of $9.4 billion, up 18 percent as reported, or up 9 percent excluding 2005 non-recurring items; 
+Diluted earnings of $6.06 per share from continuing operations, up 23 percent as reported, or up 14 percent excluding 2005 non-recurring items; 
+Net cash from operations of $15.3 billion, up $2.2 billion, excluding Global Financing receivables. 
+Diluted earnings per share from continuing operations were $6.06 compared with $4.91 per diluted share for the 2005 period, including $0.40 per diluted share for the one-time items, an increase of 23 percent. Without the one-time items in 2005, diluted earnings in 2006 increased $0.74 per share, or 14 percent versus the comparable period last year.
+
+Income from continuing operations for the year ended December 31, 2006 was $9.4 billion, compared with $8.0 billion in the year-ago period, or up 18 percent, which includes a charge of $525 million for taxes in connection with the 2005 repatriation of foreign earnings, and non- recurring pretax items for a curtailment charge of $267 million relating to the pension change and incremental restructuring charges of $1.7 billion, offset by the $1.1 billion gain on the sale of the Personal Computing (PC) business, and the $775 million legal settlement received from Microsoft. Excluding the non-recurring items and tax charge for 2005, the growth for income from continuing operations was 9 percent year over year.
+
+Revenues from continuing operations for 2006 totaled $91.4 billion, essentially flat as reported and adjusting for currency compared with $91.1 billion for 2005, which includes PC revenues of $2.9 billion for the first four months of 2005 only. Excluding the divested PC business, revenues increased 4 percent (3 percent, adjusting for currency) compared with the 2005 period.
+
+From a geographic perspective, the Americas full-year revenues were $39.5 billion, an increase of 2 percent as reported (4 percent, adjusting for currency and PCs) from the 2005 period. Revenues from Europe/Middle East/Africa were $30.5 billion, essentially flat (up 2 percent, adjusting for currency and PCs). Asia-Pacific revenues decreased 6 percent (up 2 percent, adjusting for currency and PCs) to $17.6 billion. OEM revenues were $3.9 billion, up 18 percent compared with 2005.
+
+Software segment revenues in 2006 totaled $18.2 billion, an increase of 8 percent (7 percent, adjusting for currency). Revenues from the Global Technology Services segment totaled $32.3 billion, an increase of 3 percent (2 percent, adjusting for currency) compared with 2005. Revenues from the Global Business Services segment were $16.0 billion, flat (up 1 percent, adjusting for currency). S&TG segment revenues were $22.0 billion, an increase of 5 percent (4 percent, adjusting for currency). Global Financing revenues totaled $2.4 billion, a decrease of 2 percent (2 percent, adjusting for currency).
+
+For total operations, net income for 2006 was $9.5 billion, or $6.11 per diluted share, which included a gain from discontinued operations related to country tax settlements of $76 million, compared with the 2005 net income of $7.9 billion, or $4.87 per diluted share, which included a loss from discontinued operations of $24 million and a charge for the cumulative effect of the FASB Interpretation No. 47 accounting change of $36 million.
+
+IBM ended 2006 with $10.7 billion of cash on hand and net cash provided from operations, excluding the year-to-year change in Global Financing receivables, was $15.3 billion - an increase of $2.2 billion from last year. The balance sheet remains strong, and the company is well positioned to take advantage of opportunities.
+
+In December, the company adopted Statement of Financial Accounting Standards No. 158 (SFAS 158), new accounting guidance related to pension and other postretirement plans released by the Financial Accounting Standards Board in September 2006. This accounting standard requires companies to recognize the funded status of their postretirement plans in the statement of financial position (or balance sheet). The funded status is measured as the difference between the value of pension plan assets and the company's benefit obligations to its current and retired employees. The adoption of SFAS 158 at December 31, 2006 reduced the company's assets by $9.2 billion, increased its liabilities by $0.3 billion and reduced stockholders' equity by $9.5 billion. These changes to the company's financial statements were non-cash and will have no impact on the company's existing debt covenants, credit ratings or financial flexibility.
+
+Share repurchases totaled approximately $8.0 billion in 2006. The weighted-average number of diluted common shares outstanding in 2006 was 1.55 billion compared with 1.63 billion shares in 2005. As of December 31, 2006, there were 1.51 billion basic common shares outstanding.
+
+Debt, including Global Financing, totaled $22.7 billion, compared with $22.6 billion at year-end 2005. From a management segment view, the non-global financing debt-to-capitalization ratio was 1.5 percent at the end of 2006, and Global Financing debt increased $1.8 billion from year-end 2005 to a total of $22.3 billion, resulting in a debt-to-equity ratio of 6.9 to 1.
+
+Forward-Looking and Cautionary Statements
+
+Except for the historical information and discussions contained herein, statements contained in this release may constitute forward- looking statements within the meaning of the Private Securities Litigation Reform Act of 1995. These statements involve a number of risks, uncertainties and other factors that could cause actual results to differ materially, including the company's failure to continue to develop and market new and innovative products and services and to keep pace with technological change; competitive pressures; failure to obtain or protect intellectual property rights; quarterly fluctuations in revenues and volatility of stock prices; the company's ability to attract and retain key personnel; adverse affects from tax matters; currency fluctuations and customer financing risks; customer credit risk on trade receivables; the company's failure to maintain the adequacy of its internal controls; the company's use of certain estimates and assumptions; dependence on certain suppliers; changes in the financial or business condition of the company's distributors or resellers; the company's ability to successfully manage acquisitions and alliances; failure to have sufficient insurance; legal, political, health and economic conditions; risk factors related to IBM securities; and other risks, uncertainties and factors discussed in the company's Form 10-Q, Form 10-K and in the company's other filings with the U.S. Securities and Exchange Commission (SEC) or in materials incorporated therein by reference. The company assumes no obligation to update or revise any forward-looking statements.
+
+Presentation of Information in this Press Release
+
+In an effort to provide investors with additional information regarding the company's results as determined by generally accepted accounting principles (GAAP), the company has also disclosed in this press release the following non-GAAP information which management believes provides useful information to investors:
+
+IBM Results:
+
+without non-recurring and unique items; 
+without divested PC business; 
+adjusting for currency (i.e., at constant current); 
+net cash from operations excluding Global Financing receivables. 
+The rationale for management's use of non-GAAP measures is included as part of the supplementary materials presented within the fourth-quarter earnings materials. These materials are available on the IBM investor relations Web site at www.ibm.com/investor and are being included in Attachment II ("Non-GAAP Supplementary Materials") to the Form 8-K that includes this press release and is being submitted today to the SEC.
+
