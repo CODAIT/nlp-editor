@@ -37,7 +37,7 @@ import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import { getImmediateUpstreamNodes } from '../utils';
 import JsonToXML from '../utils/JsonToXML';
-import { generateNodeName } from '../utils';
+import { generateNodeName, processNewNode } from '../utils';
 import fileDownload from 'js-file-download';
 
 import {
@@ -406,20 +406,19 @@ class VisualEditor extends React.Component {
           this.updateUnionProperties(node);
         }
       }
-    } else if (['createNode', 'createAutoNode'].includes(editType)) {
+    } else if (editType === 'paste') {
+		const { clonedNodes } = data;
+		clonedNodes.forEach( (newNode) => {
+			const node = processNewNode( newNode, nodes );
+			this.props.saveNlpNode({
+				node
+			});	
+		});
+	} else if (['createNode', 'createAutoNode'].includes(editType)) {
       const { newNode } = data;
-      const { id: nodeId, description, label, parameters } = newNode;
-      const { type } = parameters;
-      const generatedLabel = generateNodeName(type, label, nodes);
+	  const node = processNewNode( newNode, nodes );
       this.props.saveNlpNode({
-        //set isValid false, we'll check when user opens modal to save values
-        node: {
-          label: generatedLabel,
-          nodeId,
-          type,
-          description,
-          isValid: false,
-        },
+        node
       });
     }
     if (['linkNodes', 'deleteLink'].includes(editType)) {
