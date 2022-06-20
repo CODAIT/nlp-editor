@@ -36,6 +36,12 @@ class LiteralPanel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+	if (this.props.nodeId !== prevProps.nodeId) {
+		this.setState({
+			inputText: this.props.inputText,
+      		lemmaMatch: this.props.lemmaMatch
+		})
+	}
   }
 
   onChangeLemmaMatch = (value) => {
