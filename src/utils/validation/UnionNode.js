@@ -17,10 +17,11 @@
 import { getImmediateUpstreamNodes } from '../../utils';
 
 export default class UnionNode {
-  constructor(canvasController, pipelineId, nodeProps) {
+  constructor(canvasController, pipelineId, nodeProps, nodes) {
     this.canvasController = canvasController;
     this.pipelineId = pipelineId;
     this.nodeProps = nodeProps;
+	this.nodes = nodes
   }
 
   validate() {
@@ -33,9 +34,33 @@ export default class UnionNode {
         error: 'The Union node does not meet its input requirements.',
       };
     }
+	if (this.upstreamHasAttributesAligned()) {
+		return {
+			isValid: false,
+			error: 'The Union upstream nodes require attributes aligned',
+		  };
+	}
     return { isValid: true };
   }
 
+  upstreamHasAttributesAligned() {
+	  const pipelineLinks = this.canvasController.getLinks(this.pipelineId);
+	  const upstreamNodes = getImmediateUpstreamNodes(this.nodeProps.nodeId, pipelineLinks);
+	  let renamedAttribute = '',
+	  	isInvalidAttributes = false;
+	  upstreamNodes.forEach( (n, i) => {
+		  const node = this.nodes.find((no) => no.nodeId === n);
+		  if( !i ) {
+			renamedAttribute = node.renamed;
+			if( node.upstreamNodes.find( uN => uN.visible) ) {
+				isInvalidAttributes = true;
+			}
+		  } else if( renamedAttribute !== node.renamed || node.upstreamNodes.find( uN => uN.visible) ) {
+				  isInvalidAttributes = true;
+		  }
+		})
+	  return isInvalidAttributes;
+  }
   checkCardinality(nodeId) {
     const inputPorts = this.canvasController.getNodeInputPorts(
       nodeId,
