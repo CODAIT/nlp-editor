@@ -408,7 +408,6 @@ class VisualEditor extends React.Component {
       }
     } else if (editType === 'paste') {
 		const { clonedNodes } = data;
-		const { newNode } = data;
 		clonedNodes.forEach( (newNode) => {
 			const node = processNewNode( newNode, nodes );
 			this.props.saveNlpNode({
