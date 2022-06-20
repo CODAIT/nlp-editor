@@ -78,8 +78,8 @@ class FilterPanel extends React.Component {
 		id: 'text',
 		text: 'text'
 	}, {
-		id: 'range',
-		text: 'range'
+		id: 'span',
+		text: 'span'
 	}, ]
     };
   }

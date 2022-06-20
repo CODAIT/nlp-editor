@@ -296,7 +296,7 @@
           "app_data": {
             "ui_data": {
               "label": "Filter",
-              "description": "Remove overlapping annotations",
+              "description": "Remove annotations from the output",
               "image": "/images/palette/nodes/filter.svg",
               "x_pos": 0,
               "y_pos": 0
