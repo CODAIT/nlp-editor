@@ -122,9 +122,14 @@ To run the NLP editor in a container:
 **Prerequsites**:
  - NodeJS 14+ (see prerequisites on how to install)
  - Docker
- - IBM Watson Discovery Backend container `watson_nlp_tool-<date>.tar.gz` supplied to you
+ - IBM Watson Discovery Backend container `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` supplied to you
 
-Start the NLP editor locally.
+
+1. Clone the repository
+
+   ```
+   git clone git@github.com:elyra-ai/nlp-editor.git
+   ```
 
 1. Navigate to the editor source code directory
    ```
@@ -156,6 +161,7 @@ Start the NLP editor locally.
    ```
 
 1. Open http://localhost:8080 in a web browser.
+
 
 ## Getting Help
 
