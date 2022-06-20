@@ -36,6 +36,22 @@ Visual Editor for creating NLP rules.
 
 The application users a NodeJS server file as proxy, this makes it easy to replace and embed the UI with any other server - Websphere, Nginx, etc.
 
+### Prerequisites
+
+1. Install latest `node` from https://nodejs.org/en/download/ - it also installs a compatible `npm`
+
+1. In a terminal, check `node` and `npm` versions
+
+```bash
+node -v
+v16.14.2
+```
+
+```bash
+$ npm -v
+8.5.0
+```
+
 ### Run locally (option 1)
 
 **Prerequsites**:
@@ -53,7 +69,7 @@ Install the dependencies and run the GUI locally:
    npm start
    ```
 
-1. Open http://localhost:3000 in a web browser.
+1. Open http://localhost:8080 in a web browser.
 
 ### Run locally (option 2)
 
@@ -99,6 +115,53 @@ To run the NLP editor in a container:
    ```
 
 1. Open http://localhost:8080 in a web browser.
+
+
+### Run the editor locally using the IBM Watson Discovery Backend container
+
+**Prerequsites**:
+ - NodeJS 14+ (see prerequisites on how to install)
+ - Docker
+ - IBM Watson Discovery Backend container `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` supplied to you
+
+
+1. Clone the repository
+
+   ```
+   git clone git@github.com:elyra-ai/nlp-editor.git
+   ```
+
+1. Navigate to the editor source code directory
+   ```
+   cd nlp-editor
+   ```
+
+1. Build the app
+   ```
+   npm run build
+   ```
+
+1. Run the app
+   ```
+   npm run serve
+   ```
+
+1. Extract `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
+
+1. Build the container image
+   ```
+   cd watson_nlp_web_tool
+   docker build -t watson_nlp_web_tool:1.0 .
+   ```
+
+1. Run the container image with volumes mapped. Note that `/path/to/nlp-editor` s the absolute path to the `nlp-editor` repository (from Step 1).
+
+   ```
+   docker run -d -v /path/to/nlp-editor/Seer-Core/aql-processor/user-data-in:/app/Seer-Core/aql-processor/user-data-in -v /path/to/nlp-editor/Seer-Core/aql-processor/run-aql-result:/app/Seer-Core/aql-processor/run-aql-result --name watson_nlp_web_tool watson_nlp_web_tool:1.0
+   ```
+
+1. Open http://localhost:8080 in a web browser.
+
 
 ## Getting Help
 

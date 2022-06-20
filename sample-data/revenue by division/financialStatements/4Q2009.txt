@@ -1,0 +1,98 @@
+IBM Reports 2009 Fourth-Quarter and Full-Year Results
+
+
+Tab navigation
+Press release 
+Related XML feeds 
+Contact(s) information 
+Related resources 
+
+--------------------------------------------------------------------------------
+
+ARMONK, N.Y. - 19 Jan 2010: 
+
+Full-Year 2009:
+
+Record diluted earnings per share of $10.01, up 13 percent; 7th consecutive year of double-digit EPS growth; 
+Record net income of $13.4 billion, up 9 percent; 
+Gross profit margin of 45.7 percent, 6th consecutive year of increase; 
+Record free cash flow of $15.1 billion, up $0.8 billion. 
+Full-Year 2010:
+
+Earnings-per-share expectations of at least $11.00. 
+Fourth-Quarter 2009:
+
+Earnings of $3.59 per share, up 10 percent; 
+Revenue of $27.2 billion, up 1 percent, down 5 percent adjusting for currency; 
+Net income of $4.8 billion, up 9 percent; 
+Gross profit margin of 48.3 percent, up 0.4 points; up 21 of last 22 quarters; 
+Pre-tax income of $6.4 billion, up 10 percent; 
+Pre-tax margin of 23.4 percent, up 1.9 points; 
+Services signings of $18.8 billion, up 9 percent; 
+Global Services revenue up 2 percent, pre-tax income up 7 percent; 
+Software revenue up 2 percent, pre-tax income up 10 percent; 
+Systems and Technology revenue down 4 percent, pre-tax income up 15 percent; 
+Growth markets revenue up 14 percent. 
+
+IBM (NYSE: IBM) today announced fourth-quarter 2009 diluted earnings of $3.59 per share compared with diluted earnings of $3.27 per share in the fourth quarter of 2008, an increase of 10 percent.
+
+Fourth-quarter net income was $4.8 billion compared with $4.4 billion in the fourth quarter of 2008, an increase of 9 percent. Total revenues for the fourth quarter of 2009 of $27.2 billion increased 1 percent (down 5 percent, adjusting for currency) from the fourth quarter of 2008.
+
+"We concluded a strong year with a solid performance in the fourth quarter in which we again delivered growth in margins, profit and earnings," said Samuel J. Palmisano, IBM chairman, president and chief executive officer. "IBM continued to benefit from our strategic transformation, offerings that our clients value in this economy, and our commitment to developing countries around the world.
+
+"In 2009, we invested in opportunities such as Smarter Planet solutions, cloud computing and advanced analytics. These new capabilities position IBM to grow as the economy recovers. The increased operational leverage we have established by creating a globally integrated enterprise will enable us to drive greater profits as revenue growth returns. We are confident about 2010 and our ability to achieve the high end of our long-term roadmap."
+
+The company said it expects full-year 2010 diluted earnings-per-share expectations of at least $11.00.
+
+From a geographic perspective, the Americas' fourth-quarter revenues were $11.1 billion, a decrease of 3 percent (6 percent, adjusting for currency) from the 2008 period. Revenues from Europe/Middle East/Africa were $9.7 billion, up 2 percent (down 7 percent, adjusting for currency). Asia-Pacific revenues increased 6 percent (down 3 percent, adjusting for currency) to $5.8 billion. OEM revenues were $648 million, up 5 percent compared with the 2008 fourth quarter. Revenues from the company's growth markets organization increased 14 percent (2 percent, adjusting for currency) and represented 20 percent of geographic revenues.
+
+Total Global Services revenues increased 2 percent (down 5 percent, adjusting for currency); pre-tax income increased 7 percent. Global Technology Services segment revenues increased 4 percent (down 3 percent, adjusting for currency) to $10.1 billion. Global Business Services segment revenues decreased 3 percent (9 percent, adjusting for currency) to $4.6 billion.
+
+IBM signed services contracts totaling $18.8 billion, at actual rates, an increase of 9 percent (2 percent, adjusting for currency), including 22 contracts greater than $100 million.
+
+Signings in Consulting and Systems Integration and in Integrated Technology Services were $7.4 billion, an increase of 1 percent (down 6 percent, adjusting for currency). Total outsourcing signings increased 15 percent (8 percent, adjusting for currency) to $11.4 billion. The estimated services backlog at December 31 was $137 billion at actual rates compared with $134 billion at September 30, 2009, and compared with $130 billion at year-end 2008.
+
+Revenues from the Software segment were $6.6 billion, an increase of 2 percent (down 4 percent, adjusting for currency) compared with the fourth quarter of 2008. Revenues from IBM's key middleware products, which include WebSphere, Information Management, Tivoli, Lotus and Rational products, were $4.1 billion, an increase of 6 percent (flat, adjusting for currency) versus the fourth quarter of 2008. Operating systems revenues of $621 million was flat (down 1 percent, adjusting for currency) compared with the prior-year quarter.
+
+Revenues from the WebSphere family of software products, which facilitate customers' ability to manage a wide variety of business processes using open standards to interconnect applications, data and operating systems, increased 13 percent year over year. Revenues from Information Management software, which enables clients to leverage information on demand, increased 7 percent. Revenues from Tivoli software, infrastructure software that enables clients to centrally manage networks including security and storage capability, increased 7 percent, and revenues from Lotus software, which allows collaborating and messaging by clients in real-time communication and knowledge management, decreased 5 percent. Revenues from Rational software, integrated tools to improve the processes of software development, decreased 4 percent.
+
+Revenues from the Systems and Technology segment totaled $5.2 billion for the quarter, down 4 percent (9 percent, adjusting for currency) from the fourth quarter of 2008 -- but an improvement in the year-to-year revenue growth rate compared with the third quarter of 2009. Systems revenues decreased 5 percent (10 percent, adjusting for currency). Revenues from the System x servers increased 37 percent. Revenues from the converged System p products decreased 14 percent compared with the 2008 period. Revenues from System z mainframe server products decreased 27 percent compared with the year-ago period. Total delivery of System z computing power, which is measured in MIPS (millions of instructions per second), decreased 19 percent. Revenues from System Storage increased 1 percent, and revenues from Retail Store Solutions decreased 5 percent. Revenues from Microelectronics OEM increased 2 percent.
+
+Global Financing segment revenues decreased 6 percent (12 percent, adjusting for currency) in the fourth quarter to $621 million.
+
+The company's total gross profit margin was 48.3 percent in the 2009 fourth quarter compared with 47.9 percent in the 2008 fourth-quarter period, led by improving margins in both services segments and Systems and Technology. Overall gross profit margins improved year to year for the 21st time in the last 22 quarters; total services gross profit margins improved year to year for the 19th time in the last 20 quarters.
+
+Total expense and other income decreased 5 percent to $6.8 billion compared with the prior-year period. SG&A expense decreased 5 percent to $5.6 billion. RD&E expense of $1.5 billion decreased 4 percent compared with the year-ago period. Intellectual property and custom development income decreased to $313 million compared with $328 million a year ago. Other (income) and expense was income of $24 million compared with income of $97 million from a year ago. Interest expense decreased to $81 million compared with $192 million in the prior year.
+
+IBM's tax rate in the fourth-quarter 2009 was 24.6 percent compared with 23.8 percent in the fourth quarter of 2008 that included utilization of tax credits and a retroactive benefit from the U.S. research tax credit. The full-year 2009 tax rate was 26 percent, and IBM expects its full-year 2010 tax rate to be in that same range -- approximately 26 to 26.5 percent.
+
+The weighted-average number of diluted common shares outstanding in the fourth-quarter 2009 was 1.34 billion compared with 1.35 billion shares in the same period of 2008.
+
+Full-Year 2009 Results
+Net income for the year ended December 31, 2009 was $13.4 billion compared with $12.3 billion in the year-ago period, an increase of 9 percent. Diluted earnings were $10.01 per share compared with $8.89 per diluted share in 2008, an increase of 13 percent. Revenues for 2009 totaled $95.8 billion, a decrease of 8 percent (5 percent, adjusting for currency), compared with $103.6 billion in 2008.
+
+From a geographic perspective, the Americas' full-year revenues were $40.2 billion, a decrease of 6 percent (5 percent, adjusting for currency) from the 2008 period. Revenues from Europe/Middle East/Africa were $32.6 billion, a decrease of 12 percent (6 percent, adjusting for currency). Asia-Pacific revenues decreased 2 percent (4 percent, adjusting for currency) to $20.7 billion. OEM revenues were $2.3 billion, down 15 percent compared with 2008. Revenues from the company's growth markets organization decreased 3 percent (up 1 percent, adjusting for currency) and represented 19 percent of geographic revenues.
+
+Revenues from the Global Technology Services segment totaled $37.3 billion, a decrease of 5 percent (2 percent, adjusting for currency) compared with 2008. Revenues from the Global Business Services segment were $17.7 billion, down 10 percent (8 percent, adjusting for currency). Total services signings were $57.1 billion. Software segment revenues in 2009 totaled $21.4 billion, a decrease of 3 percent (1 percent, adjusting for currency). Pre-tax income for the total global services segment and software each exceeded $8 billion. Systems and Technology segment revenues were $16.2 billion, a decrease of 16 percent (15 percent, adjusting for currency). Global Financing segment revenues totaled $2.3 billion, a decrease of 10 percent (7 percent, adjusting for currency).
+
+The company's total gross profit margin was 45.7 percent in 2009 compared with 44.1 percent in 2008, led by improving margins in both services segments and software. Overall gross profit margins improved year over year for the 6th consecutive year.
+
+The weighted-average number of diluted common shares outstanding in 2009 was 1.34 billion compared with 1.39 billion shares in 2008. As of December 31, 2009, there were 1.31 billion basic common shares outstanding.
+
+Debt, including Global Financing, totaled $26.1 billion, compared with $33.9 billion at year-end 2008. From a management segment view, Global Financing debt totaled $22.4 billion versus $24.4 billion at year-end 2008, resulting in a debt-to-equity ratio of 7.1 to 1. Non-global financing debt totaled $3.7 billion, a decrease of $5.8 billion since year-end 2008, resulting in a debt-to-capitalization ratio of 16.0 percent from 48.7 percent.
+
+IBM ended 2009 with $14.0 billion of cash on hand and generated free cash flow of $15.1 billion, up more than $800 million year over year. The company returned $10.3 billion to shareholders through $2.9 billion in dividends and $7.4 billion of share repurchases. The balance sheet remains strong, and the company is well positioned to take advantage of opportunities.
+
+Forward-Looking and Cautionary Statements
+Except for the historical information and discussions contained herein, statements contained in this release may constitute forward-looking statements within the meaning of the Private Securities Litigation Reform Act of 1995. These statements involve a number of risks, uncertainties and other factors that could cause actual results to differ materially, including the following: a downturn in the economic environment and corporate IT spending budgets; the company's failure to meet growth and productivity objectives, a failure of the company's innovation initiatives; risks from investing in growth opportunities; failure of the company's intellectual property portfolio to prevent competitive offerings and the failure of the company to obtain necessary licenses; breaches of data protection; fluctuations in revenue and purchases, impact of local legal, economic, political and health conditions; adverse effects from environmental matters, tax matters and the company's pension plans; ineffective internal controls; the company's use of accounting estimates; competitive conditions; the company's ability to attract and retain key personnel and its reliance on critical skills; impact of relationships with critical suppliers; currency fluctuations and customer financing risks; impact of changes in market liquidity conditions and customer credit risk on receivables; reliance on third party distribution channels; the company's ability to successfully manage acquisitions and alliances; risk factors related to IBM securities; and other risks, uncertainties and factors discussed in the company's Form 10-Q, Form 10-K and in the company's other filings with the U.S. Securities and Exchange Commission (SEC) or in materials incorporated therein by reference. The company assumes no obligation to update or revise any forward-looking statements.
+
+Presentation of Information in this Press Release
+In an effort to provide investors with additional information regarding the company's results as determined by generally accepted accounting principles (GAAP), the company has also disclosed in this press release the following non-GAAP information which management believes provides useful information to investors:
+
+IBM Results -
+
+presenting non-Global Financing debt-to-capitalization ratio; 
+adjusting for free cash flow; 
+adjusting for currency (i.e., at constant currency). 
+The rationale for management's use of non-GAAP measures is included as part of the supplementary materials presented within the fourth-quarter earnings materials. These materials are available on the IBM investor relations Web site at www.ibm.com/investor and are being included in Attachment II ("Non-GAAP Supplementary Materials") to the Form 8-K that includes this press release and is being submitted today to the SEC.
+
