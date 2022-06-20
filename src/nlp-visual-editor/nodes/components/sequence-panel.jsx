@@ -51,14 +51,18 @@ class SequencePanel extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-      if( this.props.renamed === '') {
-		    this.setState({renamed: this.state.label});
+		let renamed = this.props.renamed;
+		if( !this.props.renamed || this.props.renamed === '') {
+		    renamed = this.props.label;
 	    }
+		const { label } = this.props;
       if (this.props.pattern === '') {
         const { pattern, upstreamNodes } = this.constructPattern();
-        this.setState({ pattern, upstreamNodes });
+        this.setState({ label, renamed, pattern, upstreamNodes });
       } else {
         this.setState({
+			label,
+			renamed,
           pattern: this.props.pattern,
           upstreamNodes: this.props.upstreamNodes,
         });
