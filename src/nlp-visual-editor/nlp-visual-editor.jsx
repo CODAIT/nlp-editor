@@ -67,6 +67,7 @@ class VisualEditor extends React.Component {
     };
 
     this.canvasController = new CanvasController();
+	this.canvasController.openPalette()
     this.canvasController.setPipelineFlowPalette(nlpPalette);
 
     this.nodeValidator = new NodeValidator(this.canvasController);

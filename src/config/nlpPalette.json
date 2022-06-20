@@ -155,7 +155,7 @@
 			  "ui_data": {
 				"label": "Literal",
 				"description": "Literal string to be matched.",
-				"image": "/images/palette/nodes/dictionary.svg",
+				"image": "/images/palette/nodes/row.svg",
 				"x_pos": 0,
 				"y_pos": 0
 			  }
