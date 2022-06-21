@@ -57,9 +57,11 @@ export default class UnionNode {
 
   getRules() {
     const { upstreamNodes, label } = this.node;
+	const { nodes } = store.getState()['nodesReducer'];
     const rules = [];
     upstreamNodes.forEach((n) => {
       const inputSpans = this.getInputSpans(n);
+	  const node = nodes.find((node) => node.nodeId === n.nodeId);
       rules.push({
         'input-spec': {
           'input-span': inputSpans,
@@ -67,7 +69,7 @@ export default class UnionNode {
         'output-spec': {
           field: {
             '@': { 
-				name: label, //"Literal_1", 
+				name: node.renamed, //"Literal_1", 
 				hide: "no",
 				"func-call": "no",
 				"renamed": "yes", 
