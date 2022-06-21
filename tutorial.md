@@ -80,6 +80,22 @@ You will see 6 results: one result from `RevenueOfDivision1`, and five results `
 
 ![Running a union](images/tutorial_revofdiv_run.png)
 
+## Create a regular expression to capture currency amounts
+
+Under **Extractors**, drag **ReGex** to the canvas. Name it `Amount` and specify the regular expression as `\d+(\.\d+)?\s+billion`. 
+Click **Save**, then **Run**.
+The regular expression captures mentions of currency amounts.
+
+![Creating a regular expression](images/tutorial_amount.png)
+
+![Running a regular expression](images/tutorial_amount_run.png)
+
+## Create a sequence to combine the division, metric and amount
+
+Create a sequence called `RevenueByDivision` and specify the pattern as `(<RevenueOfDivision.RevenueOfDivision>)<Token>{0,35}(<Amount.Amount>)`. Click **Save**.
+
+![Combining division, metric and amount](images/tutorial_revbydiv.png)
+
 
 
 
