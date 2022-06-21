@@ -131,36 +131,42 @@ To run the NLP editor in a container:
    git clone git@github.com:elyra-ai/nlp-editor.git
    ```
 
-1. Navigate to the editor source code directory
+2. Navigate to the editor source code directory
    ```
    cd nlp-editor
    ```
 
-1. Build the app
+3. Build the app
    ```
    npm run build
    ```
 
-1. Run the app
+4. Run the app
    ```
    npm run serve
    ```
 
-1. Extract `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
+5. Extract `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
 
-1. Build the container image
+6. Build the container image
    ```
    cd watson_nlp_web_tool
    docker build -t watson_nlp_web_tool:1.0 .
    ```
 
-1. Run the container image with volumes mapped. Note that `/path/to/nlp-editor` s the absolute path to the `nlp-editor` repository (from Step 1).
+7. Run the container image with volumes mapped. Note that `/path/to/nlp-editor` s the absolute path to the `nlp-editor` repository (from Step 1).
 
    ```
    docker run -d -v /path/to/nlp-editor/Seer-Core/aql-processor/user-data-in:/app/Seer-Core/aql-processor/user-data-in -v /path/to/nlp-editor/Seer-Core/aql-processor/run-aql-result:/app/Seer-Core/aql-processor/run-aql-result --name watson_nlp_web_tool watson_nlp_web_tool:1.0
    ```
 
-1. Open http://localhost:8080 in a web browser.
+8. Open http://localhost:8080 in a web browser.
+
+9. Create your NLP model. Use the [Tutorial](./tutorial) for guidance.
+
+10. When you are satisfied with your model, clock **Export**. A `.zip` file is generated on your local file system. 
+
+11. In Watson Discovery on CloudPak for Data, apply the model by following the steps in [Advanced Rules Models](https://cloud.ibm.com/docs/discovery-data?topic=discovery-data-domain#advanced-rules).
 
 
 ## Getting Help
