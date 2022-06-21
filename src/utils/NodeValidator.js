@@ -27,7 +27,7 @@ import {
 
 export default function NodeValidator(canvasController) {
   this.canvasController = canvasController;
-  this.validate = function (pipelineId, nodeProps) {
+  this.validate = function (pipelineId, nodeProps, nodes) {
     const { type } = nodeProps;
     let node;
     switch (type) {
@@ -44,7 +44,7 @@ export default function NodeValidator(canvasController) {
         node = new SequenceNode(this.canvasController, pipelineId, nodeProps);
         break;
       case 'union':
-        node = new UnionNode(this.canvasController, pipelineId, nodeProps);
+        node = new UnionNode(this.canvasController, pipelineId, nodeProps, nodes);
 		break;
 	  case 'filter':
 		node = new FilterNode(this.canvasController, pipelineId, nodeProps);
