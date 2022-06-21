@@ -106,10 +106,15 @@ class DictionaryPanel extends React.Component {
         caseSensitivity: 'match',
         lemmaMatch: false,
       });
-    } else {
+    } else if (value === 'lemmaMatch') {
       this.setState({
         caseSensitivity: 'ignore',
         lemmaMatch: true,
+      });
+    } else {
+      this.setState({
+        caseSensitivity: 'ignore',
+        lemmaMatch: false,
       });
     }
   };
@@ -220,6 +225,11 @@ class DictionaryPanel extends React.Component {
             labelText="Ignore lemma and match case"
             id="caseMatch"
             value="caseMatch"
+          />
+          <RadioButton
+            labelText="Ignore lemma and ignore case"
+            id="ignoreBoth"
+            value="ignoreBoth"
           />
         </RadioButtonGroup>
         <RHSPanelButtons
