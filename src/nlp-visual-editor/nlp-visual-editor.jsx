@@ -146,7 +146,7 @@ class VisualEditor extends React.Component {
     let response = {};
     const isValid = upstreamNodeIds.every((id) => {
       const node = nodes.find((n) => n.nodeId === id);
-      response = this.nodeValidator.validate(pipelineId, node);
+      response = this.nodeValidator.validate(pipelineId, node, nodes);
       const { isValid } = response;
       return isValid;
     });
