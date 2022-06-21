@@ -16,7 +16,13 @@ limitations under the License.
 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Checkbox, Dropdown, TextInput } from 'carbon-components-react';
+import {
+  Button,
+  Checkbox,
+  RadioButton,
+  RadioButtonGroup,
+  TextInput,
+} from 'carbon-components-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { Delete16 } from '@carbon/icons-react';
 import classNames from 'classnames';
@@ -66,13 +72,6 @@ class DictionaryPanel extends React.Component {
     return retList;
   };
 
-  getDdlMatchCaseItems = () => {
-    return [
-      { id: 'match', text: 'Match case' },
-      { id: 'ignore', text: 'Ignore case' },
-    ];
-  };
-
   onUpdateList = () => {
     const { inputText, items } = this.state;
     this.setState({ items: items.concat(inputText), inputText: '' }, () => {
@@ -101,13 +100,18 @@ class DictionaryPanel extends React.Component {
     this.setState({ items: Array.from(itemsSet) });
   };
 
-  onChangeCaseSensitivity = ({ selectedItem }) => {
-    const { id } = selectedItem;
-    this.setState({ caseSensitivity: id });
-  };
-
-  onChangeLemmaMatch = (value) => {
-    this.setState({ lemmaMatch: value });
+  onChangeLemmaCaseMatch = (value) => {
+    if (value === 'caseMatch') {
+      this.setState({
+        caseSensitivity: 'match',
+        lemmaMatch: false,
+      });
+    } else {
+      this.setState({
+        caseSensitivity: 'ignore',
+        lemmaMatch: true,
+      });
+    }
   };
 
   onChangeExternalResource = (value) => {
@@ -153,7 +157,6 @@ class DictionaryPanel extends React.Component {
       errorMessage,
     } = this.state;
     const optionItems = this.getListItems();
-    const matchCaseItems = this.getDdlMatchCaseItems();
     return (
       <div className="dictionary-panel">
         <div
@@ -195,32 +198,30 @@ class DictionaryPanel extends React.Component {
         >
           {optionItems}
         </select>
-        <Dropdown
-          id="ddlMatchCase"
-          titleText="Case sensitivity"
-          label="Dropdown menu options"
-          size="sm"
-          initialSelectedItem={matchCaseItems.find(
-            (item) => caseSensitivity == item.id,
-          )}
-          items={matchCaseItems}
-          itemToString={(matchCaseItems) =>
-            matchCaseItems ? matchCaseItems.text : ''
-          }
-          onChange={this.onChangeCaseSensitivity}
-        />
-        <Checkbox
-          labelText="Lemma Match"
-          id="chkLemmaMatch"
-          onChange={this.onChangeLemmaMatch}
-          checked={lemmaMatch}
-        />
         <Checkbox
           labelText="External Resource"
           id="chkExternalResources"
           onChange={this.onChangeExternalResource}
           checked={externalResourceChecked}
         />
+        <RadioButtonGroup
+          id="ddlMatchCase"
+          orientation="vertical"
+          legendText="Case sensitivity and Lemma Match"
+          onChange={this.onChangeLemmaCaseMatch}
+          defaultSelected={lemmaMatch ? 'lemmaMatch' : 'caseMatch'}
+        >
+          <RadioButton
+            labelText="Lemma match and ignore case"
+            id="lemmaMatch"
+            value="lemmaMatch"
+          />
+          <RadioButton
+            labelText="Ignore lemma and match case"
+            id="caseMatch"
+            value="caseMatch"
+          />
+        </RadioButtonGroup>
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });
