@@ -162,7 +162,7 @@ To run the NLP editor in a container:
 
 8. Open http://localhost:8080 in a web browser.
 
-9. Create your NLP model. Use the [Tutorial](./tutorial) for guidance.
+9. Create your NLP model. Use the [Tutorial](./tutorial.md) for guidance.
 
 10. When you are satisfied with your model, clock **Export**. A `.zip` file is generated on your local file system. 
 
