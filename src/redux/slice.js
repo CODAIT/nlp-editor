@@ -27,7 +27,8 @@ const initialState = {
   moduleName: 'elyraNLPCanvas',
   showRightPanel: false,
   showDocumentViewer: false,
-  currentAnnotation: undefined
+  currentAnnotation: undefined,
+  dirty: false,
 };
 
 const nodesSlice = createSlice({
@@ -59,6 +60,7 @@ const nodesSlice = createSlice({
         return !ids.includes(n.nodeId);
       });
       state.nodes = newNodes;
+      state.dirty = true;
     },
     saveNlpNode: (state, action) => {
       //stores or replaces node.
@@ -69,11 +71,13 @@ const nodesSlice = createSlice({
       const updatedNode = { ...existingNode, ...node };
       const nodeList = state.nodes.filter((n) => n.nodeId !== nodeId);
       state.nodes = nodeList.concat(updatedNode);
+      state.dirty = true;
     },
     setNlpNodes: (state, action) => {
       // called when saved pipeline json is opened
       const { nodes = [] } = action.payload;
       state.nodes = nodes;
+      state.dirty = true;
     },
     setInputDocument: (state, action) => {
       const { document } = action.payload;
@@ -86,12 +90,15 @@ const nodesSlice = createSlice({
       } else {
         const { annotations, names } = payload;
         state.tabularResults = { annotations, names };
-		state.currentAnnotation = names[0];
+        state.currentAnnotation = names[0];
       }
     },
-	setDocumentViewToAnnotation: (state, action) => {
-		state.currentAnnotation = action.payload;
-	}
+    setDocumentViewToAnnotation: (state, action) => {
+      state.currentAnnotation = action.payload;
+    },
+    setDirty: (state, action) => {
+      state.dirty = action.payload;
+    },
   },
 });
 
@@ -106,5 +113,6 @@ export const {
   setShowRightPanel,
   setShowDocumentViewer,
   setDocumentViewToAnnotation,
+  setDirty,
 } = nodesSlice.actions;
 export default nodesSlice.reducer;
