@@ -22,7 +22,7 @@ and can be executed by uploading the text file [4Q2006.txt](./sample-data/revenu
 
 ## Set up the input document
 
-Under **Extractors**, drag and drop **Input Documents** on the canvas. Configure with document [4Q2006.txt](./sample-data/revenue by division/financial statements/4Q2006.txt). Click **Upload**, then **Close**.
+Under **Extractors**, drag and drop **Input Documents** on the canvas. Configure with document [4Q2006.txt](./sample-data/revenue%20by%20division/financialStatements/4Q2006.txt). Click **Upload**, then **Close**.
 
 ![Setting up an input document for testing during development](images/tutorial_input.png)
 
@@ -35,7 +35,7 @@ Rename the node to `Division` and enter the terms: `Software`, `Global Business 
 
 ## Run the dictionary and see results highlighted
 
-Select the `Division` node, and click **Run**. 
+Select the `Division` node, and click **Run**.
 
 ![Running the dictionary and seeing results highlighted in the input text](images/tutorial_division_run.png)
 
