@@ -217,19 +217,19 @@ class DictionaryPanel extends React.Component {
           defaultSelected={lemmaMatch ? 'lemmaMatch' : 'caseMatch'}
         >
           <RadioButton
-            labelText="Lemma match and ignore case"
-            id="lemmaMatch"
-            value="lemmaMatch"
+            labelText="Ignore case"
+            id="ignoreBoth"
+            value="ignoreBoth"
           />
           <RadioButton
-            labelText="Ignore lemma and match case"
+            labelText="Match case"
             id="caseMatch"
             value="caseMatch"
           />
           <RadioButton
-            labelText="Ignore lemma and ignore case"
-            id="ignoreBoth"
-            value="ignoreBoth"
+            labelText="Lemma match"
+            id="lemmaMatch"
+            value="lemmaMatch"
           />
         </RadioButtonGroup>
         <RHSPanelButtons
