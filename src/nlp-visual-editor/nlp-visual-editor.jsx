@@ -50,6 +50,7 @@ import {
   setWorkingId,
   setShowRightPanel,
   setShowDocumentViewer,
+  setDirty,
 } from '../redux/slice';
 
 const TIMER_TICK = 3000; // 3 secs
@@ -67,7 +68,7 @@ class VisualEditor extends React.Component {
     };
 
     this.canvasController = new CanvasController();
-	this.canvasController.openPalette()
+    this.canvasController.openPalette();
     this.canvasController.setPipelineFlowPalette(nlpPalette);
 
     this.nodeValidator = new NodeValidator(this.canvasController);
@@ -81,6 +82,11 @@ class VisualEditor extends React.Component {
     this.props.setPipelineId({
       pipelineId: id,
     });
+    window.onbeforeunload = (e) => {
+      if (this.props.dirty) {
+        return 'Unsaved changes. Proceed?';
+      }
+    };
     this.props.setWorkingId({ workingId });
   }
 
@@ -111,16 +117,16 @@ class VisualEditor extends React.Component {
       .getUpstreamNodes([selectedNodeId], pipelineId)
       .nodes[pipelineId].reverse();
 
-	const objNodes = nodes.reduce((sum, curr) => {
-		sum[curr.nodeId] = {...{}, ...curr};
-		return sum;
-	}, {});
+    const objNodes = nodes.reduce((sum, curr) => {
+      sum[curr.nodeId] = { ...{}, ...curr };
+      return sum;
+    }, {});
 
     upstreamNodeIds.forEach((id) => {
-      	let node = objNodes[id];
+      let node = objNodes[id];
       if (node.type !== 'input') {
         const results = this.jsonToXML.transform(node, moduleName);
-		if (!Array.isArray(results)) {
+        if (!Array.isArray(results)) {
           //dictionaries return a list
           const { xml, label } = results;
           payload.push({ xml, label });
@@ -248,6 +254,7 @@ class VisualEditor extends React.Component {
       nodes: newNodes,
     };
     fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
+    this.props.setDirty(false);
   };
 
   setPipelineFlow = ({ flow, nodes }) => {
@@ -408,18 +415,18 @@ class VisualEditor extends React.Component {
         }
       }
     } else if (editType === 'paste') {
-		const { clonedNodes } = data;
-		clonedNodes.forEach( (newNode) => {
-			const node = processNewNode( newNode, nodes );
-			this.props.saveNlpNode({
-				node
-			});	
-		});
-	} else if (['createNode', 'createAutoNode'].includes(editType)) {
+      const { clonedNodes } = data;
+      clonedNodes.forEach((newNode) => {
+        const node = processNewNode(newNode, nodes);
+        this.props.saveNlpNode({
+          node,
+        });
+      });
+    } else if (['createNode', 'createAutoNode'].includes(editType)) {
       const { newNode } = data;
-	  const node = processNewNode( newNode, nodes );
+      const node = processNewNode(newNode, nodes);
       this.props.saveNlpNode({
-        node
+        node,
       });
     }
     if (['linkNodes', 'deleteLink'].includes(editType)) {
@@ -586,6 +593,7 @@ const mapStateToProps = (state) => ({
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showRightPanel: state.nodesReducer.showRightPanel,
   workingId: state.nodesReducer.workingId,
+  dirty: state.nodesReducer.dirty,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -598,6 +606,7 @@ const mapDispatchToProps = (dispatch) => ({
   setWorkingId: (id) => dispatch(setWorkingId(id)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
+  setDirty: (dirty) => dispatch(setDirty(dirty)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VisualEditor);
