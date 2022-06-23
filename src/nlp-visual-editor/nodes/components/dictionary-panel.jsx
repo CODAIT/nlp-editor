@@ -239,6 +239,7 @@ class DictionaryPanel extends React.Component {
         <RadioButtonGroup
           id="ddlMatchCase"
           orientation="vertical"
+          name="Case sensitivity and Lemma Match"
           legendText="Case sensitivity and Lemma Match"
           onChange={this.onChangeLemmaCaseMatch}
           defaultSelected={lemmaMatch ? 'lemmaMatch' : 'caseMatch'}
@@ -246,16 +247,19 @@ class DictionaryPanel extends React.Component {
           <RadioButton
             labelText="Ignore case"
             id="ignoreBoth"
+            key="ignoreBoth"
             value="ignoreBoth"
           />
           <RadioButton
             labelText="Match case"
             id="caseMatch"
+            key="caseMatch"
             value="caseMatch"
           />
           <RadioButton
             labelText="Lemma match"
             id="lemmaMatch"
+            key="lemmaMatch"
             value="lemmaMatch"
           />
         </RadioButtonGroup>
