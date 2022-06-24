@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import {
   Button,
   Checkbox,
+  FileUploader,
   RadioButton,
   RadioButtonGroup,
   TextInput,
@@ -33,6 +34,8 @@ import './dictionary-panel.scss';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
 class DictionaryPanel extends React.Component {
+  reader = new FileReader();
+
   constructor(props) {
     super(props);
     this.state = {
@@ -43,6 +46,13 @@ class DictionaryPanel extends React.Component {
       externalResourceChecked: props.externalResourceChecked,
       itemsSelected: [],
       errorMessage: undefined,
+    };
+    this.reader.onload = (event) => {
+      let newItems = event.target.result?.split('\n');
+      newItems = newItems.filter((i) => {
+        return this.state.items.indexOf(i) < 0;
+      });
+      this.setState({ items: [...this.state.items, ...newItems] });
     };
   }
 
@@ -153,6 +163,13 @@ class DictionaryPanel extends React.Component {
     return errorMessage;
   };
 
+  onFilesSelected = async (e) => {
+    const { files } = e.target;
+    for (const file of files) {
+      await this.reader.readAsText(file);
+    }
+  };
+
   render() {
     const {
       inputText,
@@ -164,6 +181,16 @@ class DictionaryPanel extends React.Component {
     const optionItems = this.getListItems();
     return (
       <div className="dictionary-panel">
+        <FileUploader
+          accept={['.txt']}
+          buttonKind="primary"
+          buttonLabel="Select files"
+          filenameStatus="edit"
+          labelDescription="only .txt files at 10mb or less"
+          labelTitle="Upload files"
+          size={'sm'}
+          onChange={this.onFilesSelected}
+        />
         <div
           className={classNames('input-controls', {
             error: errorMessage !== undefined,
@@ -212,6 +239,7 @@ class DictionaryPanel extends React.Component {
         <RadioButtonGroup
           id="ddlMatchCase"
           orientation="vertical"
+          name="Case sensitivity and Lemma Match"
           legendText="Case sensitivity and Lemma Match"
           onChange={this.onChangeLemmaCaseMatch}
           defaultSelected={lemmaMatch ? 'lemmaMatch' : 'caseMatch'}
@@ -219,16 +247,19 @@ class DictionaryPanel extends React.Component {
           <RadioButton
             labelText="Ignore case"
             id="ignoreBoth"
+            key="ignoreBoth"
             value="ignoreBoth"
           />
           <RadioButton
             labelText="Match case"
             id="caseMatch"
+            key="caseMatch"
             value="caseMatch"
           />
           <RadioButton
             labelText="Lemma match"
             id="lemmaMatch"
+            key="lemmaMatch"
             value="lemmaMatch"
           />
         </RadioButtonGroup>
