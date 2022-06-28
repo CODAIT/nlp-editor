@@ -253,8 +253,19 @@ class VisualEditor extends React.Component {
       flow,
       nodes: newNodes,
     };
-    fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
-    this.props.setDirty(false);
+    const opts = {
+      suggestedName: 'NLP_Canvas_Flow.json',
+      types: [
+        {
+          description: 'JSON file',
+          accept: { 'application/json': ['.json'] },
+        },
+      ],
+    };
+    window.showSaveFilePicker(opts).then((args) => {
+      fileDownload(JSON.stringify(data), args.name);
+      this.props.setDirty(false);
+    });
   };
 
   setPipelineFlow = ({ flow, nodes }) => {
