@@ -16,9 +16,13 @@ limitations under the License.
 -->
 # Visual Editor for NLP rules
 
-Visual Editor for creating NLP rules.
+Visual Editor for creating NLP rules. 
 
 ![Visual editor interface](https://user-images.githubusercontent.com/81634386/158040876-7bb94cbd-7c4a-4b2c-b50f-7524985801c0.png)
+
+## Watch a demo
+
+Watch a live demo of the NLP editor, and learn more about our future plans in our recent [IBM Data Science Community presentation](https://community.ibm.com/community/user/datascience/blogs/tim-bonnemann1/2022/06/30/replay-available-learn-about-elyra-visual-nlp-edit?CommunityKey=f1c2cf2b-28bf-4b68-8570-b239473dcbbc)
 
 
 ## Try the editor
