@@ -268,6 +268,27 @@ class VisualEditor extends React.Component {
     });
   };
 
+  exportPipeline = () => {
+    const opts = {
+      suggestedName: 'NLP_Canvas_Export.zip',
+      types: [
+        {
+          description: 'Zip file',
+          accept: { 'application/octet-stream': ['.zip'] },
+        },
+      ],
+    };
+    window.showSaveFilePicker(opts).then((args) => {
+      axios
+        .get(`/api/download/${this.props.pipelineId}`, {
+          responseType: 'arraybuffer',
+        })
+        .then((res) => {
+          fileDownload(res.data, args.name);
+        });
+    });
+  };
+
   setPipelineFlow = ({ flow, nodes }) => {
     const { primary_pipeline: pipelineId } = flow;
     this.props.setShowRightPanel({ showPanel: false });
@@ -373,9 +394,7 @@ class VisualEditor extends React.Component {
               size="field"
               kind="ghost"
               disabled={this.props.tabularResults === undefined}
-              onClick={() =>
-                window.open(`/api/download/${this.props.pipelineId}`)
-              }
+              onClick={this.exportPipeline}
             >
               Export
             </Button>
