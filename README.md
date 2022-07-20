@@ -95,20 +95,20 @@ v14.17.6
 
 1. Follow steps above to **Run the editor locally**
 
-2. Extract `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
-
-3. Build the container image
-   ```
-   cd watson_nlp_web_tool
-   docker build -t watson_nlp_web_tool:1.0 .
-   ```
-
-4. Add `Seer-Code` folder, then add `aql-processor` folder underneath, and finally two more folders `user-data-in` and `run-aql-result`
+2. Add the following folders to the nlp-editor; `Seer-Code` folder at root level, then add `aql-processor` folder underneath, and finally two more folders `user-data-in` and `run-aql-result`. The folder structure should reflect the following:
 
 * 
   * nlp-editor/Seer-Code/aql-processor/user-data-in
 * 
   * nlp-editor/Seer-Code/aql-processor/run-aql-result
+
+3. Extract `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
+
+4. Build the container image
+   ```
+   cd watson_nlp_web_tool
+   docker build -t watson_nlp_web_tool:1.0 .
+   ``` 
 
 5. Run the container image with volumes mapped. Note that `/path/to/nlp-editor` is the absolute path to the `nlp-editor` repository (from Step 1).
 
