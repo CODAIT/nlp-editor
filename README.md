@@ -120,7 +120,7 @@ v14.17.6
 
 9. Create your NLP model. Use the [Tutorial](./tutorial.md) for guidance.
 
-10. When you are satisfied with your model, clock **Export**. A `.zip` file is generated on your local file system. 
+10. When you are satisfied with your model, click **Export**. A `.zip` file is generated on your local file system. 
 
 11. In Watson Discovery on CloudPak for Data, apply the model by following the steps in [Advanced Rules Models](https://cloud.ibm.com/docs/discovery-data?topic=discovery-data-domain#advanced-rules).
 
