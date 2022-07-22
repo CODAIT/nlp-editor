@@ -262,8 +262,13 @@ class VisualEditor extends React.Component {
         },
       ],
     };
-    window.showSaveFilePicker(opts).then((args) => {
-      fileDownload(JSON.stringify(data), args.name);
+    window.showSaveFilePicker(opts).then(async (fileHandle) => {
+      // Create a FileSystemWritableFileStream to write to.
+      const writable = await fileHandle.createWritable();
+      // Write the contents of the file to the stream.
+      await writable.write(JSON.stringify(data));
+      // Close the file and write the contents to disk.
+      await writable.close();
       this.props.setDirty(false);
     });
   };
@@ -278,13 +283,18 @@ class VisualEditor extends React.Component {
         },
       ],
     };
-    window.showSaveFilePicker(opts).then((args) => {
+    window.showSaveFilePicker(opts).then((fileHandle) => {
       axios
         .get(`/api/download/${this.props.pipelineId}`, {
           responseType: 'arraybuffer',
         })
-        .then((res) => {
-          fileDownload(res.data, args.name);
+        .then(async (res) => {
+          // Create a FileSystemWritableFileStream to write to.
+          const writable = await fileHandle.createWritable();
+          // Write the contents of the file to the stream.
+          await writable.write(res.data);
+          // Close the file and write the contents to disk.
+          await writable.close();
         });
     });
   };
