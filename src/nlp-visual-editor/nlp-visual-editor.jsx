@@ -253,24 +253,28 @@ class VisualEditor extends React.Component {
       flow,
       nodes: newNodes,
     };
-    const opts = {
-      suggestedName: 'NLP_Canvas_Flow.json',
-      types: [
-        {
-          description: 'JSON file',
-          accept: { 'application/json': ['.json'] },
-        },
-      ],
-    };
-    window.showSaveFilePicker(opts).then(async (fileHandle) => {
-      // Create a FileSystemWritableFileStream to write to.
-      const writable = await fileHandle.createWritable();
-      // Write the contents of the file to the stream.
-      await writable.write(JSON.stringify(data));
-      // Close the file and write the contents to disk.
-      await writable.close();
-      this.props.setDirty(false);
-    });
+    if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
+      const opts = {
+        suggestedName: 'NLP_Canvas_Flow.json',
+        types: [
+          {
+            description: 'JSON file',
+            accept: { 'application/json': ['.json'] },
+          },
+        ],
+      };
+      window.showSaveFilePicker(opts).then(async (fileHandle) => {
+        // Create a FileSystemWritableFileStream to write to.
+        const writable = await fileHandle.createWritable();
+        // Write the contents of the file to the stream.
+        await writable.write(JSON.stringify(data));
+        // Close the file and write the contents to disk.
+        await writable.close();
+        this.props.setDirty(false);
+      });
+    } else {
+      fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
+    }
   };
 
   exportPipeline = () => {
@@ -283,20 +287,30 @@ class VisualEditor extends React.Component {
         },
       ],
     };
-    window.showSaveFilePicker(opts).then((fileHandle) => {
+    if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
+      window.showSaveFilePicker(opts).then((fileHandle) => {
+        axios
+          .get(`/api/download/${this.props.pipelineId}`, {
+            responseType: 'arraybuffer',
+          })
+          .then(async (res) => {
+            // Create a FileSystemWritableFileStream to write to.
+            const writable = await fileHandle.createWritable();
+            // Write the contents of the file to the stream.
+            await writable.write(res.data);
+            // Close the file and write the contents to disk.
+            await writable.close();
+          });
+      });
+    } else {
       axios
         .get(`/api/download/${this.props.pipelineId}`, {
           responseType: 'arraybuffer',
         })
-        .then(async (res) => {
-          // Create a FileSystemWritableFileStream to write to.
-          const writable = await fileHandle.createWritable();
-          // Write the contents of the file to the stream.
-          await writable.write(res.data);
-          // Close the file and write the contents to disk.
-          await writable.close();
+        .then((res) => {
+          fileDownload(res.data, 'NLP_Canvas_Export.zip');
         });
-    });
+    }
   };
 
   setPipelineFlow = ({ flow, nodes }) => {
