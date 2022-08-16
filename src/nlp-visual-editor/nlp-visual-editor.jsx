@@ -636,7 +636,7 @@ class VisualEditor extends React.Component {
       <Modal
         open
         primaryButtonText="OK"
-        closeButtonLabel="Cancel"
+        secondaryButtonText="Cancel"
         onRequestSubmit={() => {
           console.log('submit');
           this.setState({ runPipelineModal: false });
@@ -648,9 +648,11 @@ class VisualEditor extends React.Component {
       >
         <Select
           id="language-select"
+          labelText="Select Language"
           onChange={(event) => {
             this.setState({ language: event.target.value });
           }}
+          defaultValue={this.state.language}
         >
           {languages.map((language) => {
             return (
