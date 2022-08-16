@@ -20,7 +20,13 @@ import { connect, Provider } from 'react-redux';
 import axios from 'axios';
 import shortUUID from 'short-uuid';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
-import { Button, Loading, Modal } from 'carbon-components-react';
+import {
+  Button,
+  Loading,
+  Modal,
+  Select,
+  SelectItem,
+} from 'carbon-components-react';
 import {
   Play32,
   WarningAlt24,
@@ -65,6 +71,8 @@ class VisualEditor extends React.Component {
       selectedNodeId: undefined,
       enableFlowExecutionBtn: false,
       errorMessage: undefined,
+      runPipelineModal: false,
+      language: 'en',
     };
 
     this.canvasController = new CanvasController();
@@ -206,6 +214,7 @@ class VisualEditor extends React.Component {
   execute = (payload) => {
     const { workingId } = this.props;
     this.setState({ isLoading: true });
+    const flow = this.canvasController.getPipelineFlow();
 
     fetch('/api/run', {
       method: 'POST',
@@ -213,6 +222,7 @@ class VisualEditor extends React.Component {
       body: JSON.stringify({
         workingId,
         payload,
+        language: this.state.language,
       }),
     })
       .then((res) => res.json())
@@ -401,7 +411,9 @@ class VisualEditor extends React.Component {
               kind="primary"
               renderIcon={Play32}
               disabled={!enableFlowExecutionBtn}
-              onClick={this.runPipeline}
+              onClick={() => {
+                this.setState({ runPipelineModal: true });
+              }}
             >
               Run
             </Button>
@@ -570,6 +582,91 @@ class VisualEditor extends React.Component {
     );
   };
 
+  getRunPipelineModal = () => {
+    if (!this.state.runPipelineModal || this.state.errorMessage) {
+      return null;
+    }
+    const languages = [
+      {
+        label: 'Arabic',
+        id: 'ar',
+      },
+      {
+        label: 'Chinese',
+        id: 'zh',
+      },
+      {
+        label: 'Dutch',
+        id: 'nl',
+      },
+      {
+        label: 'English',
+        id: 'en',
+      },
+      {
+        label: 'French',
+        id: 'fr',
+      },
+      {
+        label: 'German',
+        id: 'de',
+      },
+      {
+        label: 'Italian',
+        id: 'it',
+      },
+      {
+        label: 'Japanese',
+        id: 'ja',
+      },
+      {
+        label: 'Korean',
+        id: 'ko',
+      },
+      {
+        label: 'Portuguese',
+        id: 'pt',
+      },
+      {
+        label: 'Spanish',
+        id: 'es',
+      },
+    ];
+    return (
+      <Modal
+        open
+        primaryButtonText="OK"
+        closeButtonLabel="Cancel"
+        onRequestSubmit={() => {
+          console.log('submit');
+          this.setState({ runPipelineModal: false });
+          this.runPipeline();
+        }}
+        onRequestClose={() => {
+          this.setState({ runPipelineModal: false });
+        }}
+      >
+        <Select
+          id="language-select"
+          onChange={(event) => {
+            this.setState({ language: event.target.value });
+          }}
+        >
+          {languages.map((language) => {
+            return (
+              <SelectItem
+                id={`${language.id}-selectItem`}
+                key={`${language.id}-selectItem`}
+                value={language.id}
+                text={language.label}
+              />
+            );
+          })}
+        </Select>
+      </Modal>
+    );
+  };
+
   getErrorModal = () => {
     const { errorMessage, selectedNodeId } = this.state;
     const { nodes } = this.props;
@@ -610,6 +707,7 @@ class VisualEditor extends React.Component {
     const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
     const errorModal = this.getErrorModal();
+    const runPipelineModal = this.getRunPipelineModal();
 
     return (
       <div className="nlp-visual-editor">
@@ -629,6 +727,7 @@ class VisualEditor extends React.Component {
           />
         </IntlProvider>
         {errorModal}
+        {runPipelineModal}
         <Loading
           description="Loading NLP results"
           withOverlay={true}

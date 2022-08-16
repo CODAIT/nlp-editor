@@ -67,7 +67,7 @@ const uploadFile = (path, file, filename = 'payload.txt') => {
   });
 };
 
-const createNodeFile = (path, fileName, contents) => {
+const createFile = (path, fileName, contents) => {
   console.log(`creating file ${fileName}`);
   fs.writeFileSync(`${path}/${fileName}`, contents);
 };
@@ -142,48 +142,51 @@ app.post('/api/uploadflow', async (req, res) => {
   }
 });
 app.get('/api/download/:workingId', (req, res) => {
-	const { workingId } = req.params;
-	const destinationPath = `${systemTdataFolder}/user-data-in/${workingId}.export-aql`;
-	fs.writeFileSync(destinationPath, "");
-	const resultFileName = `${workingId}.zip`;
-	const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
-	const FIFTYSECONDSTIMEOUT = 100;
-	let counter = 0;
-	const interval = setInterval( () => {
-		if( counter > FIFTYSECONDSTIMEOUT) {
-			clearInterval(interval);
-			return res.status(400).send({ status: '' });
-		}
+  const { workingId } = req.params;
+  const destinationPath = `${systemTdataFolder}/user-data-in/${workingId}.export-aql`;
+  fs.writeFileSync(destinationPath, '');
+  const resultFileName = `${workingId}.zip`;
+  const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
+  const FIFTYSECONDSTIMEOUT = 100;
+  let counter = 0;
+  const interval = setInterval(() => {
+    if (counter > FIFTYSECONDSTIMEOUT) {
+      clearInterval(interval);
+      return res.status(400).send({ status: '' });
+    }
 
-		if(fs.existsSync(file) ) {
-			var stat = fs.statSync(file);
+    if (fs.existsSync(file)) {
+      var stat = fs.statSync(file);
 
-			let fileContents = fs.createReadStream(file);
-			const fileType = 'application/zip';
-			res.writeHead(200, {
-				'Content-Type': fileType,
-				'Content-Length': stat.size
-			})
-			fileContents.on('close', () => {
-				clearInterval(interval);
-				deleteFile(`${systemTdataFolder}/run-aql-result/${resultFileName}`, resultFileName);
-				res.end();
-			})
-			fileContents.pipe(res);
-		}
-		counter += 1;
-	}, 500);
-	req.on("close", function() {
-		clearInterval(interval);
-	});
-	req.on("end", function() {
-		clearInterval(interval);
-	});
-})
+      let fileContents = fs.createReadStream(file);
+      const fileType = 'application/zip';
+      res.writeHead(200, {
+        'Content-Type': fileType,
+        'Content-Length': stat.size,
+      });
+      fileContents.on('close', () => {
+        clearInterval(interval);
+        deleteFile(
+          `${systemTdataFolder}/run-aql-result/${resultFileName}`,
+          resultFileName,
+        );
+        res.end();
+      });
+      fileContents.pipe(res);
+    }
+    counter += 1;
+  }, 500);
+  req.on('close', function () {
+    clearInterval(interval);
+  });
+  req.on('end', function () {
+    clearInterval(interval);
+  });
+});
 
 app.post('/api/run', (req, res) => {
   console.log('executing pipeline');
-  const { workingId, payload } = req.body;
+  const { workingId, payload, language } = req.body;
   const workingFolder = `${tempFolder}/${workingId}`;
 
   console.time('writing xml files');
@@ -194,9 +197,11 @@ app.post('/api/run', (req, res) => {
   //write files to temp folder
   payload.forEach((node) => {
     const { label, xml } = node;
-    createNodeFile(workingFolder, `${label}.xml`, xml);
+    createFile(workingFolder, `${label}.xml`, xml);
   });
   console.timeEnd('writing xml files');
+
+  createFile(workingFolder, 'language-name.txt', language);
 
   //zip tempfolder
   console.time('creating+moving zip file');
@@ -233,13 +238,13 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
     const items = [];
     const annotation = annotations[name];
     annotation.forEach((elem) => {
-		const attributes = {};
-			Object.keys(elem).forEach( key => {
-				const { location, text } = elem[key];
-      			const { begin: start, end } = location;
-				attributes[key] = {start, end, text};
-			})
-			items.push({...attributes});
+      const attributes = {};
+      Object.keys(elem).forEach((key) => {
+        const { location, text } = elem[key];
+        const { begin: start, end } = location;
+        attributes[key] = { start, end, text };
+      });
+      items.push({ ...attributes });
     });
     annonResults = { ...annonResults, [name]: items };
   });
