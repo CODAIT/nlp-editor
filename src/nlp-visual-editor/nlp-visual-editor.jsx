@@ -20,13 +20,7 @@ import { connect, Provider } from 'react-redux';
 import axios from 'axios';
 import shortUUID from 'short-uuid';
 import { CommonCanvas, CanvasController } from '@elyra/canvas';
-import {
-  Button,
-  Loading,
-  Modal,
-  Select,
-  SelectItem,
-} from 'carbon-components-react';
+import { Button, Loading, Modal, Select } from 'carbon-components-react';
 import {
   Play32,
   WarningAlt24,
@@ -35,6 +29,7 @@ import {
 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
+import LanguageModal from './components/language-modal';
 import TabularView from './views/tabular-view';
 import DocumentViewer from './views/document-viewer';
 
@@ -62,6 +57,20 @@ import {
 const TIMER_TICK = 3000; // 3 secs
 const TIMER_TRIES = 40; // 2 minutes
 
+const languages = {
+  ar: 'Arabic',
+  zh: 'Chinese',
+  nl: 'Dutch',
+  en: 'English',
+  fr: 'French',
+  de: 'German',
+  it: 'Italian',
+  ja: 'Japanese',
+  ko: 'Korean',
+  pt: 'Portuguese',
+  es: 'Spanish',
+};
+
 class VisualEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -71,8 +80,7 @@ class VisualEditor extends React.Component {
       selectedNodeId: undefined,
       enableFlowExecutionBtn: false,
       errorMessage: undefined,
-      runPipelineModal: false,
-      language: 'en',
+      languageSelectModal: false,
     };
 
     this.canvasController = new CanvasController();
@@ -222,7 +230,7 @@ class VisualEditor extends React.Component {
       body: JSON.stringify({
         workingId,
         payload,
-        language: this.state.language,
+        language: this.getCurrentLanguage(),
       }),
     })
       .then((res) => res.json())
@@ -323,6 +331,24 @@ class VisualEditor extends React.Component {
     }
   };
 
+  getCurrentLanguage = () => {
+    const flow = this.canvasController.getPipelineFlow();
+    return flow.pipelines?.[0]?.app_data?.language ?? 'en';
+  };
+
+  setCurrentLanguage = (language) => {
+    const flow = this.canvasController.getPipelineFlow();
+    if (flow.pipelines?.[0]) {
+      flow.pipelines[0].app_data = {
+        ...flow.pipelines[0].app_data,
+        language: language,
+      };
+      console.log(flow);
+      this.canvasController.setPipelineFlow(flow);
+      console.log(this.canvasController.getPipelineFlow());
+    }
+  };
+
   setPipelineFlow = ({ flow, nodes }) => {
     const { primary_pipeline: pipelineId } = flow;
     this.props.setShowRightPanel({ showPanel: false });
@@ -359,85 +385,105 @@ class VisualEditor extends React.Component {
 
   getToolbar = () => {
     const { enableFlowExecutionBtn } = this.state;
-    return [
-      { action: 'palette', label: 'Palette', enable: true },
-      { divider: true },
-      {
-        action: 'save',
-        tooltip: 'Save NLP Flow',
-        jsx: (
-          <>
-            <Button
-              id={'btn-save'}
-              size="field"
-              kind="ghost"
-              iconDescription="Save document"
-              renderIcon={DocumentDownload32}
-              onClick={this.savePipeline}
-            >
-              Save
-            </Button>
-          </>
-        ),
-      },
-      {
-        action: 'open',
-        tooltip: 'Open NLP Flow',
-        jsx: (
-          <>
-            <label className="bx--btn bx--btn--md bx--btn--ghost">
-              Open
-              <input
-                type="file"
-                id="btn-open"
-                className="open-button"
-                name="open"
-                accept=".json"
-                onChange={this.onFlowSelected}
-              />
-              <Upload16 />
-            </label>
-          </>
-        ),
-      },
-      {
-        action: 'run',
-        tooltip: 'Run NLP rule',
-        jsx: (
-          <>
-            <Button
-              id={'btn-run'}
-              size="field"
-              kind="primary"
-              renderIcon={Play32}
-              disabled={!enableFlowExecutionBtn}
-              onClick={() => {
-                this.setState({ runPipelineModal: true });
-              }}
-            >
-              Run
-            </Button>
-          </>
-        ),
-      },
-      {
-        action: 'export',
-        tooltip: 'Export',
-        jsx: (
-          <>
-            <Button
-              id={'btn-run'}
-              size="field"
-              kind="ghost"
-              disabled={this.props.tabularResults === undefined}
-              onClick={this.exportPipeline}
-            >
-              Export
-            </Button>
-          </>
-        ),
-      },
-    ];
+    return {
+      leftBar: [
+        { action: 'palette', label: 'Palette', enable: true },
+        { divider: true },
+        {
+          action: 'save',
+          tooltip: 'Save NLP Flow',
+          jsx: (
+            <>
+              <Button
+                id={'btn-save'}
+                size="field"
+                kind="ghost"
+                iconDescription="Save document"
+                renderIcon={DocumentDownload32}
+                onClick={this.savePipeline}
+              >
+                Save
+              </Button>
+            </>
+          ),
+        },
+        {
+          action: 'open',
+          tooltip: 'Open NLP Flow',
+          jsx: (
+            <>
+              <label className="bx--btn bx--btn--md bx--btn--ghost">
+                Open
+                <input
+                  type="file"
+                  id="btn-open"
+                  className="open-button"
+                  name="open"
+                  accept=".json"
+                  onChange={this.onFlowSelected}
+                />
+                <Upload16 />
+              </label>
+            </>
+          ),
+        },
+        {
+          action: 'run',
+          tooltip: 'Run NLP rule',
+          jsx: (
+            <>
+              <Button
+                id={'btn-run'}
+                size="field"
+                kind="primary"
+                renderIcon={Play32}
+                disabled={!enableFlowExecutionBtn}
+                onClick={this.runPipeline}
+              >
+                Run
+              </Button>
+            </>
+          ),
+        },
+        {
+          action: 'export',
+          tooltip: 'Export',
+          jsx: (
+            <>
+              <Button
+                id={'btn-run'}
+                size="field"
+                kind="ghost"
+                disabled={this.props.tabularResults === undefined}
+                onClick={this.exportPipeline}
+              >
+                Export
+              </Button>
+            </>
+          ),
+        },
+      ],
+      rightBar: [
+        {
+          action: 'language',
+          tooltip: 'Select Language',
+          jsx: (
+            <>
+              <Button
+                id={'btn-language'}
+                size="field"
+                kind="ghost"
+                onClick={() => {
+                  this.setState({ languageSelectModal: true });
+                }}
+              >
+                Language ({languages[this.getCurrentLanguage()]})
+              </Button>
+            </>
+          ),
+        },
+      ],
+    };
   };
 
   updateUnionProperties(node) {
@@ -582,90 +628,22 @@ class VisualEditor extends React.Component {
     );
   };
 
-  getRunPipelineModal = () => {
-    if (!this.state.runPipelineModal || this.state.errorMessage) {
+  getlanguageSelectModal = () => {
+    if (!this.state.languageSelectModal || this.state.errorMessage) {
       return null;
     }
-    const languages = [
-      {
-        label: 'Arabic',
-        id: 'ar',
-      },
-      {
-        label: 'Chinese',
-        id: 'zh',
-      },
-      {
-        label: 'Dutch',
-        id: 'nl',
-      },
-      {
-        label: 'English',
-        id: 'en',
-      },
-      {
-        label: 'French',
-        id: 'fr',
-      },
-      {
-        label: 'German',
-        id: 'de',
-      },
-      {
-        label: 'Italian',
-        id: 'it',
-      },
-      {
-        label: 'Japanese',
-        id: 'ja',
-      },
-      {
-        label: 'Korean',
-        id: 'ko',
-      },
-      {
-        label: 'Portuguese',
-        id: 'pt',
-      },
-      {
-        label: 'Spanish',
-        id: 'es',
-      },
-    ];
     return (
-      <Modal
-        open
-        primaryButtonText="OK"
-        secondaryButtonText="Cancel"
-        onRequestSubmit={() => {
-          console.log('submit');
-          this.setState({ runPipelineModal: false });
-          this.runPipeline();
+      <LanguageModal
+        onSubmit={(language) => {
+          this.setCurrentLanguage(language);
+          this.setState({ languageSelectModal: false });
         }}
         onRequestClose={() => {
-          this.setState({ runPipelineModal: false });
+          this.setState({ languageSelectModal: false });
         }}
-      >
-        <Select
-          id="language-select"
-          labelText="Select Language"
-          onChange={(event) => {
-            this.setState({ language: event.target.value });
-          }}
-          defaultValue={this.state.language}
-        >
-          {languages.map((language) => {
-            return (
-              <SelectItem
-                id={`${language.id}-selectItem`}
-                key={`${language.id}-selectItem`}
-                value={language.id}
-                text={language.label}
-              />
-            );
-          })}
-        </Select>
-      </Modal>
+        languages={languages}
+        currentLanguage={this.getCurrentLanguage()}
+      />
     );
   };
 
@@ -709,7 +687,7 @@ class VisualEditor extends React.Component {
     const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
     const errorModal = this.getErrorModal();
-    const runPipelineModal = this.getRunPipelineModal();
+    const languageSelectModal = this.getlanguageSelectModal();
 
     return (
       <div className="nlp-visual-editor">
@@ -729,7 +707,7 @@ class VisualEditor extends React.Component {
           />
         </IntlProvider>
         {errorModal}
-        {runPipelineModal}
+        {languageSelectModal}
         <Loading
           description="Loading NLP results"
           withOverlay={true}
