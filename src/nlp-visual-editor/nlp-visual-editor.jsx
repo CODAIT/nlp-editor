@@ -477,7 +477,7 @@ class VisualEditor extends React.Component {
                   this.setState({ languageSelectModal: true });
                 }}
               >
-                Language ({languages[this.getCurrentLanguage()]})
+                Select Language ({languages[this.getCurrentLanguage()]})
               </Button>
             </>
           ),
