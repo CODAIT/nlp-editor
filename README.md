@@ -122,7 +122,7 @@ v14.17.6
 
 10. When you are satisfied with your model, click **Export**. A `.zip` file is generated on your local file system. 
 
-11. In Watson Discovery on CloudPak for Data, apply the model by following the steps in [Advanced Rules Models](https://cloud.ibm.com/docs/discovery-data?topic=discovery-data-domain#advanced-rules).
+11. In Watson Discovery on CloudPak for Data, apply the model by following the steps in [Advanced Rules Models](https://cloud.ibm.com/docs/discovery-data?topic=discovery-data-domain-advanced-rules).
 
 
 ## Getting Help
