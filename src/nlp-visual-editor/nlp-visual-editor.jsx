@@ -78,7 +78,7 @@ const languages = {
   nb: 'Norwegian (Bokmål)',
   nn: 'Norwegian (Nynorsk)',
   pl: 'Polish',
-  'pt-br': 'Portuguese, Brazilian',
+  pt: 'Portuguese, Brazilian',
   ro: 'Romanian',
   ru: 'Russian',
   sr: 'Serbian',
