@@ -22,6 +22,7 @@ const fileupload = require('express-fileupload');
 const cors = require('cors');
 const AdmZip = require('adm-zip');
 const rateLimit = require('express-rate-limit');
+const { param, validationResult } = require('express-validator');
 
 app.use(cors());
 app.use(fileupload());
@@ -142,7 +143,15 @@ app.post('/api/uploadflow', async (req, res) => {
     res.status(500).send({ message: 'File upload failed' });
   }
 });
-app.get('/api/download/:workingId', (req, res) => {
+app.get('/api/download/:workingId', [
+  param('workingId').isAlphanumeric()
+],(req, res) => {
+  try {
+    validationResult(req).throw();
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+
 	const { workingId } = req.params;
 	const destinationPath = `${systemTdataFolder}/user-data-in/${workingId}.export-aql`;
 	fs.writeFileSync(destinationPath, "");
