@@ -21,6 +21,7 @@ const app = express();
 const fileupload = require('express-fileupload');
 const cors = require('cors');
 const AdmZip = require('adm-zip');
+const rateLimit = require('express-rate-limit');
 
 app.use(cors());
 app.use(fileupload());
@@ -181,7 +182,12 @@ app.get('/api/download/:workingId', (req, res) => {
 	});
 })
 
-app.post('/api/run', (req, res) => {
+app.post('/api/run', rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false,
+}), (req, res) => {
   console.log('executing pipeline');
   const { workingId, payload } = req.body;
   const workingFolder = `${tempFolder}/${workingId}`;
