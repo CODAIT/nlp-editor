@@ -145,7 +145,12 @@ app.post('/api/uploadflow', async (req, res) => {
 });
 app.get('/api/download/:workingId', [
   param('workingId').isAlphanumeric()
-],(req, res) => {
+], rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false,
+}), (req, res) => {
   try {
     validationResult(req).throw();
   } catch (err) {
