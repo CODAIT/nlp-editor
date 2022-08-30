@@ -163,7 +163,7 @@ app.get(
     const { workingId } = req.params;
     const destinationPath = sanitize(`${systemTdataFolder}/user-data-in/${workingId}.export-aql`);
     fs.writeFileSync(destinationPath, '');
-    const resultFileName = `${workingId}.zip`;
+    const resultFileName = sanitize(`${workingId}.zip`);
     const file = sanitize(`${systemTdataFolder}/run-aql-result/${resultFileName}`);
     const FIFTYSECONDSTIMEOUT = 100;
     let counter = 0;
@@ -214,12 +214,12 @@ app.post(
   (req, res) => {
     console.log('executing pipeline');
     const { workingId, payload, language } = req.body;
-    const workingFolder = `${tempFolder}/${workingId}`;
+    const workingFolder = sanitize(`${tempFolder}/${workingId}`);
 
     console.time('writing xml files');
     fs.readdirSync(workingFolder)
       .filter((f) => f.endsWith('.xml'))
-      .forEach((f) => fs.unlinkSync(`${workingFolder}/${f}`));
+      .forEach((f) => fs.unlinkSync( sanitize(`${workingFolder}/${f}`)));
 
     //write files to temp folder
     payload.forEach((node) => {
@@ -241,7 +241,7 @@ app.post(
     console.timeEnd('creating+moving zip file');
 
     //read document to render in UI
-    const docPath = `${workingFolder}/payload.txt`;
+    const docPath = sanitize(`${workingFolder}/payload.txt`);
     const document = fs.readFileSync(docPath, 'utf8');
 
     res.status(200).send({
