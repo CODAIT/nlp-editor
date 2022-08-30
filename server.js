@@ -22,6 +22,7 @@ const fileupload = require('express-fileupload');
 const cors = require('cors');
 const AdmZip = require('adm-zip');
 const rateLimit = require('express-rate-limit');
+const sanitize = require('sanitize-filename');
 const { param, validationResult } = require('express-validator');
 
 app.use(cors());
@@ -160,10 +161,10 @@ app.get(
     }
 
     const { workingId } = req.params;
-    const destinationPath = `${systemTdataFolder}/user-data-in/${workingId}.export-aql`;
+    const destinationPath = sanitize(`${systemTdataFolder}/user-data-in/${workingId}.export-aql`);
     fs.writeFileSync(destinationPath, '');
     const resultFileName = `${workingId}.zip`;
-    const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
+    const file = sanitize(`${systemTdataFolder}/run-aql-result/${resultFileName}`);
     const FIFTYSECONDSTIMEOUT = 100;
     let counter = 0;
     const interval = setInterval(() => {
