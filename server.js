@@ -21,6 +21,9 @@ const app = express();
 const fileupload = require('express-fileupload');
 const cors = require('cors');
 const AdmZip = require('adm-zip');
+const rateLimit = require('express-rate-limit');
+const sanitize = require('sanitize-filename');
+const { param, validationResult } = require('express-validator');
 
 app.use(cors());
 app.use(fileupload());
@@ -67,7 +70,7 @@ const uploadFile = (path, file, filename = 'payload.txt') => {
   });
 };
 
-const createNodeFile = (path, fileName, contents) => {
+const createFile = (path, fileName, contents) => {
   console.log(`creating file ${fileName}`);
   fs.writeFileSync(`${path}/${fileName}`, contents);
 };
@@ -141,83 +144,113 @@ app.post('/api/uploadflow', async (req, res) => {
     res.status(500).send({ message: 'File upload failed' });
   }
 });
-app.get('/api/download/:workingId', (req, res) => {
-	const { workingId } = req.params;
-	const destinationPath = `${systemTdataFolder}/user-data-in/${workingId}.export-aql`;
-	fs.writeFileSync(destinationPath, "");
-	const resultFileName = `${workingId}.zip`;
-	const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
-	const FIFTYSECONDSTIMEOUT = 100;
-	let counter = 0;
-	const interval = setInterval( () => {
-		if( counter > FIFTYSECONDSTIMEOUT) {
-			clearInterval(interval);
-			return res.status(400).send({ status: '' });
-		}
+app.get(
+  '/api/download/:workingId',
+  [param('workingId').isAlphanumeric()],
+  rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,
+  }),
+  (req, res) => {
+    try {
+      validationResult(req).throw();
+    } catch (err) {
+      return res.status(400).json(err);
+    }
 
-		if(fs.existsSync(file) ) {
-			var stat = fs.statSync(file);
+    const { workingId } = req.params;
+    const destinationPath = sanitize(`${systemTdataFolder}/user-data-in/${workingId}.export-aql`);
+    fs.writeFileSync(destinationPath, '');
+    const resultFileName = sanitize(`${workingId}.zip`);
+    const file = sanitize(`${systemTdataFolder}/run-aql-result/${resultFileName}`);
+    const FIFTYSECONDSTIMEOUT = 100;
+    let counter = 0;
+    const interval = setInterval(() => {
+      if (counter > FIFTYSECONDSTIMEOUT) {
+        clearInterval(interval);
+        return res.status(400).send({ status: '' });
+      }
 
-			let fileContents = fs.createReadStream(file);
-			const fileType = 'application/zip';
-			res.writeHead(200, {
-				'Content-Type': fileType,
-				'Content-Length': stat.size
-			})
-			fileContents.on('close', () => {
-				clearInterval(interval);
-				deleteFile(`${systemTdataFolder}/run-aql-result/${resultFileName}`, resultFileName);
-				res.end();
-			})
-			fileContents.pipe(res);
-		}
-		counter += 1;
-	}, 500);
-	req.on("close", function() {
-		clearInterval(interval);
-	});
-	req.on("end", function() {
-		clearInterval(interval);
-	});
-})
+      if (fs.existsSync(file)) {
+        var stat = fs.statSync(file);
 
-app.post('/api/run', (req, res) => {
-  console.log('executing pipeline');
-  const { workingId, payload } = req.body;
-  const workingFolder = `${tempFolder}/${workingId}`;
+        let fileContents = fs.createReadStream(file);
+        const fileType = 'application/zip';
+        res.writeHead(200, {
+          'Content-Type': fileType,
+          'Content-Length': stat.size,
+        });
+        fileContents.on('close', () => {
+          clearInterval(interval);
+          deleteFile(
+            `${systemTdataFolder}/run-aql-result/${resultFileName}`,
+            resultFileName,
+          );
+          res.end();
+        });
+        fileContents.pipe(res);
+      }
+      counter += 1;
+    }, 500);
+    req.on('close', function () {
+      clearInterval(interval);
+    });
+    req.on('end', function () {
+      clearInterval(interval);
+    });
+  },
+);
 
-  console.time('writing xml files');
-  fs.readdirSync(workingFolder)
-    .filter((f) => f.endsWith('.xml'))
-    .forEach((f) => fs.unlinkSync(`${workingFolder}/${f}`));
+app.post(
+  '/api/run',
+  rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,
+  }),
+  (req, res) => {
+    console.log('executing pipeline');
+    const { workingId, payload, language } = req.body;
+    const workingFolder = sanitize(`${tempFolder}/${workingId}`);
 
-  //write files to temp folder
-  payload.forEach((node) => {
-    const { label, xml } = node;
-    createNodeFile(workingFolder, `${label}.xml`, xml);
-  });
-  console.timeEnd('writing xml files');
+    console.time('writing xml files');
+    fs.readdirSync(workingFolder)
+      .filter((f) => f.endsWith('.xml'))
+      .forEach((f) => fs.unlinkSync( sanitize(`${workingFolder}/${f}`)));
 
-  //zip tempfolder
-  console.time('creating+moving zip file');
-  const zipFileName = `${workingId}.zip`;
-  createZipArchive(workingFolder, zipFileName);
+    //write files to temp folder
+    payload.forEach((node) => {
+      const { label, xml } = node;
+      createFile(workingFolder, `${label}.xml`, xml);
+    });
+    console.timeEnd('writing xml files');
 
-  //move zipfile to be executed
-  moveZipFile(workingFolder, zipFileName);
-  systemTStartTime = new Date().getTime(); //debugging instrumentation
-  console.timeEnd('creating+moving zip file');
+    createFile(workingFolder, 'language-name.txt', language);
 
-  //read document to render in UI
-  const docPath = `${workingFolder}/payload.txt`;
-  const document = fs.readFileSync(docPath, 'utf8');
+    //zip tempfolder
+    console.time('creating+moving zip file');
+    const zipFileName = `${workingId}.zip`;
+    createZipArchive(workingFolder, zipFileName);
 
-  res.status(200).send({
-    message: 'Execution submitted successfully.',
-    id: workingId,
-    document,
-  });
-});
+    //move zipfile to be executed
+    moveZipFile(workingFolder, zipFileName);
+    systemTStartTime = new Date().getTime(); //debugging instrumentation
+    console.timeEnd('creating+moving zip file');
+
+    //read document to render in UI
+    const docPath = sanitize(`${workingFolder}/payload.txt`);
+    const document = fs.readFileSync(docPath, 'utf8');
+
+    res.status(200).send({
+      message: 'Execution submitted successfully.',
+      id: workingId,
+      document,
+    });
+  },
+);
 
 const deleteFile = (file, resultFileName) => {
   //delete file since we read it's contents
@@ -233,13 +266,13 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
     const items = [];
     const annotation = annotations[name];
     annotation.forEach((elem) => {
-		const attributes = {};
-			Object.keys(elem).forEach( key => {
-				const { location, text } = elem[key];
-      			const { begin: start, end } = location;
-				attributes[key] = {start, end, text};
-			})
-			items.push({...attributes});
+      const attributes = {};
+      Object.keys(elem).forEach((key) => {
+        const { location, text } = elem[key];
+        const { begin: start, end } = location;
+        attributes[key] = { start, end, text };
+      });
+      items.push({ ...attributes });
     });
     annonResults = { ...annonResults, [name]: items };
   });
