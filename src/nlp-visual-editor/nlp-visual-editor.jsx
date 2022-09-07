@@ -56,7 +56,7 @@ import {
   setModuleName
 } from '../redux/slice';
 
-const TIMER_TICK = 3000; // 3 secs
+const TIMER_TICK = 250; // 1/4 second
 const TIMER_TRIES = 40; // 2 minutes
 
 const languages = {
