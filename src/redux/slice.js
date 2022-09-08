@@ -99,6 +99,9 @@ const nodesSlice = createSlice({
     setDirty: (state, action) => {
       state.dirty = action.payload;
     },
+    setModuleName: (state, action) => {
+      state.moduleName = action.payload;
+    }
   },
 });
 
@@ -114,5 +117,6 @@ export const {
   setShowDocumentViewer,
   setDocumentViewToAnnotation,
   setDirty,
+  setModuleName
 } = nodesSlice.actions;
 export default nodesSlice.reducer;

@@ -19,13 +19,14 @@ import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
 import axios from 'axios';
 import shortUUID from 'short-uuid';
-import { CommonCanvas, CanvasController } from '@elyra/canvas';
+import { CommonCanvas, CanvasController, CommonProperties } from '@elyra/canvas';
 import { Button, Loading, Modal, Select } from 'carbon-components-react';
 import {
   Play32,
   WarningAlt24,
   DocumentDownload32,
   Upload16,
+  SettingsAdjust32
 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
@@ -52,9 +53,10 @@ import {
   setShowRightPanel,
   setShowDocumentViewer,
   setDirty,
+  setModuleName
 } from '../redux/slice';
 
-const TIMER_TICK = 3000; // 3 secs
+const TIMER_TICK = 250; // 1/4 second
 const TIMER_TRIES = 40; // 2 minutes
 
 const languages = {
@@ -97,11 +99,20 @@ class VisualEditor extends React.Component {
       enableFlowExecutionBtn: false,
       errorMessage: undefined,
       languageSelectModal: false,
+      showSettings: false,
+      editorSettings: localStorage.getItem('nlpEditorSettings') ? JSON.parse(localStorage.getItem('nlpEditorSettings')) : {
+        moduleName: 'elyraNLPCanvas',
+        language: 'en'
+      }
     };
+
+    this.props.setModuleName( this.state.editorSettings.moduleName);
 
     this.canvasController = new CanvasController();
     this.canvasController.openPalette();
     this.canvasController.setPipelineFlowPalette(nlpPalette);
+
+    this.setCurrentLanguage(this.state.editorSettings.language);
 
     this.nodeValidator = new NodeValidator(this.canvasController);
     this.jsonToXML = new JsonToXML(this.canvasController);
@@ -399,12 +410,38 @@ class VisualEditor extends React.Component {
     }
   };
 
+  showSettings() {
+    this.props.setShowRightPanel({ showPanel: true });
+    this.props.setShowDocumentViewer({ showViewer: false });
+    this.setState({
+      showSettings: true
+    })
+  }
+
   getToolbar = () => {
     const { enableFlowExecutionBtn } = this.state;
     return {
       leftBar: [
         { action: 'palette', label: 'Palette', enable: true },
         { divider: true },
+        {
+          action: 'settings',
+          tooltip: 'Settings',
+          jsx: (
+            <>
+              <Button
+                id={'btn-save'}
+                size="field"
+                kind="ghost"
+                iconDescription="Editor Settings"
+                renderIcon={SettingsAdjust32}
+                onClick={() => this.showSettings()}
+              >
+                Settings
+              </Button>
+            </>
+          ),
+        },
         {
           action: 'save',
           tooltip: 'Save NLP Flow',
@@ -489,11 +526,9 @@ class VisualEditor extends React.Component {
                 id={'btn-language'}
                 size="field"
                 kind="ghost"
-                onClick={() => {
-                  this.setState({ languageSelectModal: true });
-                }}
+                disabled
               >
-                Select Language ({languages[this.getCurrentLanguage()]})
+                Language ({languages[this.getCurrentLanguage()]})
               </Button>
             </>
           ),
@@ -624,8 +659,73 @@ class VisualEditor extends React.Component {
     }, 200);
   };
 
+  getPropertiesInfo() {
+    return {
+      title: 'NLP Settings',
+      parameterDef: {
+        titleDefinition: {
+          title: 'NLP Settings',
+          editable: false
+        },
+        current_parameters: {
+          moduleName: this.state.editorSettings.moduleName,
+          language: this.getCurrentLanguage()
+        },
+        parameters: [{
+          id: 'moduleName',
+          type: 'string',
+          default: ''
+        }, {
+          id: 'language',
+          type: 'string'
+        }],
+        uihints: {
+          id: 'Settings',
+          editor_size: 'medium',
+          label: {
+            default: 'General Settings'
+          },
+          parameter_info: [{
+            parameter_ref: 'moduleName',
+            label: {
+              default: 'Module Name'
+            },
+            description: {
+              default: 'Module Name'
+            }
+          }],
+          action_info: [{
+            id: 'language',
+            label: {
+              default: 'Select Language'
+            },
+            control: 'button'
+          }],
+          group_info: [{
+            id: 'settings',
+            label: {
+              default: 'Settings'
+            },
+            parameter_refs: [
+              'moduleName'
+            ],
+          }, {
+            id: 'lang',
+            label: {
+              default: 'Language'
+            },
+            type: 'actionPanel',
+            action_refs: [
+              'language'
+            ],
+          }]
+        }
+      },
+    };
+  }
+
   getRHSPanel = () => {
-    const { selectedNodeId } = this.state;
+    const { selectedNodeId, showSettings } = this.state;
     const { showDocumentViewer } = this.props;
     if (showDocumentViewer) {
       return (
@@ -633,6 +733,42 @@ class VisualEditor extends React.Component {
           <DocumentViewer />
         </Provider>
       );
+    }
+    if (showSettings) {
+      return (
+        <CommonProperties
+          ref={(instance) => {
+            this.CommonProperties = instance;
+          }}
+          propertiesConfig={{containerType: "Custom", rightFlyout: true }}
+          propertiesInfo={this.getPropertiesInfo()} // required
+          callbacks={{
+            applyPropertyChanges: (propertySet) => {
+              this.setState({
+                editorSettings: {
+                  moduleName: propertySet.moduleName
+                }
+              });
+              this.props.setModuleName( propertySet.moduleName);
+              localStorage.setItem('nlpEditorSettings', JSON.stringify({...this.state.editorSettings, ...propertySet}));
+            },
+            closePropertiesDialog: () => {
+              this.props.setShowRightPanel({ showPanel: false });
+              this.setState({
+                showSettings: false
+              });
+            },
+            actionHandler: (id, appData, data) => {
+              switch(id) {
+                case 'language':
+                  this.setState({ languageSelectModal: true });
+                  break;
+              }
+            }
+          }} // required
+          light // optional
+        ></CommonProperties>
+      )
     }
     return (
       <Provider store={store}>
@@ -652,7 +788,12 @@ class VisualEditor extends React.Component {
       <LanguageModal
         onSubmit={(language) => {
           this.setCurrentLanguage(language);
-          this.setState({ languageSelectModal: false });
+          const editorSettings = {
+            ...this.state.editorSettings,
+            ...{language: language}
+          };
+          this.setState({ languageSelectModal: false, editorSettings: editorSettings });
+          localStorage.setItem('nlpEditorSettings', JSON.stringify(editorSettings));
         }}
         onRequestClose={() => {
           this.setState({ languageSelectModal: false });
@@ -756,6 +897,7 @@ const mapDispatchToProps = (dispatch) => ({
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
   setDirty: (dirty) => dispatch(setDirty(dirty)),
+  setModuleName: (name) => dispatch(setModuleName(name))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VisualEditor);

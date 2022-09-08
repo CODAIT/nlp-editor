@@ -146,7 +146,7 @@ app.post('/api/uploadflow', async (req, res) => {
 });
 app.get(
   '/api/download/:workingId',
-  [param('workingId').isAlphanumeric()],
+  [param('workingId').matches(/^[a-zA-Z0-9-]+$/)],
   rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -161,10 +161,10 @@ app.get(
     }
 
     const { workingId } = req.params;
-    const destinationPath = sanitize(`${systemTdataFolder}/user-data-in/${workingId}.export-aql`);
+    const destinationPath = `${systemTdataFolder}/user-data-in/${sanitize(workingId)}.export-aql`;
     fs.writeFileSync(destinationPath, '');
-    const resultFileName = sanitize(`${workingId}.zip`);
-    const file = sanitize(`${systemTdataFolder}/run-aql-result/${resultFileName}`);
+    const resultFileName = `${sanitize(workingId)}.zip`;
+    const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
     const FIFTYSECONDSTIMEOUT = 100;
     let counter = 0;
     const interval = setInterval(() => {
@@ -214,12 +214,12 @@ app.post(
   (req, res) => {
     console.log('executing pipeline');
     const { workingId, payload, language } = req.body;
-    const workingFolder = sanitize(`${tempFolder}/${workingId}`);
-
+    const workingFolder = `${tempFolder}/${sanitize(workingId)}`;
+    console.log(workingFolder);
     console.time('writing xml files');
     fs.readdirSync(workingFolder)
       .filter((f) => f.endsWith('.xml'))
-      .forEach((f) => fs.unlinkSync( sanitize(`${workingFolder}/${f}`)));
+      .forEach((f) => fs.unlinkSync( `${workingFolder}/${f}`));
 
     //write files to temp folder
     payload.forEach((node) => {
@@ -241,7 +241,7 @@ app.post(
     console.timeEnd('creating+moving zip file');
 
     //read document to render in UI
-    const docPath = sanitize(`${workingFolder}/payload.txt`);
+    const docPath = `${workingFolder}/payload.txt`;
     const document = fs.readFileSync(docPath, 'utf8');
 
     res.status(200).send({
