@@ -242,7 +242,7 @@ class DictionaryPanel extends React.Component {
           name="Case sensitivity and Lemma Match"
           legendText="Case sensitivity and Lemma Match"
           onChange={this.onChangeLemmaCaseMatch}
-          defaultSelected={lemmaMatch ? 'lemmaMatch' : 'caseMatch'}
+          defaultSelected={lemmaMatch ? 'lemmaMatch' : caseSensitivity === 'match' ? 'caseMatch' : 'ignoreBoth'}
         >
           <RadioButton
             labelText="Ignore case"
