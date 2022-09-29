@@ -70,7 +70,13 @@ class TabularView extends React.Component {
       const table = this.getTable(name);
       const tabId = `${name.toLowerCase()}_id`;
       tabs.push(
-        <Tab id={tabId} key={tabId} label={name} onClick={() => this.props.setDocumentAnnotation(name)}>
+        <Tab
+          id={tabId}
+          key={tabId}
+          label={name}
+          title={name}
+          onClick={() => this.props.setDocumentAnnotation(name)}
+        >
           {table}
         </Tab>,
       );
@@ -90,6 +96,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	setDocumentAnnotation: (annotation) => dispatch( setDocumentViewToAnnotation(annotation))
-})
+  setDocumentAnnotation: (annotation) =>
+    dispatch(setDocumentViewToAnnotation(annotation)),
+});
 export default connect(mapStateToProps, mapDispatchToProps)(TabularView);
