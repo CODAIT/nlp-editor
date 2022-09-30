@@ -23,6 +23,21 @@ import {
   RadioButton,
   RadioButtonGroup,
   TextInput,
+  Toggle,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+  TableHeader,
+  Table,
+  TableSelectRow,
+  TableSelectAll,
+  TableToolbar,
+  TableBatchAction,
+  TableBatchActions,
+  TableContainer,
+  TableToolbarContent,
+  DataTable,
 } from 'carbon-components-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { Delete16 } from '@carbon/icons-react';
@@ -40,12 +55,16 @@ class DictionaryPanel extends React.Component {
     super(props);
     this.state = {
       inputText: '',
-      items: props.items,
+      items: Array.isArray(props.items ?? [])
+        ? props.items ?? []
+        : Object.keys(props.items),
       caseSensitivity: props.caseSensitivity,
       lemmaMatch: props.lemmaMatch,
       externalResourceChecked: props.externalResourceChecked,
       itemsSelected: [],
       errorMessage: undefined,
+      mapTerms: props.mapTerms ?? false,
+      mappedItems: Array.isArray(props.items ?? []) ? {} : props.items,
     };
     this.reader.onload = (event) => {
       let newItems = event.target.result?.split('\n');
@@ -69,19 +88,6 @@ class DictionaryPanel extends React.Component {
     }
   }
 
-  getListItems = () => {
-    const { items } = this.state;
-    const retList = [];
-    items.forEach((item) => {
-      retList.push(
-        <option key={item} value={item}>
-          {item}
-        </option>,
-      );
-    });
-    return retList;
-  };
-
   onUpdateList = () => {
     const { inputText, items } = this.state;
     this.setState({ items: items.concat(inputText), inputText: '' }, () => {
@@ -89,23 +95,11 @@ class DictionaryPanel extends React.Component {
     });
   };
 
-  onSelectionChange = (e) => {
-    const { options } = e.target;
-    const optionList = Array.from(options);
-    const selectedList = [];
-    optionList.forEach((option) => {
-      if (option.selected) {
-        selectedList.push(option.value);
-      }
-    });
-    this.setState({ itemsSelected: selectedList });
-  };
-
-  onDeleteItems = () => {
-    const { items, itemsSelected } = this.state;
+  onDeleteItems = (props) => {
+    const { items } = this.state;
     const itemsSet = new Set(items);
-    itemsSelected.forEach((item) => {
-      itemsSet.delete(item);
+    props.selectedRows.forEach((row) => {
+      itemsSet.delete(row.id);
     });
     this.setState({ items: Array.from(itemsSet) });
   };
@@ -135,18 +129,25 @@ class DictionaryPanel extends React.Component {
 
   onSavePane = () => {
     const errorMessage = this.validateParameters();
-    const { items, caseSensitivity, lemmaMatch, externalResourceChecked } =
-      this.state;
+    const {
+      items,
+      caseSensitivity,
+      lemmaMatch,
+      externalResourceChecked,
+      mapTerms,
+      mappedItems,
+    } = this.state;
     const { nodeId } = this.props;
 
     if (!errorMessage) {
       const node = {
         nodeId,
-        items,
+        items: mapTerms ? mappedItems : items,
         caseSensitivity,
         lemmaMatch,
         externalResourceChecked,
         isValid: true,
+        mapTerms,
       };
       this.props.saveNlpNode({ node });
       this.props.setShowRightPanel({ showPanel: false });
@@ -177,8 +178,10 @@ class DictionaryPanel extends React.Component {
       externalResourceChecked,
       lemmaMatch,
       errorMessage,
+      items,
+      mapTerms,
+      mappedItems,
     } = this.state;
-    const optionItems = this.getListItems();
     return (
       <div className="dictionary-panel">
         <FileUploader
@@ -191,45 +194,131 @@ class DictionaryPanel extends React.Component {
           size={'sm'}
           onChange={this.onFilesSelected}
         />
-        <div
-          className={classNames('input-controls', {
-            error: errorMessage !== undefined,
+        <Toggle
+          toggled={mapTerms}
+          onToggle={() => {
+            this.setState({ mapTerms: !mapTerms });
+          }}
+          labelText="Map Terms"
+        />
+        <DataTable
+          rows={items.map((item) => {
+            if (mapTerms) {
+              return {
+                id: item,
+                value: item,
+                mapped: (
+                  <TextInput
+                    value={mappedItems[item] ?? ''}
+                    onChange={(event) => {
+                      const newMapped = Object.assign({}, mappedItems);
+                      newMapped[item] = event.target.value;
+                      this.setState({ mappedItems: newMapped });
+                    }}
+                  />
+                ),
+              };
+            } else {
+              return {
+                id: item,
+                value: item,
+              };
+            }
           })}
-        >
-          <TextInput
-            id="inputTextMatch"
-            labelText="Enter phrase to match"
-            type="text"
-            size="sm"
-            invalid={errorMessage !== undefined}
-            invalidText={errorMessage}
-            onChange={(e) => {
-              this.setState({ inputText: e.target.value });
-            }}
-            onKeyDown={(e) => {
-              const keyPressed = e.key || e.keyCode;
-              if (keyPressed === 'Enter' || keyPressed === 13) {
-                this.onUpdateList();
-              }
-            }}
-            value={inputText}
-          />
-          <Button
-            renderIcon={Delete16}
-            iconDescription="Delete row"
-            size="sm"
-            hasIconOnly
-            onClick={this.onDeleteItems}
-          />
-        </div>
-        <select
-          name="match-elements"
-          multiple
-          size="6"
-          onChange={this.onSelectionChange}
-        >
-          {optionItems}
-        </select>
+          headers={
+            mapTerms
+              ? [
+                  {
+                    header: 'Value',
+                    key: 'value',
+                  },
+                  {
+                    header: 'Mapped',
+                    key: 'mapped',
+                  },
+                ]
+              : [
+                  {
+                    header: 'Value',
+                    key: 'value',
+                  },
+                ]
+          }
+          render={(props) => {
+            return (
+              <TableContainer>
+                <TableToolbar>
+                  <TableBatchActions
+                    {...props.getBatchActionProps({
+                      totalSelected: this.state.itemsSelected.length,
+                    })}
+                  >
+                    <TableBatchAction
+                      onClick={() => {
+                        this.onDeleteItems(props);
+                      }}
+                      renderIcon={Delete16}
+                    />
+                  </TableBatchActions>
+                  <TableToolbarContent>
+                    <TextInput
+                      value={this.state.inputText}
+                      onChange={(event) => {
+                        this.setState({ inputText: event.target.value ?? '' });
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.keyCode === 13) {
+                          this.setState({
+                            items: [...items, this.state.inputText],
+                            inputText: '',
+                          });
+                        }
+                      }}
+                    />
+                    <Button
+                      tabIndex={0}
+                      onClick={() => {
+                        this.setState({
+                          items: [...items, this.state.inputText],
+                          inputText: '',
+                        });
+                      }}
+                      size="small"
+                      kind="primary"
+                    >
+                      Add new
+                    </Button>
+                  </TableToolbarContent>
+                </TableToolbar>
+                <Table {...props.getTableProps()}>
+                  {mapTerms && (
+                    <TableHead>
+                      <TableRow key="headerRow">
+                        <TableSelectAll {...props.getSelectionProps()} />
+                        <TableHeader id="valueHeader" key="valueHeader">
+                          Value
+                        </TableHeader>
+                        <TableHeader id="mappedHeader" key="mappedHeader">
+                          Mapped
+                        </TableHeader>
+                      </TableRow>
+                    </TableHead>
+                  )}
+                  <TableBody>
+                    {props.rows.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableSelectRow {...props.getSelectionProps({ row })} />
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            );
+          }}
+        />
         <Checkbox
           labelText="External Resource"
           id="chkExternalResources"
@@ -242,7 +331,13 @@ class DictionaryPanel extends React.Component {
           name="Case sensitivity and Lemma Match"
           legendText="Case sensitivity and Lemma Match"
           onChange={this.onChangeLemmaCaseMatch}
-          defaultSelected={lemmaMatch ? 'lemmaMatch' : caseSensitivity === 'match' ? 'caseMatch' : 'ignoreBoth'}
+          defaultSelected={
+            lemmaMatch
+              ? 'lemmaMatch'
+              : caseSensitivity === 'match'
+              ? 'caseMatch'
+              : 'ignoreBoth'
+          }
         >
           <RadioButton
             labelText="Ignore case"
