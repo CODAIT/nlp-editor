@@ -227,6 +227,8 @@ class DictionaryPanel extends React.Component {
               };
             }
           })}
+          invalid={errorMessage !== undefined}
+          invalidText={errorMessage}
           headers={
             mapTerms
               ? [
@@ -248,7 +250,9 @@ class DictionaryPanel extends React.Component {
           }
           render={(props) => {
             return (
-              <TableContainer>
+              <TableContainer
+                style={{ marginBottom: '10px', marginTop: '10px' }}
+              >
                 <TableToolbar>
                   <TableBatchActions
                     {...props.getBatchActionProps({
@@ -262,15 +266,20 @@ class DictionaryPanel extends React.Component {
                       renderIcon={Delete16}
                     />
                   </TableBatchActions>
-                  <TableToolbarContent>
+                  <TableToolbarContent style={{ height: 'fit-content' }}>
                     <TextInput
                       value={this.state.inputText}
+                      invalid={errorMessage !== undefined}
+                      invalidText={errorMessage}
                       placeholder="Enter a phrase to match..."
                       onChange={(event) => {
                         this.setState({ inputText: event.target.value ?? '' });
                       }}
                       onKeyDown={(event) => {
-                        if (event.keyCode === 13) {
+                        if (
+                          event.keyCode === 13 &&
+                          this.state.inputText !== ''
+                        ) {
                           this.setState({
                             items: [...items, this.state.inputText],
                             inputText: '',
@@ -281,10 +290,12 @@ class DictionaryPanel extends React.Component {
                     <Button
                       tabIndex={0}
                       onClick={() => {
-                        this.setState({
-                          items: [...items, this.state.inputText],
-                          inputText: '',
-                        });
+                        if (this.state.inputText !== '') {
+                          this.setState({
+                            items: [...items, this.state.inputText],
+                            inputText: '',
+                          });
+                        }
                       }}
                       size="small"
                       kind="primary"
