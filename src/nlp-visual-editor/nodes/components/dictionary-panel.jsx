@@ -210,6 +210,8 @@ class DictionaryPanel extends React.Component {
                 mapped: (
                   <TextInput
                     value={mappedItems[item] ?? ''}
+                    placeholder="Enter a phrase to map to..."
+                    labelText=""
                     onChange={(event) => {
                       const newMapped = Object.assign({}, mappedItems);
                       newMapped[item] = event.target.value;
@@ -263,6 +265,7 @@ class DictionaryPanel extends React.Component {
                   <TableToolbarContent>
                     <TextInput
                       value={this.state.inputText}
+                      placeholder="Enter a phrase to match..."
                       onChange={(event) => {
                         this.setState({ inputText: event.target.value ?? '' });
                       }}
