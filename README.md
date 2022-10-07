@@ -107,7 +107,7 @@ v14.17.6
   * nlp-editor/Seer-Code/aql-processor/run-aql-result
 -->
 
-2. Extract `ibm_watson_discovery_web_nlp_tool-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
+2. Extract `01-ibm_watson_discovery_web_nlp_tool_backend-<date>.tar.gz` into a folder of your choice, say `watson_nlp_web_tool`
 
 3. Build the container image
    ```
