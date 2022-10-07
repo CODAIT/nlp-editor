@@ -28,20 +28,17 @@ export default class DictionaryNode {
   getEntries = () => {
     const { items, mapTerms } = this.node;
     const entries = [];
-    if (mapTerms) {
-      for (const item in items) {
+    for (const item in items) {
+      if (mapTerms) {
         entries.push({
           'dict-entry': item,
           'mapped-entry': items[item],
         });
+      } else {
+        entries.push(items[item]);
       }
-      return entries;
-    } else {
-      items.forEach((item) => {
-        entries.push(item);
-      });
-      return entries;
     }
+    return entries;
   };
 
   getOutputSpecName = () => {
@@ -94,19 +91,23 @@ export default class DictionaryNode {
     const isCaseSensitive = caseSensitivity === 'match';
     const fieldValues = [
       {
-        name: fieldName, //node name lowercase
-        group: 0,
-        hide: 'no',
-        'func-call': 'no',
-        renamed: 'no',
-        type: 'Span',
+        '@': {
+          name: fieldName, //node name lowercase
+          group: 0,
+          hide: 'no',
+          'func-call': 'no',
+          renamed: 'no',
+          type: 'Span',
+        },
       },
     ];
     if (mapTerms) {
       fieldValues.push({
-        name: `normalized${fieldName}`,
-        'mapped-entry': 'yes',
-        hide: 'no',
+        '@': {
+          name: `normalized${fieldName}`,
+          'mapped-entry': 'yes',
+          hide: 'no',
+        },
       });
     }
     const jsonStructure = {
@@ -135,7 +136,7 @@ export default class DictionaryNode {
           },
         },
         'output-spec': {
-          field: { fieldValues },
+          field: fieldValues,
         },
         'rule-spec': {
           'dictionary-match': {

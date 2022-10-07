@@ -161,7 +161,9 @@ app.get(
     }
 
     const { workingId } = req.params;
-    const destinationPath = `${systemTdataFolder}/user-data-in/${sanitize(workingId)}.export-aql`;
+    const destinationPath = `${systemTdataFolder}/user-data-in/${sanitize(
+      workingId,
+    )}.export-aql`;
     fs.writeFileSync(destinationPath, '');
     const resultFileName = `${sanitize(workingId)}.zip`;
     const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
@@ -219,7 +221,7 @@ app.post(
     console.time('writing xml files');
     fs.readdirSync(workingFolder)
       .filter((f) => f.endsWith('.xml'))
-      .forEach((f) => fs.unlinkSync( `${workingFolder}/${f}`));
+      .forEach((f) => fs.unlinkSync(`${workingFolder}/${f}`));
 
     //write files to temp folder
     payload.forEach((node) => {
@@ -269,8 +271,11 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
       const attributes = {};
       Object.keys(elem).forEach((key) => {
         const { location, text } = elem[key];
-        const { begin: start, end } = location;
-        attributes[key] = { start, end, text };
+        attributes[key] = {
+          start: location?.begin,
+          end: location?.begin,
+          text: text ?? elem[key],
+        };
       });
       items.push({ ...attributes });
     });
