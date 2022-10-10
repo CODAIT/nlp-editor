@@ -233,17 +233,17 @@ class DictionaryPanel extends React.Component {
             mapTerms
               ? [
                   {
-                    header: 'Value',
+                    header: 'Term',
                     key: 'value',
                   },
                   {
-                    header: 'Mapped',
+                    header: 'Mapped Term',
                     key: 'mapped',
                   },
                 ]
               : [
                   {
-                    header: 'Value',
+                    header: 'Term',
                     key: 'value',
                   },
                 ]
@@ -310,10 +310,10 @@ class DictionaryPanel extends React.Component {
                       <TableRow key="headerRow">
                         <TableSelectAll {...props.getSelectionProps()} />
                         <TableHeader id="valueHeader" key="valueHeader">
-                          Value
+                          Term
                         </TableHeader>
                         <TableHeader id="mappedHeader" key="mappedHeader">
-                          Mapped
+                          Mapped Term
                         </TableHeader>
                       </TableRow>
                     </TableHead>
