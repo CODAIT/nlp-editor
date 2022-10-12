@@ -48,6 +48,7 @@ import { parse } from 'csv-parse/browser/esm';
 import './dictionary-panel.scss';
 
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
+import { Pagination } from 'carbon-components-react';
 
 class DictionaryPanel extends React.Component {
   reader = new FileReader();
@@ -66,6 +67,8 @@ class DictionaryPanel extends React.Component {
       errorMessage: undefined,
       mapTerms: props.mapTerms ?? false,
       mappedItems: Array.isArray(props.items ?? []) ? {} : props.items,
+      page: 1,
+      pageSize: 10,
     };
     this.reader.onload = (event) => {
       const { items, mapTerms, mappedItems } = this.state;
@@ -178,6 +181,13 @@ class DictionaryPanel extends React.Component {
     }
   };
 
+  getDisplayedItems() {
+    const { items, page, pageSize } = this.state;
+    const start = (page - 1) * pageSize;
+    const end = page * pageSize - 1;
+    return items.slice(start, end);
+  }
+
   validateParameters = () => {
     const { items } = this.state;
 
@@ -230,7 +240,7 @@ class DictionaryPanel extends React.Component {
           labelText="Map Terms"
         />
         <DataTable
-          rows={items.map((item) => {
+          rows={this.getDisplayedItems().map((item) => {
             if (mapTerms) {
               return {
                 id: item,
@@ -278,9 +288,7 @@ class DictionaryPanel extends React.Component {
           }
           render={(props) => {
             return (
-              <TableContainer
-                style={{ marginBottom: '10px', marginTop: '10px' }}
-              >
+              <TableContainer style={{ marginTop: '10px' }}>
                 <TableToolbar>
                   <TableBatchActions
                     {...props.getBatchActionProps({
@@ -304,9 +312,11 @@ class DictionaryPanel extends React.Component {
                         this.setState({ inputText: event.target.value ?? '' });
                       }}
                       onKeyDown={(event) => {
+                        const { inputText, items } = this.state;
                         if (
                           event.keyCode === 13 &&
-                          this.state.inputText !== ''
+                          inputText !== '' &&
+                          !items.includes(inputText)
                         ) {
                           this.setState({
                             items: [...items, this.state.inputText],
@@ -318,9 +328,10 @@ class DictionaryPanel extends React.Component {
                     <Button
                       tabIndex={0}
                       onClick={() => {
-                        if (this.state.inputText !== '') {
+                        const { items, inputText } = this.state;
+                        if (inputText !== '' && !items.includes(inputText)) {
                           this.setState({
-                            items: [...items, this.state.inputText],
+                            items: [...items, inputText],
                             inputText: '',
                           });
                         }
@@ -359,6 +370,14 @@ class DictionaryPanel extends React.Component {
                 </Table>
               </TableContainer>
             );
+          }}
+        />
+        <Pagination
+          page={this.state.page}
+          pageSizes={[10, 20, 50]}
+          totalItems={this.state.items.length}
+          onChange={(data) => {
+            this.setState({ page: data.page, pageSize: data.pageSize });
           }}
         />
         <Checkbox
