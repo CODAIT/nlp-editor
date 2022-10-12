@@ -273,7 +273,7 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
         const { location, text } = elem[key];
         attributes[key] = {
           start: location?.begin,
-          end: location?.begin,
+          end: location?.end,
           text: text ?? elem[key],
         };
       });
