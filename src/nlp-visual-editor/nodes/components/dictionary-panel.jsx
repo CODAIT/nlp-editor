@@ -43,6 +43,7 @@ import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { Delete16 } from '@carbon/icons-react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
+import { parse } from 'csv-parse/browser/esm';
 
 import './dictionary-panel.scss';
 
@@ -67,11 +68,34 @@ class DictionaryPanel extends React.Component {
       mappedItems: Array.isArray(props.items ?? []) ? {} : props.items,
     };
     this.reader.onload = (event) => {
-      let newItems = event.target.result?.split('\n');
-      newItems = newItems.filter((i) => {
-        return this.state.items.indexOf(i) < 0;
-      });
-      this.setState({ items: [...this.state.items, ...newItems] });
+      const { items, mapTerms, mappedItems } = this.state;
+      if (mapTerms) {
+        parse(event.target.result, {}, (err, records) => {
+          if (err) {
+            return;
+          }
+          if (records) {
+            const newItems = [];
+            const newMapped = {};
+            for (const rec of records) {
+              if (!items.includes(rec[0])) {
+                newItems.push(rec[0]);
+              }
+              newMapped[rec[0]] = rec[1];
+            }
+            this.setState({
+              items: [...items, ...newItems],
+              mappedItems: { ...mappedItems, ...newMapped },
+            });
+          }
+        });
+      } else {
+        let newItems = event.target.result?.split('\n');
+        newItems = newItems.filter((i) => {
+          return items.indexOf(i) < 0;
+        });
+        this.setState({ items: [...items, ...newItems] });
+      }
     };
   }
 
@@ -185,11 +209,15 @@ class DictionaryPanel extends React.Component {
     return (
       <div className="dictionary-panel">
         <FileUploader
-          accept={['.txt']}
+          accept={mapTerms ? ['.csv'] : ['.txt']}
           buttonKind="primary"
           buttonLabel="Select files"
           filenameStatus="edit"
-          labelDescription="only .txt files at 10mb or less"
+          labelDescription={
+            mapTerms
+              ? 'only .csv files at 10mb or less'
+              : 'only .txt files at 10mb or less'
+          }
           labelTitle="Upload files"
           size={'sm'}
           onChange={this.onFilesSelected}
