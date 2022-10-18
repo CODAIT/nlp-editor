@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: NLP-Editor Server - OpenAPI 3.0
+  description: >-
+    This is the REST API for the NLP-Editor Server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+paths:
+  /api/upload:
+    post:
+      summary: Upload a document for processing
+      description: Upload document for specific session to be processed
+      requestBody:
+        $ref: '#/components/requestBodies/File'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Server operation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /api/uploadflow:
+    post:
+      summary: Upload a previously saved flow
+      description: Upload a previoously saved flow
+      requestBody:
+        $ref: '#/components/requestBodies/File'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseFlow'
+        '500':
+          description: Server operation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /api/download/{workingId}:
+    get:
+      summary: Download processed results
+      description: Downloads zipped file with processed results
+      parameters:
+        - name: workingId
+          in: path
+          description: UUID of the session
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/zip:
+              schema:
+                format: binary
+        '400':
+          description: Bad request, session did not return a valid download zip file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+  /api/run:
+    post:
+      summary: Begin processing
+      description: Begin processing extractors on the supplied document
+      requestBody:
+        $ref: '#/components/requestBodies/RunPipeline'
+      responses:
+        '200':
+          description: Succesfully zipped and sent to folder to be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResponse'
+  /api/results:
+    get:
+      summary: Check for results returned from processing
+      description: Checks for results to be returned from processing, and forwards it if found
+      parameters:
+        - in: query
+          name: workingId
+          schema:
+            type: string
+            format: uuid
+          description: The current session identifier
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/StatusResponse'
+                  - $ref: '#/components/schemas/ResultsResponse'
+components:
+  schemas:
+    FileUpload:
+      type: object
+      properties:
+        workingId:
+          type: string
+          format: uuid
+        files:
+          type: string
+          format: binary
+    Response:
+      type: object
+      properties:
+        message:
+          type: string
+          description: REST API response message
+          example: Files Uploaded
+    ResponseFlow:
+      type: object
+      properties:
+        flow:
+          type: object
+          properties:
+            id:
+              type: string
+            version:
+              type: string
+        nodes:
+          type: array
+          items: 
+            $ref: '#/components/schemas/NodeItem'
+    NodeItem:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+    RunPipeline:
+      type: object
+      properties:
+        workingId:
+          type: string
+          format: uuid
+        language:
+          type: string
+        payload:
+          type: array
+          items: 
+            $ref: '#/components/schemas/XMLItem'
+    XMLItem:
+      type: object
+      properties:
+        label:
+          type: string
+        xml:
+          type: string
+          description: Inline-XML
+    StatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+    RunResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        message:
+          type: string
+        document:
+          type: string
+          description: The document submitted for processing
+    ResultsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        annotations:
+          type: object
+        names:
+          type: array
+          items:
+            type: string
+  requestBodies:
+    File:
+      description: Add one or more files for processing
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/FileUpload'
+    RunPipeline:
+      description: Execute pipeline
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RunPipeline'
