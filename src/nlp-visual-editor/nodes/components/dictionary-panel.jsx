@@ -123,12 +123,14 @@ class DictionaryPanel extends React.Component {
   };
 
   onDeleteItems = (props) => {
-    const { items } = this.state;
+    const { items, mappedItems } = this.state;
     const itemsSet = new Set(items);
+    const newMapped = { ...mappedItems };
     props.selectedRows.forEach((row) => {
       itemsSet.delete(row.id);
+      delete newMapped[row.id];
     });
-    this.setState({ items: Array.from(itemsSet) });
+    this.setState({ items: Array.from(itemsSet), mappedItems: newMapped });
   };
 
   onChangeLemmaCaseMatch = (value) => {
