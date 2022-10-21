@@ -55,11 +55,15 @@ class DictionaryPanel extends React.Component {
 
   constructor(props) {
     super(props);
+    const filterItems = (item) => {
+      return item !== '';
+    };
+    const filteredItems = Array.isArray(props.items ?? [])
+      ? props.items?.filter(filterItems) ?? []
+      : Object.keys(props.items).filter(filterItems);
     this.state = {
       inputText: '',
-      items: Array.isArray(props.items ?? [])
-        ? props.items ?? []
-        : Object.keys(props.items),
+      items: filteredItems,
       caseSensitivity: props.caseSensitivity,
       lemmaMatch: props.lemmaMatch,
       externalResourceChecked: props.externalResourceChecked,
