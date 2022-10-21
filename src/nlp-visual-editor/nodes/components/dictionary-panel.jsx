@@ -81,6 +81,9 @@ class DictionaryPanel extends React.Component {
             const newItems = [];
             const newMapped = {};
             for (const rec of records) {
+              if (rec[0] === '') {
+                continue;
+              }
               if (!items.includes(rec[0])) {
                 newItems.push(rec[0]);
               }
@@ -95,7 +98,7 @@ class DictionaryPanel extends React.Component {
       } else {
         let newItems = event.target.result?.split('\n');
         newItems = newItems.filter((i) => {
-          return items.indexOf(i) < 0;
+          return items.indexOf(i) < 0 && i !== '';
         });
         this.setState({ items: [...items, ...newItems] });
       }
