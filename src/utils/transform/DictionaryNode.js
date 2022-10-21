@@ -26,11 +26,18 @@ export default class DictionaryNode {
   }
 
   getEntries = () => {
-    const { items } = this.node;
+    const { items, mapTerms } = this.node;
     const entries = [];
-    items.forEach((item) => {
-      entries.push(item);
-    });
+    for (const item in items) {
+      if (mapTerms) {
+        entries.push({
+          'dict-entry': item,
+          'mapped-entry': items[item],
+        });
+      } else {
+        entries.push(items[item]);
+      }
+    }
     return entries;
   };
 
@@ -73,10 +80,36 @@ export default class DictionaryNode {
   };
 
   transform() {
-    const { caseSensitivity, externalResourceChecked, label, lemmaMatch } =
-      this.node;
+    const {
+      caseSensitivity,
+      externalResourceChecked,
+      label,
+      lemmaMatch,
+      mapTerms,
+    } = this.node;
     const fieldName = this.getOutputSpecName();
     const isCaseSensitive = caseSensitivity === 'match';
+    const fieldValues = [
+      {
+        '@': {
+          name: fieldName, //node name lowercase
+          group: 0,
+          hide: 'no',
+          'func-call': 'no',
+          renamed: 'no',
+          type: 'Span',
+        },
+      },
+    ];
+    if (mapTerms) {
+      fieldValues.push({
+        '@': {
+          name: `Mapped Term`,
+          'mapped-entry': 'yes',
+          hide: 'no',
+        },
+      });
+    }
     const jsonStructure = {
       '@': {
         module: this.moduleName,
@@ -103,16 +136,7 @@ export default class DictionaryNode {
           },
         },
         'output-spec': {
-          field: {
-            '@': {
-              name: fieldName, //node name lowercase
-			  group: 0,
-			  hide: "no",
-			  "func-call": "no",
-			  renamed:"no",
-			  type:"Span"
-            },
-          },
+          field: fieldValues,
         },
         'rule-spec': {
           'dictionary-match': {
@@ -120,6 +144,7 @@ export default class DictionaryNode {
               'case-sensitive': isCaseSensitive,
               'lemma-match': lemmaMatch,
               external: externalResourceChecked,
+              'mapping-table': mapTerms,
             },
             'dict-name': `${label}_dict`,
           },
@@ -128,7 +153,7 @@ export default class DictionaryNode {
     };
     const dictionary = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
-	  format: { doubleQuotes: true }
+      format: { doubleQuotes: true },
     });
     const words = this.getDictionaryWords();
     return [

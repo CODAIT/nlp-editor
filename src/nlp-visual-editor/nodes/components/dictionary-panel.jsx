@@ -23,36 +23,89 @@ import {
   RadioButton,
   RadioButtonGroup,
   TextInput,
+  Toggle,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+  TableHeader,
+  Table,
+  TableSelectRow,
+  TableSelectAll,
+  TableToolbar,
+  TableBatchAction,
+  TableBatchActions,
+  TableContainer,
+  TableToolbarContent,
+  DataTable,
 } from 'carbon-components-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { Delete16 } from '@carbon/icons-react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
+import { parse } from 'csv-parse/browser/esm';
 
 import './dictionary-panel.scss';
 
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
+import { Pagination } from 'carbon-components-react';
 
 class DictionaryPanel extends React.Component {
   reader = new FileReader();
 
   constructor(props) {
     super(props);
+    const filterItems = (item) => {
+      return item !== '';
+    };
+    const filteredItems = Array.isArray(props.items ?? [])
+      ? props.items?.filter(filterItems) ?? []
+      : Object.keys(props.items).filter(filterItems);
     this.state = {
       inputText: '',
-      items: props.items,
+      items: filteredItems,
       caseSensitivity: props.caseSensitivity,
       lemmaMatch: props.lemmaMatch,
       externalResourceChecked: props.externalResourceChecked,
       itemsSelected: [],
       errorMessage: undefined,
+      mapTerms: props.mapTerms ?? false,
+      mappedItems: Array.isArray(props.items ?? []) ? {} : props.items,
+      page: 1,
+      pageSize: 10,
     };
     this.reader.onload = (event) => {
-      let newItems = event.target.result?.split('\n');
-      newItems = newItems.filter((i) => {
-        return this.state.items.indexOf(i) < 0;
-      });
-      this.setState({ items: [...this.state.items, ...newItems] });
+      const { items, mapTerms, mappedItems } = this.state;
+      if (mapTerms) {
+        parse(event.target.result, {}, (err, records) => {
+          if (err) {
+            return;
+          }
+          if (records) {
+            const newItems = [];
+            const newMapped = {};
+            for (const rec of records) {
+              if (rec[0] === '') {
+                continue;
+              }
+              if (!items.includes(rec[0])) {
+                newItems.push(rec[0]);
+              }
+              newMapped[rec[0]] = rec[1];
+            }
+            this.setState({
+              items: [...items, ...newItems],
+              mappedItems: { ...mappedItems, ...newMapped },
+            });
+          }
+        });
+      } else {
+        let newItems = event.target.result?.split('\n');
+        newItems = newItems.filter((i) => {
+          return items.indexOf(i) < 0 && i !== '';
+        });
+        this.setState({ items: [...items, ...newItems] });
+      }
     };
   }
 
@@ -69,19 +122,6 @@ class DictionaryPanel extends React.Component {
     }
   }
 
-  getListItems = () => {
-    const { items } = this.state;
-    const retList = [];
-    items.forEach((item) => {
-      retList.push(
-        <option key={item} value={item}>
-          {item}
-        </option>,
-      );
-    });
-    return retList;
-  };
-
   onUpdateList = () => {
     const { inputText, items } = this.state;
     this.setState({ items: items.concat(inputText), inputText: '' }, () => {
@@ -89,25 +129,15 @@ class DictionaryPanel extends React.Component {
     });
   };
 
-  onSelectionChange = (e) => {
-    const { options } = e.target;
-    const optionList = Array.from(options);
-    const selectedList = [];
-    optionList.forEach((option) => {
-      if (option.selected) {
-        selectedList.push(option.value);
-      }
-    });
-    this.setState({ itemsSelected: selectedList });
-  };
-
-  onDeleteItems = () => {
-    const { items, itemsSelected } = this.state;
+  onDeleteItems = (props) => {
+    const { items, mappedItems } = this.state;
     const itemsSet = new Set(items);
-    itemsSelected.forEach((item) => {
-      itemsSet.delete(item);
+    const newMapped = { ...mappedItems };
+    props.selectedRows.forEach((row) => {
+      itemsSet.delete(row.id);
+      delete newMapped[row.id];
     });
-    this.setState({ items: Array.from(itemsSet) });
+    this.setState({ items: Array.from(itemsSet), mappedItems: newMapped });
   };
 
   onChangeLemmaCaseMatch = (value) => {
@@ -135,23 +165,37 @@ class DictionaryPanel extends React.Component {
 
   onSavePane = () => {
     const errorMessage = this.validateParameters();
-    const { items, caseSensitivity, lemmaMatch, externalResourceChecked } =
-      this.state;
+    const {
+      items,
+      caseSensitivity,
+      lemmaMatch,
+      externalResourceChecked,
+      mapTerms,
+      mappedItems,
+    } = this.state;
     const { nodeId } = this.props;
 
     if (!errorMessage) {
       const node = {
         nodeId,
-        items,
+        items: mapTerms ? mappedItems : items,
         caseSensitivity,
         lemmaMatch,
         externalResourceChecked,
         isValid: true,
+        mapTerms,
       };
       this.props.saveNlpNode({ node });
       this.props.setShowRightPanel({ showPanel: false });
     }
   };
+
+  getDisplayedItems() {
+    const { items, page, pageSize } = this.state;
+    const start = (page - 1) * pageSize;
+    const end = page * pageSize - 1;
+    return items.slice(start, end);
+  }
 
   validateParameters = () => {
     const { items } = this.state;
@@ -177,59 +221,174 @@ class DictionaryPanel extends React.Component {
       externalResourceChecked,
       lemmaMatch,
       errorMessage,
+      items,
+      mapTerms,
+      mappedItems,
     } = this.state;
-    const optionItems = this.getListItems();
     return (
       <div className="dictionary-panel">
         <FileUploader
-          accept={['.txt']}
+          accept={mapTerms ? ['.csv'] : ['.txt']}
           buttonKind="primary"
           buttonLabel="Select files"
           filenameStatus="edit"
-          labelDescription="only .txt files at 10mb or less"
+          labelDescription={
+            mapTerms
+              ? 'only .csv files at 10mb or less'
+              : 'only .txt files at 10mb or less'
+          }
           labelTitle="Upload files"
           size={'sm'}
           onChange={this.onFilesSelected}
         />
-        <div
-          className={classNames('input-controls', {
-            error: errorMessage !== undefined,
+        <Toggle
+          toggled={mapTerms}
+          onToggle={() => {
+            this.setState({ mapTerms: !mapTerms });
+          }}
+          labelText="Map Terms"
+        />
+        <DataTable
+          rows={this.getDisplayedItems().map((item) => {
+            if (mapTerms) {
+              return {
+                id: item,
+                value: item,
+                mapped: (
+                  <TextInput
+                    value={mappedItems[item] ?? ''}
+                    placeholder="Enter a phrase to map to..."
+                    labelText=""
+                    onChange={(event) => {
+                      const newMapped = Object.assign({}, mappedItems);
+                      newMapped[item] = event.target.value;
+                      this.setState({ mappedItems: newMapped });
+                    }}
+                  />
+                ),
+              };
+            } else {
+              return {
+                id: item,
+                value: item,
+              };
+            }
           })}
-        >
-          <TextInput
-            id="inputTextMatch"
-            labelText="Enter phrase to match"
-            type="text"
-            size="sm"
-            invalid={errorMessage !== undefined}
-            invalidText={errorMessage}
-            onChange={(e) => {
-              this.setState({ inputText: e.target.value });
-            }}
-            onKeyDown={(e) => {
-              const keyPressed = e.key || e.keyCode;
-              if (keyPressed === 'Enter' || keyPressed === 13) {
-                this.onUpdateList();
-              }
-            }}
-            value={inputText}
-          />
-          <Button
-            renderIcon={Delete16}
-            iconDescription="Delete row"
-            size="sm"
-            hasIconOnly
-            onClick={this.onDeleteItems}
-          />
-        </div>
-        <select
-          name="match-elements"
-          multiple
-          size="6"
-          onChange={this.onSelectionChange}
-        >
-          {optionItems}
-        </select>
+          invalid={errorMessage !== undefined}
+          invalidText={errorMessage}
+          headers={
+            mapTerms
+              ? [
+                  {
+                    header: 'Term',
+                    key: 'value',
+                  },
+                  {
+                    header: 'Mapped Term',
+                    key: 'mapped',
+                  },
+                ]
+              : [
+                  {
+                    header: 'Term',
+                    key: 'value',
+                  },
+                ]
+          }
+          render={(props) => {
+            return (
+              <TableContainer style={{ marginTop: '10px' }}>
+                <TableToolbar>
+                  <TableBatchActions
+                    {...props.getBatchActionProps({
+                      totalSelected: this.state.itemsSelected.length,
+                    })}
+                  >
+                    <TableBatchAction
+                      onClick={() => {
+                        this.onDeleteItems(props);
+                      }}
+                      renderIcon={Delete16}
+                    />
+                  </TableBatchActions>
+                  <TableToolbarContent style={{ height: 'fit-content' }}>
+                    <TextInput
+                      value={this.state.inputText}
+                      invalid={errorMessage !== undefined}
+                      invalidText={errorMessage}
+                      placeholder="Enter a phrase to match..."
+                      onChange={(event) => {
+                        this.setState({ inputText: event.target.value ?? '' });
+                      }}
+                      onKeyDown={(event) => {
+                        const { inputText, items } = this.state;
+                        if (
+                          event.keyCode === 13 &&
+                          inputText !== '' &&
+                          !items.includes(inputText)
+                        ) {
+                          this.setState({
+                            items: [...items, this.state.inputText],
+                            inputText: '',
+                          });
+                        }
+                      }}
+                    />
+                    <Button
+                      tabIndex={0}
+                      onClick={() => {
+                        const { items, inputText } = this.state;
+                        if (inputText !== '' && !items.includes(inputText)) {
+                          this.setState({
+                            items: [...items, inputText],
+                            inputText: '',
+                          });
+                        }
+                      }}
+                      size="small"
+                      kind="primary"
+                    >
+                      Add new
+                    </Button>
+                  </TableToolbarContent>
+                </TableToolbar>
+                <Table {...props.getTableProps()}>
+                  {mapTerms && (
+                    <TableHead>
+                      <TableRow key="headerRow">
+                        <TableSelectAll {...props.getSelectionProps()} />
+                        <TableHeader id="valueHeader" key="valueHeader">
+                          Term
+                        </TableHeader>
+                        <TableHeader id="mappedHeader" key="mappedHeader">
+                          Mapped Term
+                        </TableHeader>
+                      </TableRow>
+                    </TableHead>
+                  )}
+                  <TableBody>
+                    {props.rows.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableSelectRow {...props.getSelectionProps({ row })} />
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            );
+          }}
+        />
+        <Pagination
+          page={this.state.page}
+          pageSizes={[10, 20, 50]}
+          totalItems={this.state.items.length}
+          onChange={(data) => {
+            this.setState({ page: data.page, pageSize: data.pageSize });
+          }}
+        />
         <Checkbox
           labelText="External Resource"
           id="chkExternalResources"
@@ -242,7 +401,13 @@ class DictionaryPanel extends React.Component {
           name="Case sensitivity and Lemma Match"
           legendText="Case sensitivity and Lemma Match"
           onChange={this.onChangeLemmaCaseMatch}
-          defaultSelected={lemmaMatch ? 'lemmaMatch' : caseSensitivity === 'match' ? 'caseMatch' : 'ignoreBoth'}
+          defaultSelected={
+            lemmaMatch
+              ? 'lemmaMatch'
+              : caseSensitivity === 'match'
+              ? 'caseMatch'
+              : 'ignoreBoth'
+          }
         >
           <RadioButton
             labelText="Ignore case"

@@ -24,6 +24,7 @@ const NlpResultsHighlight = ({ textToHighlight, spans }) => {
   let lastIndex = 0;
   spans.forEach((span) => {
     const { start, end, color } = span;
+    console.log(span);
     if (lastIndex < start) {
       const text = textToHighlight.substring(lastIndex, start);
       chunks.push({ text, start: lastIndex, end: start, highlight: false });
