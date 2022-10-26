@@ -18,9 +18,6 @@ name: Validate
 
 on: [push, pull_request]
 
-env:
-  FORCE_COLOR: true
-
 jobs:
   lint:
     name: Lint
@@ -30,12 +27,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '6'
-      - uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: Install
         run: npm install
       - name: Check format
