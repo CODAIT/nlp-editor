@@ -34,6 +34,7 @@
   },
   "scripts": {
     "format": "prettier --write './src/**/*.{js,jsx}'",
+    "format:check": "prettier --check './src/**/*.{js,jsx}'",
     "serve": "node server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
