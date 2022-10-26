@@ -19,14 +19,19 @@ import { IntlProvider } from 'react-intl';
 import { connect, Provider } from 'react-redux';
 import axios from 'axios';
 import shortUUID from 'short-uuid';
-import { CommonCanvas, CanvasController, CommonProperties } from '@elyra/canvas';
+import {
+  CommonCanvas,
+  CanvasController,
+  CommonProperties,
+} from '@elyra/canvas';
 import { Button, Loading, Modal, Select } from 'carbon-components-react';
 import {
   Play32,
   WarningAlt24,
   DocumentDownload32,
   Upload16,
-  SettingsAdjust32
+  SettingsAdjust32,
+  Close24,
 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
@@ -53,7 +58,7 @@ import {
   setShowRightPanel,
   setShowDocumentViewer,
   setDirty,
-  setModuleName
+  setModuleName,
 } from '../redux/slice';
 
 const TIMER_TICK = 250; // 1/4 second
@@ -100,13 +105,16 @@ class VisualEditor extends React.Component {
       errorMessage: undefined,
       languageSelectModal: false,
       showSettings: false,
-      editorSettings: localStorage.getItem('nlpEditorSettings') ? JSON.parse(localStorage.getItem('nlpEditorSettings')) : {
-        moduleName: 'elyraNLPCanvas',
-        language: 'en'
-      }
+      editorSettings: localStorage.getItem('nlpEditorSettings')
+        ? JSON.parse(localStorage.getItem('nlpEditorSettings'))
+        : {
+            moduleName: 'elyraNLPCanvas',
+            language: 'en',
+          },
+      showBottomPanel: props.tabularResults !== undefined,
     };
 
-    this.props.setModuleName( this.state.editorSettings.moduleName);
+    this.props.setModuleName(this.state.editorSettings.moduleName);
 
     this.canvasController = new CanvasController();
     this.canvasController.openPalette();
@@ -133,7 +141,7 @@ class VisualEditor extends React.Component {
     this.props.setWorkingId({ workingId });
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = (prevProps, prevState) => {
     //listening to update the names of nodes when changed on their panel
     const names = this.props.nodes.map((n) => n.label).join();
     const { nodes } = this.canvasController.getPipeline(this.props.pipelineId);
@@ -148,6 +156,13 @@ class VisualEditor extends React.Component {
           this.props.pipelineId,
         );
       });
+    }
+    if (
+      prevProps.tabularResults === undefined &&
+      this.props.tabularResults !== undefined &&
+      !prevState.showBottomPanel
+    ) {
+      this.setState({ showBottomPanel: true });
     }
   };
 
@@ -414,8 +429,8 @@ class VisualEditor extends React.Component {
     this.props.setShowRightPanel({ showPanel: true });
     this.props.setShowDocumentViewer({ showViewer: false });
     this.setState({
-      showSettings: true
-    })
+      showSettings: true,
+    });
   }
 
   getToolbar = () => {
@@ -522,12 +537,7 @@ class VisualEditor extends React.Component {
           tooltip: 'Select Language',
           jsx: (
             <>
-              <Button
-                id={'btn-language'}
-                size="field"
-                kind="ghost"
-                disabled
-              >
+              <Button id={'btn-language'} size="field" kind="ghost" disabled>
                 Language ({languages[this.getCurrentLanguage()]})
               </Button>
             </>
@@ -665,61 +675,67 @@ class VisualEditor extends React.Component {
       parameterDef: {
         titleDefinition: {
           title: 'NLP Settings',
-          editable: false
+          editable: false,
         },
         current_parameters: {
           moduleName: this.state.editorSettings.moduleName,
-          language: this.getCurrentLanguage()
+          language: this.getCurrentLanguage(),
         },
-        parameters: [{
-          id: 'moduleName',
-          type: 'string',
-          default: ''
-        }, {
-          id: 'language',
-          type: 'string'
-        }],
+        parameters: [
+          {
+            id: 'moduleName',
+            type: 'string',
+            default: '',
+          },
+          {
+            id: 'language',
+            type: 'string',
+          },
+        ],
         uihints: {
           id: 'Settings',
           editor_size: 'medium',
           label: {
-            default: 'General Settings'
+            default: 'General Settings',
           },
-          parameter_info: [{
-            parameter_ref: 'moduleName',
-            label: {
-              default: 'Module Name'
+          parameter_info: [
+            {
+              parameter_ref: 'moduleName',
+              label: {
+                default: 'Module Name',
+              },
+              description: {
+                default: 'Module Name',
+              },
             },
-            description: {
-              default: 'Module Name'
-            }
-          }],
-          action_info: [{
-            id: 'language',
-            label: {
-              default: 'Select Language'
+          ],
+          action_info: [
+            {
+              id: 'language',
+              label: {
+                default: 'Select Language',
+              },
+              control: 'button',
             },
-            control: 'button'
-          }],
-          group_info: [{
-            id: 'settings',
-            label: {
-              default: 'Settings'
+          ],
+          group_info: [
+            {
+              id: 'settings',
+              label: {
+                default: 'Settings',
+              },
+              parameter_refs: ['moduleName'],
             },
-            parameter_refs: [
-              'moduleName'
-            ],
-          }, {
-            id: 'lang',
-            label: {
-              default: 'Language'
+            {
+              id: 'lang',
+              label: {
+                default: 'Language',
+              },
+              type: 'actionPanel',
+              action_refs: ['language'],
             },
-            type: 'actionPanel',
-            action_refs: [
-              'language'
-            ],
-          }]
-        }
+          ],
+        },
       },
     };
   }
@@ -740,35 +756,41 @@ class VisualEditor extends React.Component {
           ref={(instance) => {
             this.CommonProperties = instance;
           }}
-          propertiesConfig={{containerType: "Custom", rightFlyout: true }}
+          propertiesConfig={{ containerType: 'Custom', rightFlyout: true }}
           propertiesInfo={this.getPropertiesInfo()} // required
           callbacks={{
             applyPropertyChanges: (propertySet) => {
               this.setState({
                 editorSettings: {
-                  moduleName: propertySet.moduleName
-                }
+                  moduleName: propertySet.moduleName,
+                },
               });
-              this.props.setModuleName( propertySet.moduleName);
-              localStorage.setItem('nlpEditorSettings', JSON.stringify({...this.state.editorSettings, ...propertySet}));
+              this.props.setModuleName(propertySet.moduleName);
+              localStorage.setItem(
+                'nlpEditorSettings',
+                JSON.stringify({
+                  ...this.state.editorSettings,
+                  ...propertySet,
+                }),
+              );
             },
             closePropertiesDialog: () => {
               this.props.setShowRightPanel({ showPanel: false });
               this.setState({
-                showSettings: false
+                showSettings: false,
               });
             },
             actionHandler: (id, appData, data) => {
-              switch(id) {
+              switch (id) {
                 case 'language':
                   this.setState({ languageSelectModal: true });
                   break;
               }
-            }
+            },
           }} // required
           light // optional
         ></CommonProperties>
-      )
+      );
     }
     return (
       <Provider store={store}>
@@ -790,10 +812,16 @@ class VisualEditor extends React.Component {
           this.setCurrentLanguage(language);
           const editorSettings = {
             ...this.state.editorSettings,
-            ...{language: language}
+            ...{ language: language },
           };
-          this.setState({ languageSelectModal: false, editorSettings: editorSettings });
-          localStorage.setItem('nlpEditorSettings', JSON.stringify(editorSettings));
+          this.setState({
+            languageSelectModal: false,
+            editorSettings: editorSettings,
+          });
+          localStorage.setItem(
+            'nlpEditorSettings',
+            JSON.stringify(editorSettings),
+          );
         }}
         onRequestClose={() => {
           this.setState({ languageSelectModal: false });
@@ -832,14 +860,20 @@ class VisualEditor extends React.Component {
   getTabularView = () => {
     return (
       <Provider store={store}>
+        <Close24
+          aria-label="Document Viewer"
+          className="doc-viewer-close"
+          onClick={() => this.setState({ showBottomPanel: false })}
+          style={{ position: 'absolute', right: '0', cursor: 'pointer' }}
+        />
         <TabularView onRowSelected={this.onRowSelected} />
       </Provider>
     );
   };
 
   render() {
-    const { showRightPanel, tabularResults } = this.props;
-    const { isLoading } = this.state;
+    const { showRightPanel } = this.props;
+    const { isLoading, showBottomPanel } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
@@ -859,7 +893,7 @@ class VisualEditor extends React.Component {
             clickActionHandler={this.onCanvasAreaClick}
             editActionHandler={this.onEditCanvas}
             toolbarConfig={toolbarConfig}
-            showBottomPanel={tabularResults !== undefined}
+            showBottomPanel={showBottomPanel}
             bottomPanelContent={bottomContent}
           />
         </IntlProvider>
@@ -897,7 +931,7 @@ const mapDispatchToProps = (dispatch) => ({
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
   setDirty: (dirty) => dispatch(setDirty(dirty)),
-  setModuleName: (name) => dispatch(setModuleName(name))
+  setModuleName: (name) => dispatch(setModuleName(name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VisualEditor);
