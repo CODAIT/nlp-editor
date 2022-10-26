@@ -26,18 +26,18 @@ export default class SequenceNode {
 
   transform() {
     const { label, scope } = this.node;
-	const predicate = this.node.filterType
-	const funcName = this.node.funcName;
-	const { nodes } = store.getState()['nodesReducer'];
-	const primaryInput = nodes.find(n => n.nodeId === this.node.primary);
-	const secondInput = nodes.find(n => n.nodeId === this.node.secondary);
-	let overrideSecondaryFilterInputName;
-	if( secondInput.type === 'filter') {
-		const filterParent = nodes.find(n => n.nodeId === secondInput.primary);
-		if( filterParent ) {
-			overrideSecondaryFilterInputName = filterParent.label;
-		}
-	}
+    const predicate = this.node.filterType;
+    const funcName = this.node.funcName;
+    const { nodes } = store.getState()['nodesReducer'];
+    const primaryInput = nodes.find((n) => n.nodeId === this.node.primary);
+    const secondInput = nodes.find((n) => n.nodeId === this.node.secondary);
+    let overrideSecondaryFilterInputName;
+    if (secondInput.type === 'filter') {
+      const filterParent = nodes.find((n) => n.nodeId === secondInput.primary);
+      if (filterParent) {
+        overrideSecondaryFilterInputName = filterParent.label;
+      }
+    }
 
     const jsonStructure = {
       '@': {
@@ -47,62 +47,72 @@ export default class SequenceNode {
         'xsi:noNamespaceSchemaLocation': 'schema/target_lang_spec.xsd',
       },
       'input-concepts': {
-        'input-concept': [{
-			'@': {
-				module: this.moduleName,
-				name: primaryInput.label
-			}
-		}],
+        'input-concept': [
+          {
+            '@': {
+              module: this.moduleName,
+              name: primaryInput.label,
+            },
+          },
+        ],
       },
       rule: {
         'input-spec': {
-			'input-span': [{
-				'@': {
-					'input-concept-module': this.moduleName,
-					'input-concept-name': primaryInput.label,
-					'input-field-name': primaryInput.label
-				}
-			}]
-		},
-		'output-spec': {
-          field: [{
-			'@': {
-				name: primaryInput.label
-			}
-		  }]
+          'input-span': [
+            {
+              '@': {
+                'input-concept-module': this.moduleName,
+                'input-concept-name': primaryInput.label,
+                'input-field-name': primaryInput.label,
+              },
+            },
+          ],
+        },
+        'output-spec': {
+          field: [
+            {
+              '@': {
+                name: primaryInput.label,
+              },
+            },
+          ],
         },
         'rule-spec': {
-          'concept-projection': {}
+          'concept-projection': {},
         },
       },
     };
 
-	jsonStructure[predicate] = {
-		predicate: {
-			'function-call': {
-				'@': {'func-name': funcName},
-				arg: [{
-					'field-spec': {
-						'@': {
-							'input-field-name': primaryInput.label,
-							'input-concept-name': label,
-							'input-concept-module': this.moduleName
-						}
-					}
-				},{
-					'field-spec': {
-						'@': {
-							'input-field-name': overrideSecondaryFilterInputName || secondInput.label,
-							'input-concept-name': secondInput.label,
-							'input-concept-module': this.moduleName
-						}
-					}
-				}]
-			}
-		}
-	};
+    jsonStructure[predicate] = {
+      predicate: {
+        'function-call': {
+          '@': { 'func-name': funcName },
+          arg: [
+            {
+              'field-spec': {
+                '@': {
+                  'input-field-name': primaryInput.label,
+                  'input-concept-name': label,
+                  'input-concept-module': this.moduleName,
+                },
+              },
+            },
+            {
+              'field-spec': {
+                '@': {
+                  'input-field-name':
+                    overrideSecondaryFilterInputName || secondInput.label,
+                  'input-concept-name': secondInput.label,
+                  'input-concept-module': this.moduleName,
+                },
+              },
+            },
+          ],
+        },
+      },
+    };
 
-	/*
+    /*
 	switch( scope ) {
 		case 'length':
 			> shorter than, longer than, equals
@@ -159,10 +169,10 @@ export default class SequenceNode {
 			break;
 	}
 	*/
-		
+
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
-	  format: { doubleQuotes: true }
+      format: { doubleQuotes: true },
     });
     return {
       xml,

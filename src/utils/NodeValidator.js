@@ -22,7 +22,7 @@ import {
   UnionNode,
   LiteralNode,
   FilterNode,
-  ConsolidateNode
+  ConsolidateNode,
 } from './validation';
 
 export default function NodeValidator(canvasController) {
@@ -44,16 +44,25 @@ export default function NodeValidator(canvasController) {
         node = new SequenceNode(this.canvasController, pipelineId, nodeProps);
         break;
       case 'union':
-        node = new UnionNode(this.canvasController, pipelineId, nodeProps, nodes);
-		break;
-	  case 'filter':
-		node = new FilterNode(this.canvasController, pipelineId, nodeProps);
-		break;
-	  case 'consolidate':
-		node = new ConsolidateNode(this.canvasController, pipelineId, nodeProps);
-		break;
-	  case 'literal':
-		node = new LiteralNode(this.canvasController, pipelineId, nodeProps);
+        node = new UnionNode(
+          this.canvasController,
+          pipelineId,
+          nodeProps,
+          nodes,
+        );
+        break;
+      case 'filter':
+        node = new FilterNode(this.canvasController, pipelineId, nodeProps);
+        break;
+      case 'consolidate':
+        node = new ConsolidateNode(
+          this.canvasController,
+          pipelineId,
+          nodeProps,
+        );
+        break;
+      case 'literal':
+        node = new LiteralNode(this.canvasController, pipelineId, nodeProps);
         break;
     }
     return node.validate();

@@ -29,7 +29,7 @@ import {
   UnionPanel,
   LiteralPanel,
   FilterPanel,
-  ConsolidatePanel
+  ConsolidatePanel,
 } from '../nodes/components';
 
 import { isNodeLabelValid } from '../../utils';
@@ -64,10 +64,12 @@ class RHSPanel extends React.Component {
         return <LiteralPanel {...node} />;
       case 'regex':
         return <RegexPanel {...node} />;
-	  case 'filter':
-		return <FilterPanel {...node} canvasController={canvasController}  />;
-	  case 'consolidate':
-		return <ConsolidatePanel {...node}  canvasController={canvasController}  />;
+      case 'filter':
+        return <FilterPanel {...node} canvasController={canvasController} />;
+      case 'consolidate':
+        return (
+          <ConsolidatePanel {...node} canvasController={canvasController} />
+        );
       case 'dictionary':
         return (
           <DictionaryPanel {...node} canvasController={canvasController} />

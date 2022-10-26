@@ -41,8 +41,7 @@ export default class LiteralNode {
   };
 
   transform() {
-    const { inputText, label, lemmaMatch } =
-      this.node;
+    const { inputText, label, lemmaMatch } = this.node;
     const fieldName = this.getOutputSpecName();
     const jsonStructure = {
       '@': {
@@ -72,44 +71,42 @@ export default class LiteralNode {
         'output-spec': {
           field: {
             '@': {
-				name: "Literal_1",
-				group: 0,
-				hide: "no",
-				"func-call":"no",
-				"renamed": "no",
-				type: "Span"
+              name: 'Literal_1',
+              group: 0,
+              hide: 'no',
+              'func-call': 'no',
+              renamed: 'no',
+              type: 'Span',
             },
           },
         },
         'rule-spec': {
           'seq-pattern': {
-			  'pattern-spec': {
-				  'sequence': {
-					  'atom': {
-						  '@': {
-							'group': 0,
-							'min': 1,
-							'max': 1
-						  },
-						  'dict-match': {
-							  '@': {
-								  'entry': inputText,
-								  'lemma-match': lemmaMatch								  
-							  }
-						  }
-					  }
-				  }
-			  }
+            'pattern-spec': {
+              sequence: {
+                atom: {
+                  '@': {
+                    group: 0,
+                    min: 1,
+                    max: 1,
+                  },
+                  'dict-match': {
+                    '@': {
+                      entry: inputText,
+                      'lemma-match': lemmaMatch,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
     };
     const literal = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
-	  format: { doubleQuotes: true }
+      format: { doubleQuotes: true },
     });
-    return [
-      { xml: literal, label }
-    ];
+    return [{ xml: literal, label }];
   }
 }

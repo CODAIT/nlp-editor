@@ -55,17 +55,17 @@ function generateNodeName(type, paletteLabel, existingNodes) {
   );
   return `${tmpName}_${nodesWithSameName.length + 1}`;
 }
-function processNewNode( node, nodes ) {
-	const { id: nodeId, description, label, parameters } = node;
-	const { type } = parameters;
-	const generatedLabel = generateNodeName(type, label, nodes);
-	return {
-		label: generatedLabel,
-		nodeId,
-		type,
-		description,
-		isValid: false,
-	};
+function processNewNode(node, nodes) {
+  const { id: nodeId, description, label, parameters } = node;
+  const { type } = parameters;
+  const generatedLabel = generateNodeName(type, label, nodes);
+  return {
+    label: generatedLabel,
+    nodeId,
+    type,
+    description,
+    isValid: false,
+  };
 }
 
 export {
@@ -73,5 +73,5 @@ export {
   getImmediateUpstreamNodes,
   getImmediateDownstreamNodes,
   generateNodeName,
-  processNewNode
+  processNewNode,
 };
