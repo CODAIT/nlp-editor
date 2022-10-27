@@ -32,6 +32,11 @@
     "short-uuid": "^4.2.0",
     "url": "^0.11.0"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "scripts": {
     "format": "prettier --write './src/**/*.{js,jsx}'",
     "format:check": "prettier --check './src/**/*.{js,jsx}'",
