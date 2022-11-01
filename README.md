@@ -56,18 +56,18 @@ Verify nvm installed properly
 
 ```
 > nvm -v
-0.39.0
+0.39.2
 ```
-Next, install the required NodeJS version; currently at 14.17.6
+Next, install the required NodeJS version; currently at 18.12.0
 ```
-nvm install v14.17.6
+nvm install v18.12.0
 ```
 Verify node and npm installed properly
 ```
 > node -v
-v14.17.6
+v18.12.0
 > npm -v
-6.14.15
+8.19.2
 ```
 
 ### Run the editor locally (without a backend runtime)
