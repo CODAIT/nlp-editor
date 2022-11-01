@@ -785,6 +785,9 @@ class VisualEditor extends React.Component {
                 });
               }
               this.props.setShowRightPanel({ showPanel: false });
+              this.setState({
+                showSettings: false,
+              });
             },
             actionHandler: (id, appData, data) => {
               switch (id) {
@@ -824,7 +827,6 @@ class VisualEditor extends React.Component {
             languageSelectModal: false,
             editorSettings: editorSettings,
           });
-          console.log(editorSettings);
           localStorage.setItem(
             'nlpEditorSettings',
             JSON.stringify(editorSettings),

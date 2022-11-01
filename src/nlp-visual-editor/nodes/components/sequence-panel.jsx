@@ -17,7 +17,13 @@ limitations under the License.
 import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button, TextInput, Checkbox, Dropdown, TextArea } from 'carbon-components-react';
+import {
+  Button,
+  TextInput,
+  Checkbox,
+  Dropdown,
+  TextArea,
+} from 'carbon-components-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { Edit16 } from '@carbon/icons-react';
 import './sequence-panel.scss';
@@ -28,13 +34,13 @@ class SequencePanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-	  nodeId: this.props.nodeId,
-	  label: this.props.label,
-	  renamed: this.props.renamed,
+      nodeId: this.props.nodeId,
+      label: this.props.label,
+      renamed: this.props.renamed,
       pattern: this.props.pattern,
-      upstreamNodes: JSON.parse( JSON.stringify( this.props.upstreamNodes)),
-	  editId: null,
-	  editLabel: ''
+      upstreamNodes: JSON.parse(JSON.stringify(this.props.upstreamNodes)),
+      editId: null,
+      editLabel: '',
     };
   }
 
@@ -44,25 +50,25 @@ class SequencePanel extends React.Component {
       ({ pattern, upstreamNodes } = this.constructPattern());
       this.setState({ pattern, upstreamNodes });
     }
-	if( !this.props.renamed) {
-		this.setState({renamed: this.state.label});
-	}
+    if (!this.props.renamed) {
+      this.setState({ renamed: this.state.label });
+    }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-		let renamed = this.props.renamed;
-		if( !this.props.renamed || this.props.renamed === '') {
-		    renamed = this.props.label;
-	    }
-		const { label } = this.props;
+      let renamed = this.props.renamed;
+      if (!this.props.renamed || this.props.renamed === '') {
+        renamed = this.props.label;
+      }
+      const { label } = this.props;
       if (this.props.pattern === '') {
         const { pattern, upstreamNodes } = this.constructPattern();
         this.setState({ label, renamed, pattern, upstreamNodes });
       } else {
         this.setState({
-			label,
-			renamed,
+          label,
+          renamed,
           pattern: this.props.pattern,
           upstreamNodes: this.props.upstreamNodes,
         });
@@ -83,7 +89,13 @@ class SequencePanel extends React.Component {
       if (index < immediateNodes.length - 1) {
         pattern += `<Token>{1,2}`;
       }
-      upstreamNodes.push({ label, nodeId, type, visible: visible || false, renamed: label });
+      upstreamNodes.push({
+        label,
+        nodeId,
+        type,
+        visible: visible || false,
+        renamed: label,
+      });
     });
     return { pattern, upstreamNodes };
   };
@@ -95,8 +107,10 @@ class SequencePanel extends React.Component {
     if (nodeList) {
       nodeList.forEach((n) => {
         const nodeName = n.substring(2, n.length);
-        const { nodeId, type, visible, renamed } = upstreamNodes.find((n) => n.label === nodeName);
-        newList.push({ label: nodeName, nodeId, type, visible, renamed  });
+        const { nodeId, type, visible, renamed } = upstreamNodes.find(
+          (n) => n.label === nodeName,
+        );
+        newList.push({ label: nodeName, nodeId, type, visible, renamed });
       });
     }
     return newList;
@@ -132,7 +146,7 @@ class SequencePanel extends React.Component {
       const upstreamNodes = this.parsePattern();
       const node = {
         nodeId,
-		renamed,
+        renamed,
         pattern,
         upstreamNodes,
         tokens,
@@ -144,16 +158,16 @@ class SequencePanel extends React.Component {
   };
 
   onSaveAttributeLabel(node) {
-	const localNodes = JSON.parse( JSON.stringify(this.state.upstreamNodes));
-	const targetNode = localNodes.find(n => n.nodeId === node.nodeId);
-	targetNode.renamed = this.state.editLabel;
-	this.setState({upstreamNodes: localNodes, editId: false});
+    const localNodes = JSON.parse(JSON.stringify(this.state.upstreamNodes));
+    const targetNode = localNodes.find((n) => n.nodeId === node.nodeId);
+    targetNode.renamed = this.state.editLabel;
+    this.setState({ upstreamNodes: localNodes, editId: false });
   }
   onSaveAttributeVisible(node, value) {
-	const localNodes = JSON.parse( JSON.stringify(this.state.upstreamNodes));
-	const targetNode = localNodes.find(n => n.nodeId === node.nodeId);
-	targetNode.visible = value;
-	this.setState({upstreamNodes: localNodes});
+    const localNodes = JSON.parse(JSON.stringify(this.state.upstreamNodes));
+    const targetNode = localNodes.find((n) => n.nodeId === node.nodeId);
+    targetNode.visible = value;
+    this.setState({ upstreamNodes: localNodes });
   }
 
   render() {
@@ -170,87 +184,101 @@ class SequencePanel extends React.Component {
             this.setState({ pattern: e.target.value });
           }}
         />
-		<hr/>
-		  <h4>Attributes</h4>
+        <hr />
+        <h4>Attributes</h4>
 
-		{
-			this.state.nodeId === this.state.editId ? (<TextInput 
-					id={`textIn-${this.state.nodeId}`}
-					key={`textIn-${this.state.nodeId}`}
-					labelText={`Rename attribute ${this.state.label}`}
-					onChange={(e) => {
-						this.setState({editLabel: e.target.value});
-					}}
-					onKeyDown={(e) => {
-						const keyPressed = e.key || e.keyCode;
-						if (keyPressed === 'Enter' || keyPressed === 13) {
-							this.setState({ renamed: this.state.editLabel, editId: null });
-						} else if (keyPressed === 'Escape' || keyPressed === 27) {
-						  this.setState({ editId: null });
-						}
-					  }}
-					value={this.state.editLabel} />) : (<div 
-					className="attributes" 
-					key={`span-${this.state.nodeId}`}>
-						<Checkbox
-							id={`check${this.state.nodeId}`}
-							labelText=""
-							disabled
-							checked={true}
-							/>	
-						{this.state.renamed || this.state.label} 
-						<Button
-							id={`button-${this.state.nodeId}`}
-							renderIcon={Edit16}
-							iconDescription="Edit label"
-							size="sm"
-							hasIconOnly
-							kind="ghost"
-							onClick={() => this.setState({editId: this.state.nodeId, editLabel: this.state.renamed || this.state.label})}
-						/>
-					
-					</div>)
-		}
-		{this.state.upstreamNodes.map(node => {
-			if(node.nodeId === this.state.editId) {
-				return (<TextInput 
-					id={`textIn-${node.nodeId}`}
-					key={`textIn-${node.nodeId}`}
-					labelText={`Rename attribute ${node.label}`}
-					onChange={(e) => {
-						this.setState({editLabel: e.target.value});
-					}}
-					onKeyDown={(e) => {
-						const keyPressed = e.key || e.keyCode;
-						if (keyPressed === 'Enter' || keyPressed === 13) {
-						  this.onSaveAttributeLabel(node);
-						} else if (keyPressed === 'Escape' || keyPressed === 27) {
-						  this.setState({ editId: null });
-						}
-					  }}
-					value={this.state.editLabel} />)
-			} 
-			return (<div className="attributes" key={`span-${node.nodeId}`}>
-				<Checkbox
-					id={`check${node.nodeId}`}
-					labelText=""
-					onChange={(value) =>  this.onSaveAttributeVisible(node, value)}
-					checked={node.visible}
-					/>	
-				{node.renamed || node.label} 
-				<Button
-					id={`button-${node.nodeId}`}
-					renderIcon={Edit16}
-					iconDescription="Edit label"
-					size="sm"
-					hasIconOnly
-					kind="ghost"
-					onClick={() => this.setState({editId: node.nodeId, editLabel: node.renamed})}
-				/>
-				
-			</div>)
-		})}
-		
+        {this.state.nodeId === this.state.editId ? (
+          <TextInput
+            id={`textIn-${this.state.nodeId}`}
+            key={`textIn-${this.state.nodeId}`}
+            labelText={`Rename attribute ${this.state.label}`}
+            onChange={(e) => {
+              this.setState({ editLabel: e.target.value });
+            }}
+            onKeyDown={(e) => {
+              const keyPressed = e.key || e.keyCode;
+              if (keyPressed === 'Enter' || keyPressed === 13) {
+                this.setState({ renamed: this.state.editLabel, editId: null });
+              } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                this.setState({ editId: null });
+              }
+            }}
+            value={this.state.editLabel}
+          />
+        ) : (
+          <div className="attributes" key={`span-${this.state.nodeId}`}>
+            <Checkbox
+              id={`check${this.state.nodeId}`}
+              labelText=""
+              disabled
+              checked={true}
+            />
+            {this.state.renamed || this.state.label}
+            <Button
+              id={`button-${this.state.nodeId}`}
+              renderIcon={Edit16}
+              iconDescription="Edit label"
+              size="sm"
+              hasIconOnly
+              kind="ghost"
+              onClick={() =>
+                this.setState({
+                  editId: this.state.nodeId,
+                  editLabel: this.state.renamed || this.state.label,
+                })
+              }
+            />
+          </div>
+        )}
+        {this.state.upstreamNodes.map((node) => {
+          if (node.nodeId === this.state.editId) {
+            return (
+              <TextInput
+                id={`textIn-${node.nodeId}`}
+                key={`textIn-${node.nodeId}`}
+                labelText={`Rename attribute ${node.label}`}
+                onChange={(e) => {
+                  this.setState({ editLabel: e.target.value });
+                }}
+                onKeyDown={(e) => {
+                  const keyPressed = e.key || e.keyCode;
+                  if (keyPressed === 'Enter' || keyPressed === 13) {
+                    this.onSaveAttributeLabel(node);
+                  } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                    this.setState({ editId: null });
+                  }
+                }}
+                value={this.state.editLabel}
+              />
+            );
+          }
+          return (
+            <div className="attributes" key={`span-${node.nodeId}`}>
+              <Checkbox
+                id={`check${node.nodeId}`}
+                labelText=""
+                onChange={(value) => this.onSaveAttributeVisible(node, value)}
+                checked={node.visible}
+              />
+              {node.renamed || node.label}
+              <Button
+                id={`button-${node.nodeId}`}
+                renderIcon={Edit16}
+                iconDescription="Edit label"
+                size="sm"
+                hasIconOnly
+                kind="ghost"
+                onClick={() =>
+                  this.setState({
+                    editId: node.nodeId,
+                    editLabel: node.renamed,
+                  })
+                }
+              />
+            </div>
+          );
+        })}
+
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

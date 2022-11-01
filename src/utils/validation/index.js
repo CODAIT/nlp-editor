@@ -22,4 +22,13 @@ import UnionNode from './UnionNode';
 import LiteralNode from './LiteralNode';
 import FilterNode from './FilterNode';
 import ConsolidateNode from './ConsolidateNode';
-export { RegexNode, DictionaryNode, SequenceNode, InputNode, UnionNode, LiteralNode, FilterNode, ConsolidateNode };
+export {
+  RegexNode,
+  DictionaryNode,
+  SequenceNode,
+  InputNode,
+  UnionNode,
+  LiteralNode,
+  FilterNode,
+  ConsolidateNode,
+};
