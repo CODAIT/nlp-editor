@@ -63,6 +63,8 @@ import {
 
 const TIMER_TICK = 250; // 1/4 second
 const TIMER_TRIES = 40; // 2 minutes
+const DEFAULT_LANGUAGE = 'en';
+const DEFAULT_MODULE_NAME = 'elyraNLPCanvas';
 
 const languages = {
   ar: 'Arabic',
@@ -239,8 +241,8 @@ class VisualEditor extends React.Component {
       editorSettings: localStorage.getItem('nlpEditorSettings')
         ? JSON.parse(localStorage.getItem('nlpEditorSettings'))
         : {
-            moduleName: 'elyraNLPCanvas',
-            language: 'en',
+            moduleName: DEFAULT_MODULE_NAME,
+            language: DEFAULT_LANGUAGE,
           },
       showBottomPanel: props.tabularResults !== undefined,
     };
@@ -403,7 +405,7 @@ class VisualEditor extends React.Component {
       body: JSON.stringify({
         workingId,
         payload,
-        language: this.getCurrentLanguage(),
+        language: this.getCurrentLanguage() ?? DEFAULT_LANGUAGE,
       }),
     })
       .then((res) => res.json())
@@ -506,7 +508,7 @@ class VisualEditor extends React.Component {
 
   getCurrentLanguage = () => {
     const flow = this.canvasController.getPipelineFlow();
-    return flow.pipelines?.[0]?.app_data?.language ?? 'en';
+    return flow.pipelines?.[0]?.app_data?.language;
   };
 
   setCurrentLanguage = (language) => {
@@ -516,9 +518,7 @@ class VisualEditor extends React.Component {
         ...flow.pipelines[0].app_data,
         language: language,
       };
-      console.log(flow);
       this.canvasController.setPipelineFlow(flow);
-      console.log(this.canvasController.getPipelineFlow());
     }
   };
 
@@ -549,6 +549,15 @@ class VisualEditor extends React.Component {
         throw 'File does not conform to the Elyra NLP Tooling schema.';
       }
       this.setPipelineFlow(data);
+      if (data.flow.pipelines?.[0]?.app_data?.language) {
+        this.setCurrentLanguage(data.flow.pipelines[0].app_data.language);
+        this.setState({
+          editorSettings: {
+            ...this.state.editorSettings,
+            language: data.flow.pipelines[0].app_data.language,
+          },
+        });
+      }
     } catch (ex) {
       console.log(ex);
       const errorMessage = typeof ex === 'object' ? ex.toString() : ex;
@@ -669,7 +678,7 @@ class VisualEditor extends React.Component {
           jsx: (
             <>
               <Button id={'btn-language'} size="field" kind="ghost" disabled>
-                Language ({languages[this.getCurrentLanguage()]})
+                Language ({languages[this.state.editorSettings.language]})
               </Button>
             </>
           ),
@@ -808,10 +817,7 @@ class VisualEditor extends React.Component {
           title: 'NLP Settings',
           editable: false,
         },
-        current_parameters: {
-          moduleName: this.state.editorSettings.moduleName,
-          language: this.getCurrentLanguage(),
-        },
+        current_parameters: this.state.editorSettings,
         parameters: [
           {
             id: 'moduleName',
@@ -844,7 +850,9 @@ class VisualEditor extends React.Component {
             {
               id: 'language',
               label: {
-                default: 'Select Language',
+                default: `Select Language (${
+                  languages[this.state.editorSettings.language]
+                })`,
               },
               control: 'button',
             },
@@ -973,22 +981,32 @@ class VisualEditor extends React.Component {
           propertiesConfig={{ containerType: 'Custom', rightFlyout: true }}
           propertiesInfo={this.getPropertiesInfo()} // required
           callbacks={{
-            applyPropertyChanges: (propertySet) => {
-              this.setState({
-                editorSettings: {
-                  moduleName: propertySet.moduleName,
-                },
-              });
-              this.props.setModuleName(propertySet.moduleName);
-              localStorage.setItem(
-                'nlpEditorSettings',
-                JSON.stringify({
-                  ...this.state.editorSettings,
-                  ...propertySet,
-                }),
-              );
+            propertyListener: (data) => {
+              if (data.action === 'UPDATE_PROPERTY') {
+                const newEditorSettings = { ...this.state.editorSettings };
+                newEditorSettings[data.property?.name] = data.value;
+                this.setState({ editorSettings: newEditorSettings });
+              }
             },
-            closePropertiesDialog: () => {
+            closePropertiesDialog: (closeSource) => {
+              console.log(closeSource);
+              if (closeSource === 'apply') {
+                localStorage.setItem(
+                  'nlpEditorSettings',
+                  JSON.stringify(this.state.editorSettings),
+                );
+                this.setCurrentLanguage(this.state.editorSettings.language);
+              } else if (closeSource === 'cancel') {
+                this.setState({
+                  showSettings: false,
+                  editorSettings: localStorage.getItem('nlpEditorSettings')
+                    ? JSON.parse(localStorage.getItem('nlpEditorSettings'))
+                    : {
+                        moduleName: DEFAULT_MODULE_NAME,
+                        language: DEFAULT_LANGUAGE,
+                      },
+                });
+              }
               this.props.setShowRightPanel({ showPanel: false });
               this.setState({
                 showSettings: false,
@@ -1026,7 +1044,7 @@ class VisualEditor extends React.Component {
           this.setCurrentLanguage(language);
           const editorSettings = {
             ...this.state.editorSettings,
-            ...{ language: language },
+            language: language,
           };
           this.setState({
             languageSelectModal: false,
@@ -1041,7 +1059,7 @@ class VisualEditor extends React.Component {
           this.setState({ languageSelectModal: false });
         }}
         languages={languages}
-        currentLanguage={this.getCurrentLanguage()}
+        currentLanguage={this.getCurrentLanguage() ?? DEFAULT_LANGUAGE}
       />
     );
   };
