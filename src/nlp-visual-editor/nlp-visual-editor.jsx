@@ -31,6 +31,7 @@ import {
   DocumentDownload32,
   Upload16,
   SettingsAdjust32,
+  Close24,
 } from '@carbon/icons-react';
 import nlpPalette from '../config/nlpPalette.json';
 import RHSPanel from './components/rhs-panel';
@@ -110,6 +111,7 @@ class VisualEditor extends React.Component {
             moduleName: 'elyraNLPCanvas',
             language: 'en',
           },
+      showBottomPanel: props.tabularResults !== undefined,
     };
 
     this.props.setModuleName(this.state.editorSettings.moduleName);
@@ -139,7 +141,7 @@ class VisualEditor extends React.Component {
     this.props.setWorkingId({ workingId });
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = (prevProps, prevState) => {
     //listening to update the names of nodes when changed on their panel
     const names = this.props.nodes.map((n) => n.label).join();
     const { nodes } = this.canvasController.getPipeline(this.props.pipelineId);
@@ -154,6 +156,13 @@ class VisualEditor extends React.Component {
           this.props.pipelineId,
         );
       });
+    }
+    if (
+      prevProps.tabularResults === undefined &&
+      this.props.tabularResults !== undefined &&
+      !prevState.showBottomPanel
+    ) {
+      this.setState({ showBottomPanel: true });
     }
   };
 
@@ -851,14 +860,20 @@ class VisualEditor extends React.Component {
   getTabularView = () => {
     return (
       <Provider store={store}>
+        <Close24
+          aria-label="Document Viewer"
+          className="doc-viewer-close"
+          onClick={() => this.setState({ showBottomPanel: false })}
+          style={{ position: 'absolute', right: '0', cursor: 'pointer' }}
+        />
         <TabularView onRowSelected={this.onRowSelected} />
       </Provider>
     );
   };
 
   render() {
-    const { showRightPanel, tabularResults } = this.props;
-    const { isLoading } = this.state;
+    const { showRightPanel } = this.props;
+    const { isLoading, showBottomPanel } = this.state;
     const rightFlyoutContent = showRightPanel ? this.getRHSPanel() : null;
     const bottomContent = this.getTabularView();
     const toolbarConfig = this.getToolbar();
@@ -878,7 +893,7 @@ class VisualEditor extends React.Component {
             clickActionHandler={this.onCanvasAreaClick}
             editActionHandler={this.onEditCanvas}
             toolbarConfig={toolbarConfig}
-            showBottomPanel={tabularResults !== undefined}
+            showBottomPanel={showBottomPanel}
             bottomPanelContent={bottomContent}
           />
         </IntlProvider>
