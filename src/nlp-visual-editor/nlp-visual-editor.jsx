@@ -62,6 +62,8 @@ import {
 
 const TIMER_TICK = 250; // 1/4 second
 const TIMER_TRIES = 40; // 2 minutes
+const DEFAULT_LANGUAGE = 'en';
+const DEFAULT_MODULE_NAME = 'elyraNLPCanvas';
 
 const languages = {
   ar: 'Arabic',
@@ -107,8 +109,8 @@ class VisualEditor extends React.Component {
       editorSettings: localStorage.getItem('nlpEditorSettings')
         ? JSON.parse(localStorage.getItem('nlpEditorSettings'))
         : {
-            moduleName: 'elyraNLPCanvas',
-            language: 'en',
+            moduleName: DEFAULT_MODULE_NAME,
+            language: DEFAULT_LANGUAGE,
           },
     };
 
@@ -263,7 +265,7 @@ class VisualEditor extends React.Component {
       body: JSON.stringify({
         workingId,
         payload,
-        language: this.getCurrentLanguage() ?? 'en',
+        language: this.getCurrentLanguage() ?? DEFAULT_LANGUAGE,
       }),
     })
       .then((res) => res.json())
@@ -777,8 +779,8 @@ class VisualEditor extends React.Component {
                   editorSettings: localStorage.getItem('nlpEditorSettings')
                     ? JSON.parse(localStorage.getItem('nlpEditorSettings'))
                     : {
-                        moduleName: 'elyraNLPCanvas',
-                        language: 'en',
+                        moduleName: DEFAULT_MODULE_NAME,
+                        language: DEFAULT_LANGUAGE,
                       },
                 });
               }
@@ -832,7 +834,7 @@ class VisualEditor extends React.Component {
           this.setState({ languageSelectModal: false });
         }}
         languages={languages}
-        currentLanguage={this.getCurrentLanguage() ?? 'en'}
+        currentLanguage={this.getCurrentLanguage() ?? DEFAULT_LANGUAGE}
       />
     );
   };
