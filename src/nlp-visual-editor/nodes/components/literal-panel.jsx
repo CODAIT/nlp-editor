@@ -36,12 +36,12 @@ class LiteralPanel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-	if (this.props.nodeId !== prevProps.nodeId) {
-		this.setState({
-			inputText: this.props.inputText,
-      		lemmaMatch: this.props.lemmaMatch
-		})
-	}
+    if (this.props.nodeId !== prevProps.nodeId) {
+      this.setState({
+        inputText: this.props.inputText,
+        lemmaMatch: this.props.lemmaMatch,
+      });
+    }
   }
 
   onChangeLemmaMatch = (value) => {
@@ -50,8 +50,7 @@ class LiteralPanel extends React.Component {
 
   onSavePane = () => {
     const errorMessage = this.validateParameters();
-    const {lemmaMatch, inputText } =
-      this.state;
+    const { lemmaMatch, inputText } = this.state;
     const { nodeId } = this.props;
 
     if (!errorMessage) {
@@ -77,11 +76,7 @@ class LiteralPanel extends React.Component {
   };
 
   render() {
-    const {
-      inputText,
-      lemmaMatch,
-      errorMessage,
-    } = this.state;
+    const { inputText, lemmaMatch, errorMessage } = this.state;
     return (
       <div className="literal-panel">
         <div
@@ -108,7 +103,7 @@ class LiteralPanel extends React.Component {
           onChange={this.onChangeLemmaMatch}
           checked={lemmaMatch}
         />
-		<RHSPanelButtons
+        <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });
           }}
@@ -125,7 +120,7 @@ LiteralPanel.propTypes = {
 
 LiteralPanel.defaultProps = {
   inputText: '',
-  lemmaMatch: false
+  lemmaMatch: false,
 };
 
 const mapStateToProps = (state) => ({

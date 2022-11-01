@@ -9,7 +9,7 @@
     "adm-zip": "^0.5.9",
     "axios": "^0.26.0",
     "carbon-components": "^10.52.0",
-    "carbon-components-react": "^7.52.0",
+    "carbon-components-react": "^7.50.0",
     "carbon-icons": "^7.0.7",
     "classnames": "^2.3.1",
     "cors": "^2.8.5",
@@ -18,12 +18,14 @@
     "express-fileupload": "^1.3.1",
     "express-rate-limit": "^6.5.2",
     "express-validator": "^6.14.2",
+    "husky": "^2.3.0",
     "js-file-download": "^0.4.12",
     "js2xmlparser": "^4.0.2",
+    "lint-staged": "^9.5.0",
     "path": "^0.12.7",
     "prop-types": "^15.8.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-intl": "^5.24.6",
     "react-redux": "^7.2.6",
     "react-scripts": "5.0.0",
@@ -32,8 +34,14 @@
     "short-uuid": "^4.2.0",
     "url": "^0.11.0"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "scripts": {
     "format": "prettier --write './src/**/*.{js,jsx}'",
+    "format:check": "prettier --check './src/**/*.{js,jsx}'",
     "serve": "node server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",

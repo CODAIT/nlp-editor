@@ -193,7 +193,7 @@ class DictionaryPanel extends React.Component {
   getDisplayedItems() {
     const { items, page, pageSize } = this.state;
     const start = (page - 1) * pageSize;
-    const end = page * pageSize - 1;
+    const end = page * pageSize;
     return items.slice(start, end);
   }
 

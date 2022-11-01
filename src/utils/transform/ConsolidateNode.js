@@ -26,8 +26,8 @@ export default class SequenceNode {
 
   transform() {
     const { label, consolidateTarget, consolidatePolicy } = this.node;
-	const { nodes } = store.getState()['nodesReducer'];
-	const primaryInput = nodes.find(n => n.nodeId === this.node.primary);
+    const { nodes } = store.getState()['nodesReducer'];
+    const primaryInput = nodes.find((n) => n.nodeId === this.node.primary);
     const jsonStructure = {
       '@': {
         module: this.moduleName,
@@ -36,45 +36,51 @@ export default class SequenceNode {
         'xsi:noNamespaceSchemaLocation': 'schema/target_lang_spec.xsd',
       },
       'input-concepts': {
-        'input-concept': [{
-			'@': {
-				module: this.moduleName,
-				name: consolidateTarget
-			}
-		}],
+        'input-concept': [
+          {
+            '@': {
+              module: this.moduleName,
+              name: consolidateTarget,
+            },
+          },
+        ],
       },
       rule: {
         'input-spec': {
-			'input-span': [{
-				'@': {
-					'input-concept-module': this.moduleName,
-					'input-concept-name': consolidateTarget,
-					'input-field-name': consolidateTarget
-				}
-			}]
-		},
-		'output-spec': {
-          field: [{
-			'@': {
-				name: consolidateTarget
-			}
-		  }]
+          'input-span': [
+            {
+              '@': {
+                'input-concept-module': this.moduleName,
+                'input-concept-name': consolidateTarget,
+                'input-field-name': consolidateTarget,
+              },
+            },
+          ],
+        },
+        'output-spec': {
+          field: [
+            {
+              '@': {
+                name: consolidateTarget,
+              },
+            },
+          ],
         },
         'rule-spec': {
-          'concept-projection': {}
+          'concept-projection': {},
         },
       },
-	  'consolidation-spec': {
-		'@': {
-			target: consolidateTarget,
-			policy: consolidatePolicy
-		}
-	  }
+      'consolidation-spec': {
+        '@': {
+          target: consolidateTarget,
+          policy: consolidatePolicy,
+        },
+      },
     };
-		
+
     const xml = js2xmlparser.parse('concept', jsonStructure, {
       declaration: { encoding: 'UTF-8' },
-	  format: { doubleQuotes: true }
+      format: { doubleQuotes: true },
     });
     return {
       xml,
