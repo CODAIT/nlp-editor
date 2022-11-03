@@ -215,7 +215,7 @@ app.post(
   }),
   (req, res) => {
     console.log('executing pipeline');
-    const { workingId, payload, language } = req.body;
+    const { workingId, payload, language, exportPipeline } = req.body;
     const workingFolder = `${tempFolder}/${sanitize(workingId)}`;
     console.log(workingFolder);
     console.time('writing xml files');
@@ -231,6 +231,10 @@ app.post(
     console.timeEnd('writing xml files');
 
     createFile(workingFolder, 'language-name.txt', language);
+    if (exportPipeline) {
+      console.log(`creating file ${workingId}.export-aql`);
+      createFile(workingFolder, `${workingId}.export-aql`, '');
+    }
 
     //zip tempfolder
     console.time('creating+moving zip file');
@@ -297,8 +301,11 @@ const hasError = (fileContents) => {
 };
 
 app.get('/api/results', function (req, res) {
-  const { workingId } = req.query;
-  const resultFileName = `${workingId}-result.json`;
+  const { workingId, exportPipeline } = req.query;
+  const resultFileName =
+    exportPipeline === 'true'
+      ? `${workingId}-export.zip`
+      : `${workingId}-result.json`;
   const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
   if (!fs.existsSync(file)) {
     //no file present, assume that runtime is still in progress
@@ -322,7 +329,8 @@ app.get('/api/results', function (req, res) {
     return res.status(200).send({ status: 'error', message: errorMessage });
   }
 
-  const results = formatResults(parsedContents);
+  const results =
+    exportPipeline === 'true' ? parsedContents : formatResults(parsedContents);
 
   deleteFile(file, resultFileName);
   return res.status(200).send({ status: 'success', ...results });

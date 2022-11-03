@@ -354,9 +354,9 @@ class VisualEditor extends React.Component {
     return isValid;
   };
 
-  fetchResults = () => {
+  fetchResults = (exportPipeline) => {
     const { workingId } = this.props;
-    const url = `/api/results?workingId=${workingId}`;
+    const url = `/api/results?workingId=${workingId}&exportPipeline=${exportPipeline}`;
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -372,17 +372,41 @@ class VisualEditor extends React.Component {
           }
           this.tickCounter += 1;
         } else if (status === 'success') {
-          const { names = [] } = data;
           clearInterval(this.timer);
-          let state = { isLoading: false };
-          if (names.length === 0) {
-            state = {
-              ...state,
-              errorMessage: 'No matches were found in the input document.',
+          if (exportPipeline) {
+            const opts = {
+              suggestedName: 'NLP_Canvas_Export.zip',
+              types: [
+                {
+                  description: 'Zip file',
+                  accept: { 'application/octet-stream': ['.zip'] },
+                },
+              ],
             };
+            if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
+              window.showSaveFilePicker(opts).then(async (fileHandle) => {
+                // Create a FileSystemWritableFileStream to write to.
+                const writable = await fileHandle.createWritable();
+                // Write the contents of the file to the stream.
+                await writable.write(data);
+                // Close the file and write the contents to disk.
+                await writable.close();
+              });
+            } else {
+              fileDownload(data, 'NLP_Canvas_Export.zip');
+            }
+          } else {
+            const { names = [] } = data;
+            let state = { isLoading: false };
+            if (names.length === 0) {
+              state = {
+                ...state,
+                errorMessage: 'No matches were found in the input document.',
+              };
+            }
+            this.setState({ ...state });
+            this.props.setTabularResults(data);
           }
-          this.setState({ ...state });
-          this.props.setTabularResults(data);
         } else if (status === 'error') {
           const { message } = data;
           clearInterval(this.timer);
@@ -390,14 +414,14 @@ class VisualEditor extends React.Component {
             isLoading: false,
             errorMessage: message,
           });
+          this.props.setTabularResults(undefined);
         }
       });
   };
 
-  execute = (payload) => {
+  execute = (payload, exportPipeline) => {
     const { workingId } = this.props;
     this.setState({ isLoading: true });
-    const flow = this.canvasController.getPipelineFlow();
 
     fetch('/api/run', {
       method: 'POST',
@@ -406,6 +430,7 @@ class VisualEditor extends React.Component {
         workingId,
         payload,
         language: this.getCurrentLanguage() ?? DEFAULT_LANGUAGE,
+        exportPipeline,
       }),
     })
       .then((res) => res.json())
@@ -414,11 +439,13 @@ class VisualEditor extends React.Component {
         this.props.setInputDocument({ document });
         this.props.setShowDocumentViewer({ showViewer: true });
         //poll for results at specific interval
-        this.timer = setInterval(this.fetchResults, TIMER_TICK);
+        this.timer = setInterval(() => {
+          this.fetchResults(exportPipeline);
+        }, TIMER_TICK);
       });
   };
 
-  runPipeline = () => {
+  runPipeline = (exportPipeline) => {
     console.time('validating nlp nodes');
     const isValid = this.validatePipeline();
     console.timeEnd('validating nlp nodes');
@@ -426,12 +453,12 @@ class VisualEditor extends React.Component {
       return false;
     }
 
-    this.props.setTabularResults(undefined);
+    // this.props.setTabularResults(undefined);
 
     console.time('transforming nlp nodes to XML');
     const payload = this.transformToXML();
     console.timeEnd('transforming nlp nodes to XML');
-    this.execute(payload);
+    this.execute(payload, exportPipeline);
   };
 
   savePipeline = () => {
@@ -646,7 +673,7 @@ class VisualEditor extends React.Component {
                 kind="primary"
                 renderIcon={Play32}
                 disabled={!enableFlowExecutionBtn}
-                onClick={this.runPipeline}
+                onClick={() => this.runPipeline(false)}
               >
                 Run
               </Button>
@@ -663,7 +690,7 @@ class VisualEditor extends React.Component {
                 size="field"
                 kind="ghost"
                 disabled={this.props.tabularResults === undefined}
-                onClick={this.exportPipeline}
+                onClick={() => this.runPipeline(true)}
               >
                 Export
               </Button>
