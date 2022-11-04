@@ -358,8 +358,8 @@ class VisualEditor extends React.Component {
     const { workingId } = this.props;
     const url = `/api/results?workingId=${workingId}&exportPipeline=${exportPipeline}`;
     fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
+      .then((res) => (exportPipeline ? res : res.json()))
+      .then(async (data) => {
         const { status } = data;
         if (status === 'in-progress') {
           if (this.tickCounter >= TIMER_TRIES) {
@@ -371,30 +371,33 @@ class VisualEditor extends React.Component {
             });
           }
           this.tickCounter += 1;
-        } else if (status === 'success') {
+        } else if (status === 'success' || status === 200) {
           clearInterval(this.timer);
           if (exportPipeline) {
-            const opts = {
-              suggestedName: 'NLP_Canvas_Export.zip',
-              types: [
-                {
-                  description: 'Zip file',
-                  accept: { 'application/octet-stream': ['.zip'] },
-                },
-              ],
-            };
+            const reader = data.body.getReader();
+            const contents = await reader.read();
             if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
+              const opts = {
+                suggestedName: 'NLP_Canvas_Export.zip',
+                types: [
+                  {
+                    description: 'Zip file',
+                    accept: { 'application/octet-stream': ['.zip'] },
+                  },
+                ],
+              };
               window.showSaveFilePicker(opts).then(async (fileHandle) => {
                 // Create a FileSystemWritableFileStream to write to.
                 const writable = await fileHandle.createWritable();
                 // Write the contents of the file to the stream.
-                await writable.write(data);
+                await writable.write(contents.value);
                 // Close the file and write the contents to disk.
                 await writable.close();
               });
             } else {
-              fileDownload(data, 'NLP_Canvas_Export.zip');
+              fileDownload(contents.value, 'NLP_Canvas_Export.zip');
             }
+            this.setState({ isLoading: false });
           } else {
             const { names = [] } = data;
             let state = { isLoading: false };
@@ -435,9 +438,11 @@ class VisualEditor extends React.Component {
     })
       .then((res) => res.json())
       .then((data) => {
-        const { document } = data;
-        this.props.setInputDocument({ document });
-        this.props.setShowDocumentViewer({ showViewer: true });
+        if (!exportPipeline) {
+          const { document } = data;
+          this.props.setInputDocument({ document });
+          this.props.setShowDocumentViewer({ showViewer: true });
+        }
         //poll for results at specific interval
         this.timer = setInterval(() => {
           this.fetchResults(exportPipeline);
@@ -494,42 +499,6 @@ class VisualEditor extends React.Component {
       });
     } else {
       fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
-    }
-  };
-
-  exportPipeline = () => {
-    const opts = {
-      suggestedName: 'NLP_Canvas_Export.zip',
-      types: [
-        {
-          description: 'Zip file',
-          accept: { 'application/octet-stream': ['.zip'] },
-        },
-      ],
-    };
-    if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
-      window.showSaveFilePicker(opts).then((fileHandle) => {
-        axios
-          .get(`/api/download/${this.props.pipelineId}`, {
-            responseType: 'arraybuffer',
-          })
-          .then(async (res) => {
-            // Create a FileSystemWritableFileStream to write to.
-            const writable = await fileHandle.createWritable();
-            // Write the contents of the file to the stream.
-            await writable.write(res.data);
-            // Close the file and write the contents to disk.
-            await writable.close();
-          });
-      });
-    } else {
-      axios
-        .get(`/api/download/${this.props.pipelineId}`, {
-          responseType: 'arraybuffer',
-        })
-        .then((res) => {
-          fileDownload(res.data, 'NLP_Canvas_Export.zip');
-        });
     }
   };
 

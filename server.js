@@ -144,66 +144,6 @@ app.post('/api/uploadflow', async (req, res) => {
     res.status(500).send({ message: 'File upload failed' });
   }
 });
-app.get(
-  '/api/download/:workingId',
-  [param('workingId').matches(/^[a-zA-Z0-9-]+$/)],
-  rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false,
-  }),
-  (req, res) => {
-    try {
-      validationResult(req).throw();
-    } catch (err) {
-      return res.status(400).json(err);
-    }
-
-    const { workingId } = req.params;
-    const destinationPath = `${systemTdataFolder}/user-data-in/${sanitize(
-      workingId,
-    )}.export-aql`;
-    fs.writeFileSync(destinationPath, '');
-    const resultFileName = `${sanitize(workingId)}.zip`;
-    const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
-    const FIFTYSECONDSTIMEOUT = 100;
-    let counter = 0;
-    const interval = setInterval(() => {
-      if (counter > FIFTYSECONDSTIMEOUT) {
-        clearInterval(interval);
-        return res.status(400).send({ status: '' });
-      }
-
-      if (fs.existsSync(file)) {
-        var stat = fs.statSync(file);
-
-        let fileContents = fs.createReadStream(file);
-        const fileType = 'application/zip';
-        res.writeHead(200, {
-          'Content-Type': fileType,
-          'Content-Length': stat.size,
-        });
-        fileContents.on('close', () => {
-          clearInterval(interval);
-          deleteFile(
-            `${systemTdataFolder}/run-aql-result/${resultFileName}`,
-            resultFileName,
-          );
-          res.end();
-        });
-        fileContents.pipe(res);
-      }
-      counter += 1;
-    }, 500);
-    req.on('close', function () {
-      clearInterval(interval);
-    });
-    req.on('end', function () {
-      clearInterval(interval);
-    });
-  },
-);
 
 app.post(
   '/api/run',
@@ -310,7 +250,7 @@ app.get('/api/results', function (req, res) {
   if (!fs.existsSync(file)) {
     //no file present, assume that runtime is still in progress
     console.log(`results file ${resultFileName} not found.`);
-    return res.status(200).send({ status: 'in-progress' });
+    return res.status(202).send({ status: 'in-progress' });
   }
   console.log(
     `SystemT execution time: ${new Date().getTime() - systemTStartTime} ms`,
@@ -318,22 +258,42 @@ app.get('/api/results', function (req, res) {
 
   //result file was found - read contents of file
   console.log(`results file ${resultFileName} found.`);
-  let fileContents = fs.readFileSync(file, 'utf8');
-  const parsedContents = JSON.parse(fileContents);
+  if (exportPipeline === 'true') {
+    var stat = fs.statSync(file);
+    let fileContents = fs.createReadStream(file);
+    const fileType = 'application/zip';
+    res.writeHead(200, {
+      'Content-Type': fileType,
+      'Content-Length': stat.size,
+    });
+    fileContents.on('close', () => {
+      deleteFile(
+        `${systemTdataFolder}/run-aql-result/${resultFileName}`,
+        resultFileName,
+      );
+      res.end();
+    });
+    fileContents.pipe(res);
+  } else {
+    let fileContents = fs.readFileSync(file, 'utf8');
+    const parsedContents = JSON.parse(fileContents);
 
-  // execution returned errors
-  const errorMessage = hasError(parsedContents);
-  if (errorMessage) {
-    console.log('found error message', errorMessage);
+    // execution returned errors
+    const errorMessage = hasError(parsedContents);
+    if (errorMessage) {
+      console.log('found error message', errorMessage);
+      deleteFile(file, resultFileName);
+      return res.status(200).send({ status: 'error', message: errorMessage });
+    }
+
+    const results =
+      exportPipeline === 'true'
+        ? parsedContents
+        : formatResults(parsedContents);
+
     deleteFile(file, resultFileName);
-    return res.status(200).send({ status: 'error', message: errorMessage });
+    return res.status(200).send({ status: 'success', ...results });
   }
-
-  const results =
-    exportPipeline === 'true' ? parsedContents : formatResults(parsedContents);
-
-  deleteFile(file, resultFileName);
-  return res.status(200).send({ status: 'success', ...results });
 });
 
 app.get('/', function (req, res) {
