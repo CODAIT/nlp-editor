@@ -24,7 +24,7 @@ import {
   CanvasController,
   CommonProperties,
 } from '@elyra/canvas';
-import { Button, Loading, Modal, Select } from 'carbon-components-react';
+import { Button, Loading, Modal } from 'carbon-components-react';
 import {
   Play32,
   WarningAlt24,
@@ -44,7 +44,7 @@ import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import { getImmediateUpstreamNodes } from '../utils';
 import JsonToXML from '../utils/JsonToXML';
-import { generateNodeName, processNewNode } from '../utils';
+import { processNewNode } from '../utils';
 import fileDownload from 'js-file-download';
 
 import {
@@ -54,7 +54,6 @@ import {
   setInputDocument,
   setPipelineId,
   setTabularResults,
-  setWorkingId,
   setShowRightPanel,
   setShowDocumentViewer,
   setDirty,
@@ -261,7 +260,6 @@ class VisualEditor extends React.Component {
   }
 
   componentDidMount() {
-    const workingId = shortUUID.generate();
     const id = this.canvasController.getPrimaryPipelineId();
     this.props.setPipelineId({
       pipelineId: id,
@@ -271,7 +269,6 @@ class VisualEditor extends React.Component {
         return 'Unsaved changes. Proceed?';
       }
     };
-    this.props.setWorkingId({ workingId });
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -354,8 +351,7 @@ class VisualEditor extends React.Component {
     return isValid;
   };
 
-  fetchResults = (exportPipeline) => {
-    const { workingId } = this.props;
+  fetchResults = (exportPipeline, workingId) => {
     const url = `/api/results?workingId=${workingId}&exportPipeline=${exportPipeline}`;
     fetch(url)
       .then((res) => (exportPipeline ? res : res.json()))
@@ -422,35 +418,43 @@ class VisualEditor extends React.Component {
       });
   };
 
-  execute = (payload, exportPipeline) => {
-    const { workingId } = this.props;
+  execute = (payload, exportPipeline, workingId) => {
     this.setState({ isLoading: true });
-
-    fetch('/api/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        workingId,
-        payload,
-        language: this.getCurrentLanguage() ?? DEFAULT_LANGUAGE,
-        exportPipeline,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    console.log(this.props.payloadDocument);
+    const formData = new FormData();
+    formData.append('file', this.props.payloadDocument);
+    formData.append('workingId', workingId);
+    formData.append('payload', JSON.stringify(payload));
+    formData.append('language', this.getCurrentLanguage() ?? DEFAULT_LANGUAGE);
+    formData.append('exportPipeline', exportPipeline);
+    formData.append('payloadDocument', this.props.payloadDocument);
+    axios
+      .post('/api/run', formData, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then((res) => {
+        const { data } = res;
         if (!exportPipeline) {
           const { document } = data;
           this.props.setInputDocument({ document });
           this.props.setShowDocumentViewer({ showViewer: true });
         }
+        let counter = 0;
         //poll for results at specific interval
         this.timer = setInterval(() => {
-          this.fetchResults(exportPipeline);
+          counter += 1;
+          if (counter > 600) {
+            clearInterval(this.timer);
+            this.setState({ isLoading: false });
+          }
+          this.fetchResults(exportPipeline, workingId);
         }, TIMER_TICK);
       });
   };
 
   runPipeline = (exportPipeline) => {
+    const workingId = shortUUID.generate();
     console.time('validating nlp nodes');
     const isValid = this.validatePipeline();
     console.timeEnd('validating nlp nodes');
@@ -458,12 +462,14 @@ class VisualEditor extends React.Component {
       return false;
     }
 
-    // this.props.setTabularResults(undefined);
+    if (!exportPipeline) {
+      this.props.setTabularResults(undefined);
+    }
 
     console.time('transforming nlp nodes to XML');
     const payload = this.transformToXML();
     console.timeEnd('transforming nlp nodes to XML');
-    this.execute(payload, exportPipeline);
+    this.execute(payload, exportPipeline, workingId);
   };
 
   savePipeline = () => {
@@ -527,38 +533,33 @@ class VisualEditor extends React.Component {
     this.props.setNlpNodes({ nodes });
   };
 
-  onFlowSelected = async (e) => {
-    //create a new workingId, treat it as a new session
-    const workingId = shortUUID.generate();
-    this.props.setWorkingId({ workingId });
+  onFlowSelected = (e) => {
     const { files } = e.target;
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      formData.append('attach_file', file);
-    }
-    formData.append('workingId', workingId);
-    try {
-      const { data } = await axios.post('/api/uploadflow', formData);
-      const { flow, nodes } = data;
-      if (flow === undefined || nodes === undefined) {
-        throw 'File does not conform to the Elyra NLP Tooling schema.';
+    var reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const pipelineJSON = JSON.parse(reader.result);
+        const { flow, nodes } = pipelineJSON;
+        if (flow === undefined || nodes === undefined) {
+          throw 'File does not conform to the Elyra NLP Tooling schema.';
+        }
+        this.setPipelineFlow(pipelineJSON);
+        if (flow.pipelines?.[0]?.app_data?.language) {
+          this.setCurrentLanguage(flow.pipelines[0].app_data.language);
+          this.setState({
+            editorSettings: {
+              ...this.state.editorSettings,
+              language: flow.pipelines[0].app_data.language,
+            },
+          });
+        }
+      } catch (ex) {
+        console.log(ex);
+        const errorMessage = typeof ex === 'object' ? ex.toString() : ex;
+        this.setState({ errorMessage });
       }
-      this.setPipelineFlow(data);
-      if (data.flow.pipelines?.[0]?.app_data?.language) {
-        this.setCurrentLanguage(data.flow.pipelines[0].app_data.language);
-        this.setState({
-          editorSettings: {
-            ...this.state.editorSettings,
-            language: data.flow.pipelines[0].app_data.language,
-          },
-        });
-      }
-    } catch (ex) {
-      console.log(ex);
-      const errorMessage = typeof ex === 'object' ? ex.toString() : ex;
-      this.setState({ errorMessage });
-    }
+    };
+    reader.readAsText(files[0]);
   };
 
   showSettings() {
@@ -1144,7 +1145,7 @@ const mapStateToProps = (state) => ({
   tabularResults: state.nodesReducer.tabularResults,
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showRightPanel: state.nodesReducer.showRightPanel,
-  workingId: state.nodesReducer.workingId,
+  payloadDocument: state.nodesReducer.payloadDocument,
   dirty: state.nodesReducer.dirty,
 });
 
@@ -1155,7 +1156,6 @@ const mapDispatchToProps = (dispatch) => ({
   setNlpNodes: (nodes) => dispatch(setNlpNodes(nodes)),
   setPipelineId: (id) => dispatch(setPipelineId(id)),
   setTabularResults: (data) => dispatch(setTabularResults(data)),
-  setWorkingId: (id) => dispatch(setWorkingId(id)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
   setDirty: (dirty) => dispatch(setDirty(dirty)),

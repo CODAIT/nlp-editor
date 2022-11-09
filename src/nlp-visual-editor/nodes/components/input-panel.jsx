@@ -27,6 +27,7 @@ import './input-panel.scss';
 
 import {
   saveNlpNode,
+  setPayloadDocument,
   setShowRightPanel,
   setTabularResults,
 } from '../../../redux/slice';
@@ -62,23 +63,11 @@ class InputPanel extends React.Component {
     this.setState({ files });
   };
 
-  onUploadFiles = async (e) => {
-    const { workingId } = this.props;
+  onUploadFiles = (e) => {
     e.preventDefault();
-    const formData = new FormData();
     const { files } = this.state;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      formData.append('attach_file', file);
-    }
-    formData.append('workingId', workingId);
-    try {
-      const res = await axios.post('/api/upload', formData);
-      this.saveParameters();
-    } catch (ex) {
-      //TODO handle error
-      console.log(ex);
-    }
+    this.props.setPayloadDocument(files[0]);
+    this.saveParameters();
   };
 
   getFileNames = () => {
@@ -213,6 +202,7 @@ const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setTabularResults: (data) => dispatch(setTabularResults(data)),
+  setPayloadDocument: (files) => dispatch(setPayloadDocument(files)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputPanel);

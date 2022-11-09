@@ -34,7 +34,11 @@ import {
 
 import { isNodeLabelValid } from '../../utils';
 
-import { saveNlpNode, setShowRightPanel } from '../../redux/slice';
+import {
+  saveNlpNode,
+  setShowRightPanel,
+  setInputDocument,
+} from '../../redux/slice';
 
 class RHSPanel extends React.Component {
   constructor(props) {

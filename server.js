@@ -153,11 +153,20 @@ app.post(
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false,
   }),
-  (req, res) => {
+  async (req, res) => {
     console.log('executing pipeline');
-    const { workingId, payload, language, exportPipeline } = req.body;
+    const { workingId, language, exportPipeline } = req.body;
+    const payload = JSON.parse(req.body.payload);
+
+    //create a tmp folder to work in, if it does not exist
+    createFolder(tempFolder);
+    //create working folder for this session.
     const workingFolder = `${tempFolder}/${sanitize(workingId)}`;
-    console.log(workingFolder);
+    createFolder(workingFolder);
+
+    //Upload the input file
+    await req.files.file.mv(`${workingFolder}/payload.txt`);
+
     console.time('writing xml files');
     fs.readdirSync(workingFolder)
       .filter((f) => f.endsWith('.xml'))
@@ -170,8 +179,11 @@ app.post(
     });
     console.timeEnd('writing xml files');
 
+    // Create file to indicate language.
     createFile(workingFolder, 'language-name.txt', language);
-    if (exportPipeline) {
+
+    // Add additional export file for exporting.
+    if (exportPipeline === 'true') {
       console.log(`creating file ${workingId}.export-aql`);
       createFile(workingFolder, `${workingId}.export-aql`, '');
     }
@@ -189,6 +201,7 @@ app.post(
     //read document to render in UI
     const docPath = `${workingFolder}/payload.txt`;
     const document = fs.readFileSync(docPath, 'utf8');
+    fs.rmSync(workingFolder, { recursive: true, force: true });
 
     res.status(200).send({
       message: 'Execution submitted successfully.',
