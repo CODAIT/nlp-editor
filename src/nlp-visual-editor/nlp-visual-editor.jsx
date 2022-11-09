@@ -372,27 +372,7 @@ class VisualEditor extends React.Component {
           if (exportPipeline) {
             const reader = data.body.getReader();
             const contents = await reader.read();
-            if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
-              const opts = {
-                suggestedName: 'NLP_Canvas_Export.zip',
-                types: [
-                  {
-                    description: 'Zip file',
-                    accept: { 'application/octet-stream': ['.zip'] },
-                  },
-                ],
-              };
-              window.showSaveFilePicker(opts).then(async (fileHandle) => {
-                // Create a FileSystemWritableFileStream to write to.
-                const writable = await fileHandle.createWritable();
-                // Write the contents of the file to the stream.
-                await writable.write(contents.value);
-                // Close the file and write the contents to disk.
-                await writable.close();
-              });
-            } else {
-              fileDownload(contents.value, 'NLP_Canvas_Export.zip');
-            }
+            fileDownload(contents.value, 'NLP_Canvas_Export.zip');
             this.setState({ isLoading: false });
           } else {
             const { names = [] } = data;
@@ -484,28 +464,7 @@ class VisualEditor extends React.Component {
       flow,
       nodes: newNodes,
     };
-    if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
-      const opts = {
-        suggestedName: 'NLP_Canvas_Flow.json',
-        types: [
-          {
-            description: 'JSON file',
-            accept: { 'application/json': ['.json'] },
-          },
-        ],
-      };
-      window.showSaveFilePicker(opts).then(async (fileHandle) => {
-        // Create a FileSystemWritableFileStream to write to.
-        const writable = await fileHandle.createWritable();
-        // Write the contents of the file to the stream.
-        await writable.write(JSON.stringify(data));
-        // Close the file and write the contents to disk.
-        await writable.close();
-        this.props.setDirty(false);
-      });
-    } else {
-      fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
-    }
+    fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
   };
 
   getCurrentLanguage = () => {
