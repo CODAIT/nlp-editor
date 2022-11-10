@@ -24,7 +24,7 @@ import {
   CanvasController,
   CommonProperties,
 } from '@elyra/canvas';
-import { Button, Loading, Modal, Select } from 'carbon-components-react';
+import { Button, Loading, Modal } from 'carbon-components-react';
 import {
   Play32,
   WarningAlt24,
@@ -44,7 +44,7 @@ import { store } from '../redux/store';
 import NodeValidator from '../utils/NodeValidator';
 import { getImmediateUpstreamNodes } from '../utils';
 import JsonToXML from '../utils/JsonToXML';
-import { generateNodeName, processNewNode } from '../utils';
+import { processNewNode } from '../utils';
 import fileDownload from 'js-file-download';
 
 import {
@@ -54,7 +54,6 @@ import {
   setInputDocument,
   setPipelineId,
   setTabularResults,
-  setWorkingId,
   setShowRightPanel,
   setShowDocumentViewer,
   setDirty,
@@ -261,7 +260,6 @@ class VisualEditor extends React.Component {
   }
 
   componentDidMount() {
-    const workingId = shortUUID.generate();
     const id = this.canvasController.getPrimaryPipelineId();
     this.props.setPipelineId({
       pipelineId: id,
@@ -271,7 +269,6 @@ class VisualEditor extends React.Component {
         return 'Unsaved changes. Proceed?';
       }
     };
-    this.props.setWorkingId({ workingId });
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -300,8 +297,8 @@ class VisualEditor extends React.Component {
   };
 
   transformToXML = () => {
-    const { moduleName, nodes, pipelineId } = this.props;
-    const { selectedNodeId } = this.state;
+    const { nodes, pipelineId } = this.props;
+    const { selectedNodeId, editorSettings } = this.state;
     const payload = [];
 
     let upstreamNodeIds = this.canvasController
@@ -316,7 +313,10 @@ class VisualEditor extends React.Component {
     upstreamNodeIds.forEach((id) => {
       let node = objNodes[id];
       if (node.type !== 'input') {
-        const results = this.jsonToXML.transform(node, moduleName);
+        const results = this.jsonToXML.transform(
+          node,
+          editorSettings.moduleName,
+        );
         if (!Array.isArray(results)) {
           //dictionaries return a list
           const { xml, label } = results;
@@ -354,12 +354,11 @@ class VisualEditor extends React.Component {
     return isValid;
   };
 
-  fetchResults = () => {
-    const { workingId } = this.props;
-    const url = `/api/results?workingId=${workingId}`;
+  fetchResults = (exportPipeline, workingId) => {
+    const url = `/api/results?workingId=${workingId}&exportPipeline=${exportPipeline}`;
     fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
+      .then((res) => (exportPipeline ? res : res.json()))
+      .then(async (data) => {
         const { status } = data;
         if (status === 'in-progress') {
           if (this.tickCounter >= TIMER_TRIES) {
@@ -371,18 +370,25 @@ class VisualEditor extends React.Component {
             });
           }
           this.tickCounter += 1;
-        } else if (status === 'success') {
-          const { names = [] } = data;
+        } else if (status === 'success' || status === 200) {
           clearInterval(this.timer);
-          let state = { isLoading: false };
-          if (names.length === 0) {
-            state = {
-              ...state,
-              errorMessage: 'No matches were found in the input document.',
-            };
+          if (exportPipeline) {
+            const reader = data.body.getReader();
+            const contents = await reader.read();
+            fileDownload(contents.value, 'NLP_Canvas_Export.zip');
+            this.setState({ isLoading: false });
+          } else {
+            const { names = [] } = data;
+            let state = { isLoading: false };
+            if (names.length === 0) {
+              state = {
+                ...state,
+                errorMessage: 'No matches were found in the input document.',
+              };
+            }
+            this.setState({ ...state });
+            this.props.setTabularResults(data);
           }
-          this.setState({ ...state });
-          this.props.setTabularResults(data);
         } else if (status === 'error') {
           const { message } = data;
           clearInterval(this.timer);
@@ -390,35 +396,47 @@ class VisualEditor extends React.Component {
             isLoading: false,
             errorMessage: message,
           });
+          this.props.setTabularResults(undefined);
         }
       });
   };
 
-  execute = (payload) => {
-    const { workingId } = this.props;
+  execute = (payload, exportPipeline, workingId) => {
     this.setState({ isLoading: true });
-    const flow = this.canvasController.getPipelineFlow();
-
-    fetch('/api/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        workingId,
-        payload,
-        language: this.getCurrentLanguage() ?? DEFAULT_LANGUAGE,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const { document } = data;
-        this.props.setInputDocument({ document });
-        this.props.setShowDocumentViewer({ showViewer: true });
+    const formData = new FormData();
+    formData.append('file', this.state.payloadDocument);
+    formData.append('workingId', workingId);
+    formData.append('payload', JSON.stringify(payload));
+    formData.append('language', this.getCurrentLanguage() ?? DEFAULT_LANGUAGE);
+    formData.append('exportPipeline', exportPipeline);
+    formData.append('payloadDocument', this.state.payloadDocument);
+    axios
+      .post('/api/run', formData, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then((res) => {
+        const { data } = res;
+        if (!exportPipeline) {
+          const { document } = data;
+          this.props.setInputDocument({ document });
+          this.props.setShowDocumentViewer({ showViewer: true });
+        }
+        let counter = 0;
         //poll for results at specific interval
-        this.timer = setInterval(this.fetchResults, TIMER_TICK);
+        this.timer = setInterval(() => {
+          counter += 1;
+          if (counter > 600) {
+            clearInterval(this.timer);
+            this.setState({ isLoading: false });
+          }
+          this.fetchResults(exportPipeline, workingId);
+        }, TIMER_TICK);
       });
   };
 
-  runPipeline = () => {
+  runPipeline = (exportPipeline) => {
+    const workingId = shortUUID.generate();
     console.time('validating nlp nodes');
     const isValid = this.validatePipeline();
     console.timeEnd('validating nlp nodes');
@@ -426,12 +444,14 @@ class VisualEditor extends React.Component {
       return false;
     }
 
-    this.props.setTabularResults(undefined);
+    if (!exportPipeline) {
+      this.props.setTabularResults(undefined);
+    }
 
     console.time('transforming nlp nodes to XML');
     const payload = this.transformToXML();
     console.timeEnd('transforming nlp nodes to XML');
-    this.execute(payload);
+    this.execute(payload, exportPipeline, workingId);
   };
 
   savePipeline = () => {
@@ -446,64 +466,7 @@ class VisualEditor extends React.Component {
       flow,
       nodes: newNodes,
     };
-    if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
-      const opts = {
-        suggestedName: 'NLP_Canvas_Flow.json',
-        types: [
-          {
-            description: 'JSON file',
-            accept: { 'application/json': ['.json'] },
-          },
-        ],
-      };
-      window.showSaveFilePicker(opts).then(async (fileHandle) => {
-        // Create a FileSystemWritableFileStream to write to.
-        const writable = await fileHandle.createWritable();
-        // Write the contents of the file to the stream.
-        await writable.write(JSON.stringify(data));
-        // Close the file and write the contents to disk.
-        await writable.close();
-        this.props.setDirty(false);
-      });
-    } else {
-      fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
-    }
-  };
-
-  exportPipeline = () => {
-    const opts = {
-      suggestedName: 'NLP_Canvas_Export.zip',
-      types: [
-        {
-          description: 'Zip file',
-          accept: { 'application/octet-stream': ['.zip'] },
-        },
-      ],
-    };
-    if (navigator.userAgent.match(/chrome|chromium|crios/i)) {
-      window.showSaveFilePicker(opts).then((fileHandle) => {
-        axios
-          .get(`/api/download/${this.props.pipelineId}`, {
-            responseType: 'arraybuffer',
-          })
-          .then(async (res) => {
-            // Create a FileSystemWritableFileStream to write to.
-            const writable = await fileHandle.createWritable();
-            // Write the contents of the file to the stream.
-            await writable.write(res.data);
-            // Close the file and write the contents to disk.
-            await writable.close();
-          });
-      });
-    } else {
-      axios
-        .get(`/api/download/${this.props.pipelineId}`, {
-          responseType: 'arraybuffer',
-        })
-        .then((res) => {
-          fileDownload(res.data, 'NLP_Canvas_Export.zip');
-        });
-    }
+    fileDownload(JSON.stringify(data), 'NLP_Canvas_Flow.json');
   };
 
   getCurrentLanguage = () => {
@@ -531,38 +494,33 @@ class VisualEditor extends React.Component {
     this.props.setNlpNodes({ nodes });
   };
 
-  onFlowSelected = async (e) => {
-    //create a new workingId, treat it as a new session
-    const workingId = shortUUID.generate();
-    this.props.setWorkingId({ workingId });
+  onFlowSelected = (e) => {
     const { files } = e.target;
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      formData.append('attach_file', file);
-    }
-    formData.append('workingId', workingId);
-    try {
-      const { data } = await axios.post('/api/uploadflow', formData);
-      const { flow, nodes } = data;
-      if (flow === undefined || nodes === undefined) {
-        throw 'File does not conform to the Elyra NLP Tooling schema.';
+    var reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const pipelineJSON = JSON.parse(reader.result);
+        const { flow, nodes } = pipelineJSON;
+        if (flow === undefined || nodes === undefined) {
+          throw 'File does not conform to the Elyra NLP Tooling schema.';
+        }
+        this.setPipelineFlow(pipelineJSON);
+        if (flow.pipelines?.[0]?.app_data?.language) {
+          this.setCurrentLanguage(flow.pipelines[0].app_data.language);
+          this.setState({
+            editorSettings: {
+              ...this.state.editorSettings,
+              language: flow.pipelines[0].app_data.language,
+            },
+          });
+        }
+      } catch (ex) {
+        console.log(ex);
+        const errorMessage = typeof ex === 'object' ? ex.toString() : ex;
+        this.setState({ errorMessage });
       }
-      this.setPipelineFlow(data);
-      if (data.flow.pipelines?.[0]?.app_data?.language) {
-        this.setCurrentLanguage(data.flow.pipelines[0].app_data.language);
-        this.setState({
-          editorSettings: {
-            ...this.state.editorSettings,
-            language: data.flow.pipelines[0].app_data.language,
-          },
-        });
-      }
-    } catch (ex) {
-      console.log(ex);
-      const errorMessage = typeof ex === 'object' ? ex.toString() : ex;
-      this.setState({ errorMessage });
-    }
+    };
+    reader.readAsText(files[0]);
   };
 
   showSettings() {
@@ -646,7 +604,7 @@ class VisualEditor extends React.Component {
                 kind="primary"
                 renderIcon={Play32}
                 disabled={!enableFlowExecutionBtn}
-                onClick={this.runPipeline}
+                onClick={() => this.runPipeline(false)}
               >
                 Run
               </Button>
@@ -663,7 +621,7 @@ class VisualEditor extends React.Component {
                 size="field"
                 kind="ghost"
                 disabled={this.props.tabularResults === undefined}
-                onClick={this.exportPipeline}
+                onClick={() => this.runPipeline(true)}
               >
                 Export
               </Button>
@@ -1029,6 +987,9 @@ class VisualEditor extends React.Component {
         <RHSPanel
           nodeId={selectedNodeId}
           canvasController={this.canvasController}
+          setPayloadDocument={(files) =>
+            this.setState({ payloadDocument: files })
+          }
         />
       </Provider>
     );
@@ -1148,7 +1109,6 @@ const mapStateToProps = (state) => ({
   tabularResults: state.nodesReducer.tabularResults,
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showRightPanel: state.nodesReducer.showRightPanel,
-  workingId: state.nodesReducer.workingId,
   dirty: state.nodesReducer.dirty,
 });
 
@@ -1159,7 +1119,6 @@ const mapDispatchToProps = (dispatch) => ({
   setNlpNodes: (nodes) => dispatch(setNlpNodes(nodes)),
   setPipelineId: (id) => dispatch(setPipelineId(id)),
   setTabularResults: (data) => dispatch(setTabularResults(data)),
-  setWorkingId: (id) => dispatch(setWorkingId(id)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setShowDocumentViewer: (doShow) => dispatch(setShowDocumentViewer(doShow)),
   setDirty: (dirty) => dispatch(setDirty(dirty)),

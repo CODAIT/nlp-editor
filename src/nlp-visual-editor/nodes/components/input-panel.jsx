@@ -22,7 +22,6 @@ import {
 } from 'carbon-components-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import './input-panel.scss';
 
 import {
@@ -62,23 +61,11 @@ class InputPanel extends React.Component {
     this.setState({ files });
   };
 
-  onUploadFiles = async (e) => {
-    const { workingId } = this.props;
+  onUploadFiles = (e) => {
     e.preventDefault();
-    const formData = new FormData();
     const { files } = this.state;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      formData.append('attach_file', file);
-    }
-    formData.append('workingId', workingId);
-    try {
-      const res = await axios.post('/api/upload', formData);
-      this.saveParameters();
-    } catch (ex) {
-      //TODO handle error
-      console.log(ex);
-    }
+    this.props.setPayloadDocument(files[0]);
+    this.saveParameters();
   };
 
   getFileNames = () => {
@@ -131,6 +118,7 @@ class InputPanel extends React.Component {
       setTabularResults,
       children,
       workingId,
+      setPayloadDocument,
       ...rest
     } = this.props;
     const { files } = this.state;

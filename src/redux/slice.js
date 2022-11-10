@@ -19,7 +19,6 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   nodes: [],
   pipelineId: undefined,
-  workingId: undefined,
   canvasController: undefined,
   errorMessage: undefined,
   tabularResults: undefined,
@@ -38,10 +37,6 @@ const nodesSlice = createSlice({
     setPipelineId: (state, action) => {
       const { pipelineId } = action.payload;
       state.pipelineId = pipelineId;
-    },
-    setWorkingId: (state, action) => {
-      const { workingId } = action.payload;
-      state.workingId = workingId;
     },
     setShowRightPanel: (state, action) => {
       const { showPanel } = action.payload;
@@ -112,7 +107,6 @@ export const {
   setInputDocument,
   setTabularResults,
   setPipelineId,
-  setWorkingId,
   setShowRightPanel,
   setShowDocumentViewer,
   setDocumentViewToAnnotation,

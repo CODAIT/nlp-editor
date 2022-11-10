@@ -34,7 +34,11 @@ import {
 
 import { isNodeLabelValid } from '../../utils';
 
-import { saveNlpNode, setShowRightPanel } from '../../redux/slice';
+import {
+  saveNlpNode,
+  setShowRightPanel,
+  setInputDocument,
+} from '../../redux/slice';
 
 class RHSPanel extends React.Component {
   constructor(props) {
@@ -59,7 +63,12 @@ class RHSPanel extends React.Component {
     const nodeProps = { nodeId, canvasController };
     switch (type) {
       case 'input':
-        return <InputPanel {...node} />;
+        return (
+          <InputPanel
+            {...node}
+            setPayloadDocument={this.props.setPayloadDocument}
+          />
+        );
       case 'literal':
         return <LiteralPanel {...node} />;
       case 'regex':
