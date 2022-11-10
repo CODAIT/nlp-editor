@@ -22,12 +22,10 @@ import {
 } from 'carbon-components-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import './input-panel.scss';
 
 import {
   saveNlpNode,
-  setPayloadDocument,
   setShowRightPanel,
   setTabularResults,
 } from '../../../redux/slice';
@@ -120,6 +118,7 @@ class InputPanel extends React.Component {
       setTabularResults,
       children,
       workingId,
+      setPayloadDocument,
       ...rest
     } = this.props;
     const { files } = this.state;
@@ -202,7 +201,6 @@ const mapDispatchToProps = (dispatch) => ({
   saveNlpNode: (node) => dispatch(saveNlpNode(node)),
   setShowRightPanel: (doShow) => dispatch(setShowRightPanel(doShow)),
   setTabularResults: (data) => dispatch(setTabularResults(data)),
-  setPayloadDocument: (files) => dispatch(setPayloadDocument(files)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputPanel);

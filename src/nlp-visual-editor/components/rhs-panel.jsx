@@ -63,7 +63,12 @@ class RHSPanel extends React.Component {
     const nodeProps = { nodeId, canvasController };
     switch (type) {
       case 'input':
-        return <InputPanel {...node} />;
+        return (
+          <InputPanel
+            {...node}
+            setPayloadDocument={this.props.setPayloadDocument}
+          />
+        );
       case 'literal':
         return <LiteralPanel {...node} />;
       case 'regex':

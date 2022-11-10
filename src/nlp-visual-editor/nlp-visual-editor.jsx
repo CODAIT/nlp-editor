@@ -403,14 +403,13 @@ class VisualEditor extends React.Component {
 
   execute = (payload, exportPipeline, workingId) => {
     this.setState({ isLoading: true });
-    console.log(this.props.payloadDocument);
     const formData = new FormData();
-    formData.append('file', this.props.payloadDocument);
+    formData.append('file', this.state.payloadDocument);
     formData.append('workingId', workingId);
     formData.append('payload', JSON.stringify(payload));
     formData.append('language', this.getCurrentLanguage() ?? DEFAULT_LANGUAGE);
     formData.append('exportPipeline', exportPipeline);
-    formData.append('payloadDocument', this.props.payloadDocument);
+    formData.append('payloadDocument', this.state.payloadDocument);
     axios
       .post('/api/run', formData, {
         method: 'POST',
@@ -988,6 +987,9 @@ class VisualEditor extends React.Component {
         <RHSPanel
           nodeId={selectedNodeId}
           canvasController={this.canvasController}
+          setPayloadDocument={(files) =>
+            this.setState({ payloadDocument: files })
+          }
         />
       </Provider>
     );
@@ -1107,7 +1109,6 @@ const mapStateToProps = (state) => ({
   tabularResults: state.nodesReducer.tabularResults,
   showDocumentViewer: state.nodesReducer.showDocumentViewer,
   showRightPanel: state.nodesReducer.showRightPanel,
-  payloadDocument: state.nodesReducer.payloadDocument,
   dirty: state.nodesReducer.dirty,
 });
 
