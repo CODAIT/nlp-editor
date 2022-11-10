@@ -297,8 +297,8 @@ class VisualEditor extends React.Component {
   };
 
   transformToXML = () => {
-    const { moduleName, nodes, pipelineId } = this.props;
-    const { selectedNodeId } = this.state;
+    const { nodes, pipelineId } = this.props;
+    const { selectedNodeId, editorSettings } = this.state;
     const payload = [];
 
     let upstreamNodeIds = this.canvasController
@@ -313,7 +313,10 @@ class VisualEditor extends React.Component {
     upstreamNodeIds.forEach((id) => {
       let node = objNodes[id];
       if (node.type !== 'input') {
-        const results = this.jsonToXML.transform(node, moduleName);
+        const results = this.jsonToXML.transform(
+          node,
+          editorSettings.moduleName,
+        );
         if (!Array.isArray(results)) {
           //dictionaries return a list
           const { xml, label } = results;
