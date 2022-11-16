@@ -165,7 +165,7 @@
               "ui_data": {
                 "label": "RevenueOfDivision1",
                 "image": "/images/palette/nodes/sequence.svg",
-                "x_pos": 584.0667114257812,
+                "x_pos": 583.0667114257812,
                 "y_pos": 72.04448699951172,
                 "description": "Connect your extractors for execution"
               }
@@ -322,7 +322,8 @@
       "items": ["Hardware", "Software"],
       "caseSensitivity": "ignore",
       "lemmaMatch": false,
-      "externalResourceChecked": false
+      "externalResourceChecked": false,
+      "mapTerms": false
     },
     {
       "label": "Metric",
@@ -333,7 +334,8 @@
       "items": ["Revenue", "Revenues"],
       "caseSensitivity": "ignore",
       "lemmaMatch": false,
-      "externalResourceChecked": false
+      "externalResourceChecked": false,
+      "mapTerms": false
     },
     {
       "label": "Preposition",
@@ -344,7 +346,8 @@
       "items": ["to", "from"],
       "caseSensitivity": "match",
       "lemmaMatch": false,
-      "externalResourceChecked": false
+      "externalResourceChecked": false,
+      "mapTerms": false
     },
     {
       "label": "RevenueOfDivision1",
@@ -360,26 +363,8 @@
         },
         { "label": "Metric", "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65" }
       ],
-      "tokens": [{ "min": "1", "max": "2" }]
-    },
-    {
-      "label": "RevenueOfDivision",
-      "nodeId": "86722aff-f413-445b-8dd8-bae54ecf143e",
-      "type": "union",
-      "description": "Join nodes with similar schemas",
-      "isValid": true,
-      "upstreamNodes": [
-        {
-          "label": "RevenueOfDivision1",
-          "nodeId": "20872282-7824-4fe5-a51a-6b6b51f975dc"
-        },
-        {
-          "label": "RevenueOfDivision2",
-          "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e"
-        }
-      ],
-      "overlapMatches": false,
-      "method": "ContainedWithin"
+      "tokens": [{ "min": "1", "max": "2" }],
+      "renamed": "RevenueOfDivision"
     },
     {
       "label": "RevenueOfDivision2",
@@ -402,7 +387,27 @@
       "tokens": [
         { "min": "0", "max": "2" },
         { "min": "0", "max": "2" }
-      ]
+      ],
+      "renamed": "RevenueOfDivision"
+    },
+    {
+      "label": "RevenueOfDivision",
+      "nodeId": "86722aff-f413-445b-8dd8-bae54ecf143e",
+      "type": "union",
+      "description": "Join nodes with similar schemas",
+      "isValid": true,
+      "upstreamNodes": [
+        {
+          "label": "RevenueOfDivision1",
+          "nodeId": "20872282-7824-4fe5-a51a-6b6b51f975dc"
+        },
+        {
+          "label": "RevenueOfDivision2",
+          "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e"
+        }
+      ],
+      "overlapMatches": false,
+      "method": "ContainedWithin"
     },
     {
       "label": "Input Documents_1",
