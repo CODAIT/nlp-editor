@@ -403,102 +403,6 @@
   },
   "nodes": [
     {
-      "label": "RevenueOfDivision1",
-      "nodeId": "20872282-7824-4fe5-a51a-6b6b51f975dc",
-      "type": "sequence",
-      "description": "Connect your extractors for execution",
-      "isValid": true,
-      "pattern": "(<Division.Division>)<Token>{1,2}(<Metric.Metric>)",
-      "upstreamNodes": [
-        {
-          "label": "Division",
-          "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394"
-        },
-        { "label": "Metric", "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65" }
-      ],
-      "tokens": [{ "min": "1", "max": "2" }]
-    },
-    {
-      "label": "Division",
-      "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": [
-        "Hardware",
-        "Software",
-        "Global Business Services",
-        "Global Technology Services"
-      ],
-      "caseSensitivity": "ignore",
-      "lemmaMatch": false,
-      "externalResourceChecked": false
-    },
-    {
-      "label": "Metric",
-      "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": ["Revenues"],
-      "caseSensitivity": "ignore",
-      "lemmaMatch": false,
-      "externalResourceChecked": false
-    },
-    {
-      "label": "Preposition",
-      "nodeId": "09e75964-1a81-4920-a5de-25da83dd97c8",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": ["from", "for"],
-      "caseSensitivity": "match",
-      "lemmaMatch": false,
-      "externalResourceChecked": false
-    },
-    {
-      "label": "RevenueOfDivision2",
-      "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e",
-      "type": "sequence",
-      "description": "Connect your extractors for execution",
-      "isValid": true,
-      "pattern": "(<Metric.Metric>)<Token>{0,2}(<Preposition.Preposition>)<Token>{0,2}(<Division.Division>)",
-      "upstreamNodes": [
-        { "label": "Metric", "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65" },
-        {
-          "label": "Preposition",
-          "nodeId": "09e75964-1a81-4920-a5de-25da83dd97c8"
-        },
-        {
-          "label": "Division",
-          "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394"
-        }
-      ],
-      "tokens": [
-        { "min": "0", "max": "2" },
-        { "min": "0", "max": "2" }
-      ]
-    },
-    {
-      "label": "RevenueOfDivision",
-      "nodeId": "86722aff-f413-445b-8dd8-bae54ecf143e",
-      "type": "union",
-      "description": "Join nodes with similar schemas",
-      "isValid": true,
-      "upstreamNodes": [
-        {
-          "label": "RevenueOfDivision1",
-          "nodeId": "20872282-7824-4fe5-a51a-6b6b51f975dc"
-        },
-        {
-          "label": "RevenueOfDivision2",
-          "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e"
-        }
-      ],
-      "overlapMatches": false,
-      "method": "ContainedWithin"
-    },
-    {
       "label": "Amount",
       "nodeId": "6269feaa-5f80-4f7b-88c1-40d7c5c50f8c",
       "type": "regex",
@@ -528,6 +432,107 @@
         { "label": "Amount", "nodeId": "6269feaa-5f80-4f7b-88c1-40d7c5c50f8c" }
       ],
       "tokens": [{ "min": "0", "max": "35" }]
+    },
+    {
+      "label": "Division",
+      "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": [
+        "Hardware",
+        "Software",
+        "Global Business Services",
+        "Global Technology Services"
+      ],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false
+    },
+    {
+      "label": "Metric",
+      "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["Revenues"],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false
+    },
+    {
+      "label": "Preposition",
+      "nodeId": "09e75964-1a81-4920-a5de-25da83dd97c8",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["from", "for"],
+      "caseSensitivity": "match",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false
+    },
+    {
+      "label": "RevenueOfDivision",
+      "nodeId": "86722aff-f413-445b-8dd8-bae54ecf143e",
+      "type": "union",
+      "description": "Join nodes with similar schemas",
+      "isValid": true,
+      "upstreamNodes": [
+        {
+          "label": "RevenueOfDivision1",
+          "nodeId": "20872282-7824-4fe5-a51a-6b6b51f975dc"
+        },
+        {
+          "label": "RevenueOfDivision2",
+          "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e"
+        }
+      ],
+      "overlapMatches": false,
+      "method": "ContainedWithin"
+    },
+    {
+      "label": "RevenueOfDivision1",
+      "nodeId": "20872282-7824-4fe5-a51a-6b6b51f975dc",
+      "type": "sequence",
+      "description": "Connect your extractors for execution",
+      "isValid": true,
+      "pattern": "(<Division.Division>)<Token>{1,2}(<Metric.Metric>)",
+      "upstreamNodes": [
+        {
+          "label": "Division",
+          "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394"
+        },
+        { "label": "Metric", "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65" }
+      ],
+      "tokens": [{ "min": "1", "max": "2" }],
+      "renamed": "RevenueOfDivision"
+    },
+    {
+      "label": "RevenueOfDivision2",
+      "nodeId": "205aa637-ea22-40ff-a6c5-83e337b0598e",
+      "type": "sequence",
+      "description": "Connect your extractors for execution",
+      "isValid": true,
+      "pattern": "(<Metric.Metric>)<Token>{0,2}(<Preposition.Preposition>)<Token>{0,2}(<Division.Division>)",
+      "upstreamNodes": [
+        { "label": "Metric", "nodeId": "db80a27b-f074-4249-a2c3-15f48d4bfd65" },
+        {
+          "label": "Preposition",
+          "nodeId": "09e75964-1a81-4920-a5de-25da83dd97c8"
+        },
+        {
+          "label": "Division",
+          "nodeId": "7eb66ec2-b2dd-47fd-b776-a55b7a158394"
+        }
+      ],
+      "tokens": [
+        { "min": "0", "max": "2" },
+        { "min": "0", "max": "2" }
+      ],
+      "renamed": "RevenueOfDivision"
     },
     {
       "label": "Input Documents_1",

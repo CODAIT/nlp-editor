@@ -220,44 +220,6 @@
   },
   "nodes": [
     {
-      "label": "Metric",
-      "nodeId": "d88d7167-3b2c-427a-9b50-27049feb904d",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": ["Revenues"],
-      "caseSensitivity": "ignore",
-      "lemmaMatch": false,
-      "externalResourceChecked": false
-    },
-    {
-      "label": "Preposition",
-      "nodeId": "dfe40d07-c154-467c-aab1-f17b13ac6122",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": ["from", "to"],
-      "caseSensitivity": "ignore",
-      "lemmaMatch": false,
-      "externalResourceChecked": false
-    },
-    {
-      "label": "Division",
-      "nodeId": "4cc4d6f5-a5ff-4c80-891e-f9c48285977e",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": [
-        "Software",
-        "Hardware",
-        "Global Business Services",
-        "Global Technology Services"
-      ],
-      "caseSensitivity": "match",
-      "lemmaMatch": false,
-      "externalResourceChecked": false
-    },
-    {
       "label": "RevenueOfDivision",
       "nodeId": "eba98361-462f-4332-9dc6-cf6e10c80bb3",
       "type": "sequence",
@@ -279,6 +241,47 @@
         { "min": "0", "max": "0" },
         { "min": "0", "max": "2" }
       ]
+    },
+    {
+      "label": "Metric",
+      "nodeId": "d88d7167-3b2c-427a-9b50-27049feb904d",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["Revenues"],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false
+    },
+    {
+      "label": "Preposition",
+      "nodeId": "dfe40d07-c154-467c-aab1-f17b13ac6122",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["from", "to"],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false
+    },
+    {
+      "label": "Division",
+      "nodeId": "4cc4d6f5-a5ff-4c80-891e-f9c48285977e",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": [
+        "Software",
+        "Hardware",
+        "Global Business Services",
+        "Global Technology Services"
+      ],
+      "caseSensitivity": "match",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false
     },
     {
       "label": "Input Documents_1",
