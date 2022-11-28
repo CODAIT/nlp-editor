@@ -112,7 +112,7 @@ app.post('/api/upload', async (req, res) => {
   //create a tmp folder to work in, if it does not exists
   createFolder(tempFolder);
   //create working folder for this session.
-  const workingFolder = `${tempFolder}/${workingId}`;
+  const workingFolder = `${tempFolder}/${sanitize(workingId)}`;
   createFolder(workingFolder);
 
   try {
@@ -171,12 +171,12 @@ app.post(
     // Add additional export file for exporting.
     if (exportPipeline === 'true') {
       console.log(`creating file ${workingId}.export-aql`);
-      createFile(workingFolder, `${workingId}.export-aql`, '');
+      createFile(workingFolder, `${sanitize(workingId)}.export-aql`, '');
     }
 
     //zip tempfolder
     console.time('creating+moving zip file');
-    const zipFileName = `${workingId}.zip`;
+    const zipFileName = `${sanitize(workingId)}.zip`;
     createZipArchive(workingFolder, zipFileName);
 
     //move zipfile to be executed
