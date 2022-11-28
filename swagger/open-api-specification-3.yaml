@@ -27,25 +27,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-  /api/uploadflow:
-    post:
-      summary: Upload a previously saved flow
-      description: Upload a previoously saved flow
-      requestBody:
-        $ref: '#/components/requestBodies/File'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseFlow'
-        '500':
-          description: Server operation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
   /api/download/{workingId}:
     get:
       summary: Download processed results
@@ -122,29 +103,6 @@ components:
           type: string
           description: REST API response message
           example: Files Uploaded
-    ResponseFlow:
-      type: object
-      properties:
-        flow:
-          type: object
-          properties:
-            id:
-              type: string
-            version:
-              type: string
-        nodes:
-          type: array
-          items: 
-            $ref: '#/components/schemas/NodeItem'
-    NodeItem:
-      type: object
-      properties:
-        nodeId:
-          type: string
-        label:
-          type: string
-        type:
-          type: string
     RunPipeline:
       type: object
       properties:

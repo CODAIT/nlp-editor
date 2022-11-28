@@ -26,6 +26,15 @@ const sanitize = require('sanitize-filename');
 const { param, validationResult } = require('express-validator');
 
 app.use(cors());
+app.use(function (req, res, next) {
+  if (req.secure) {
+    res.setHeader(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload',
+    );
+  }
+  next();
+});
 app.use(fileupload());
 const jsonParser = express.json();
 app.use(jsonParser);
@@ -122,29 +131,6 @@ app.post('/api/upload', async (req, res) => {
   }
 });
 
-app.post('/api/uploadflow', async (req, res) => {
-  const { workingId } = req.body;
-  console.log(`uploading flow to ${workingId}`);
-  const filesToUpload = req.files.attach_file;
-
-  //create a tmp folder to work in, if it does not exists
-  createFolder(tempFolder);
-  //create working folder for this session.
-  const workingFolder = `${tempFolder}/${workingId}`;
-  createFolder(workingFolder);
-
-  try {
-    await uploadFile(workingFolder, filesToUpload, 'inputflow.json');
-    const doc = fs.readFileSync(`${workingFolder}/inputflow.json`, 'utf8');
-    const document = JSON.parse(doc);
-    deleteFile(`${workingFolder}/inputflow.json`, `inputflow.json`);
-    res.status(200).send({ ...document });
-  } catch (e) {
-    console.error(e);
-    res.status(500).send({ message: 'File upload failed' });
-  }
-});
-
 app.post(
   '/api/run',
   rateLimit({
@@ -205,7 +191,7 @@ app.post(
 
     res.status(200).send({
       message: 'Execution submitted successfully.',
-      id: workingId,
+      id: sanitize(workingId), // Stored XSS High
       document,
     });
   },
@@ -257,8 +243,8 @@ app.get('/api/results', function (req, res) {
   const { workingId, exportPipeline } = req.query;
   const resultFileName =
     exportPipeline === 'true'
-      ? `${workingId}-export.zip`
-      : `${workingId}-result.json`;
+      ? `${sanitize(workingId)}-export.zip`
+      : `${sanitize(workingId)}-result.json`;
   const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
   if (!fs.existsSync(file)) {
     //no file present, assume that runtime is still in progress
