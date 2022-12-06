@@ -81,7 +81,7 @@ export default class SequenceNode {
     if (node.type === 'literal') {
       atomItem['col-ref']['@']['isLiteral'] = 'yes';
     }
-    if (index < length - 1) {
+    if (index < length - 1 && tokens !== undefined) {
       const { min, max } = tokens;
       tokenGapItem = { '@': { min, max } };
     }
