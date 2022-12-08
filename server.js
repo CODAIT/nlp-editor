@@ -23,7 +23,7 @@ const cors = require('cors');
 const AdmZip = require('adm-zip');
 const rateLimit = require('express-rate-limit');
 const sanitize = require('sanitize-filename');
-const { param, validationResult } = require('express-validator');
+const { body, checkSchema, validationResult } = require('express-validator');
 
 app.use(cors());
 app.use(function (req, res, next) {
@@ -133,6 +133,19 @@ app.post('/api/upload', async (req, res) => {
 
 app.post(
   '/api/run',
+  [
+    body('workingId').matches(/^[a-zA-Z0-9-]+$/),
+    body('language').matches(/^[a-zA-Z-]+$/),
+    body('exportPipeline').matches(/^true|false$/),
+    checkSchema({
+      payload: {
+        custom: {
+          options: (data) => JSON.parse(data),
+          errorMessage: 'Invalid JSON',
+        },
+      },
+    }),
+  ],
   rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -140,6 +153,12 @@ app.post(
     legacyHeaders: false,
   }),
   async (req, res) => {
+    try {
+      validationResult(req).throw();
+    } catch (err) {
+      return res.status(400).json(err);
+    }
+
     console.log('executing pipeline');
     const { workingId, language, exportPipeline } = req.body;
     const payload = JSON.parse(req.body.payload);
