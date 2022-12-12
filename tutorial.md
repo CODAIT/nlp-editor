@@ -29,7 +29,7 @@ Under **Extractors**, drag and drop **Input Documents** on the canvas. Configure
 ## Create a dictionary of division names 
 
 Under **Extractors**, drag **Dictionary** on the canvas. Connect its input to the output of **Input Documents**. 
-Rename the node to `Division` and enter the terms: `Software`, `Global Business Services`, and `Global Technology Services`. Click **Save**.
+Rename the node to `Division` and enter the terms: `Software`, `Hardware`, `Global Business Services`, and `Global Technology Services`. Click **Save**.
 
 ![Creating a dictionary of division names](images/tutorial_division.png)
 
@@ -41,11 +41,11 @@ Select the `Division` node, and click **Run**.
 
 ## Create a second dictionary of metric names
 
-Similar to the prior step, create a dictionary called `Metric` with a single term `revenue`. Select **Ignore case** and **Lemma Match**. Don't forget to click **Save**.
+Similar to the prior step, create a dictionary called `Metric` with a single term `revenue`. Select **Lemma Match**. Don't forget to click **Save**.
 
 ![Creating a dictionary of metrics](images/tutorial_metric.png)
 
-## Create a second dictionary of prepositions
+## Create a third dictionary of prepositions
 
 Create a dictionary `Preposition` with terms `for`, and `from`. Select **Ignore case**. Click **Save**.
 
@@ -74,15 +74,23 @@ Click **Save** and **Run**.
 ## Create a union
 
 Under **Generation**, drag **Union** to the canvas. Connect its inputs to the outputs of `RevenueOfDivision1` and `RevenueOfDivision2`. Rename the union to `RevenueOfDivision`. Click **Close** and **Run**. 
-You will see 6 results: one result from `RevenueOfDivision1`, and five results `RevenueOfDivision2`.
 
 ![Create a union](images/tutorial_revofdiv.png)
+
+You will see an error _"Union node requires attribute aligned"_ because the two attributes of the two input nodes have different names. You must make the input nodes union compatible by renaming the attributes.
+
+For this, open the node `RevenueOfDivision1` and rename the first attribute `RevenueOfDivision` and click **Save**.
+Do the same for the node `RevenueOfDivision2`: rename the first attribute `RevenueOfDivision` and **Save**.
+
+![Renaming an attribute](images/tutorial_revofdiv_rename.png)
+
+Now select the Union node `RevenueOfDivision` and run it. You will see 6 results: one result from `RevenueOfDivision1`, and five results `RevenueOfDivision2`.
 
 ![Running a union](images/tutorial_revofdiv_run.png)
 
 ## Create a regular expression to capture currency amounts
 
-Under **Extractors**, drag **ReGex** to the canvas. Name it `Amount` and specify the regular expression as `\d+(\.\d+)?\s+billion`. 
+Under **Extractors**, drag **ReGex** to the canvas. Name it `Amount` and specify the regular expression as `\$\d+(\.\d+)?\s+billion`. 
 Click **Save**, then **Run**.
 The regular expression captures mentions of currency amounts.
 
@@ -92,9 +100,27 @@ The regular expression captures mentions of currency amounts.
 
 ## Create a sequence to combine the division, metric and amount
 
-Create a sequence called `RevenueByDivision` and specify the pattern as `(<RevenueOfDivision.RevenueOfDivision>)<Token>{0,35}(<Amount.Amount>)`. Click **Save**.
+Create a sequence called `RevenueByDivision` and specify the pattern as `(<RevenueOfDivision.RevenueOfDivision>)<Token>{0,35}(<Amount.Amount>)`. Ensure the name of the first attribute is also `RevenueByDivision`, renaming it if necessary. Click **Save** and **Run**.
 
 ![Combining division, metric and amount](images/tutorial_revbydiv.png)
+
+![Running a larger sequence to find the actual revenue amount of a division](images/tutorial_revbydiv_run.png)
+
+## Remove overlapping results with Consolidate
+
+In the result, we notice a few overlapping results: the second result `revenues from Global Technology Services ... $8.6 billion` overlaps with the third results `revenues from Global Technology Services ... $8.6 billion ... $4.2 billion`.
+The third result is incorrect, as `$4.2 billion` is the revenue of a different division.
+
+We can remove such overlaps using the Consolidate node. 
+Under **Refinement**, drag **Consolidate** on the canvas and connect its input with `RevenueByDivision`.
+Rename it to `RevenueConsolidated` and configure it using the `NotContainedWithin` policy, as shown below. Click **Save**.
+
+![Remove overlaps with Consolidate](images/tutorial_revenueconsolidated.png)
+
+Run `RevenueConsolidated`. The incorrect overlapping results have been removed.
+
+![Running a Consolidate node](images/tutorial_revenueconsolidated_run.png)
+
 
 
 
