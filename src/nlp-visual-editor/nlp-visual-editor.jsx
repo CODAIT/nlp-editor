@@ -356,9 +356,10 @@ class VisualEditor extends React.Component {
 
   fetchResults = (exportPipeline, workingId) => {
     const url = `/api/results?workingId=${workingId}&exportPipeline=${exportPipeline}`;
-    fetch(url)
-      .then((res) => (exportPipeline ? res : res.json()))
-      .then(async (data) => {
+    axios
+      .get(url, { responseType: exportPipeline ? 'blob' : 'json' })
+      .then((res) => {
+        const { data } = res;
         const { status } = data;
         if (status === 'in-progress') {
           if (this.tickCounter >= TIMER_TRIES) {
@@ -370,12 +371,14 @@ class VisualEditor extends React.Component {
             });
           }
           this.tickCounter += 1;
-        } else if (status === 'success' || status === 200) {
+        } else if (
+          status === 'success' ||
+          status === 200 ||
+          res.status === 200
+        ) {
           clearInterval(this.timer);
           if (exportPipeline) {
-            const reader = data.body.getReader();
-            const contents = await reader.read();
-            fileDownload(contents.value, 'NLP_Canvas_Export.zip');
+            fileDownload(data, 'NLP_Canvas_Export.zip');
             this.setState({ isLoading: false });
           } else {
             const { names = [] } = data;
