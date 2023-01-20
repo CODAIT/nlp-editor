@@ -22,7 +22,7 @@ Visual Editor for creating NLP rules.
 
 ## How to use
 
-1. Watch a live demo of the NLP editor, and learn more about our future plans in our recent [IBM Data Science Community presentation](https://community.ibm.com/community/user/datascience/blogs/tim-bonnemann1/2022/06/30/replay-available-learn-about-elyra-visual-nlp-edit?CommunityKey=f1c2cf2b-28bf-4b68-8570-b239473dcbbc).
+1. Watch a live demo of the NLP editor, and learn more about our future plans in our recent [IBM Data Science Community presentation](https://community.ibm.com/community/user/ai-datascience/blogs/tim-bonnemann1/2022/06/30/replay-available-learn-about-elyra-visual-nlp-edit).
 
 2. Walk through our [Tutorial](tutorial.md).
 
