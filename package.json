@@ -32,7 +32,8 @@
     "sanitize-filename": "^1.6.3",
     "sass": "^1.49.7",
     "short-uuid": "^4.2.0",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "xss-filters": "^1.2.7"
   },
   "husky": {
     "hooks": {

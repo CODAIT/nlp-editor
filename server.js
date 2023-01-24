@@ -22,6 +22,7 @@ const fileupload = require('express-fileupload');
 const cors = require('cors');
 const AdmZip = require('adm-zip');
 const rateLimit = require('express-rate-limit');
+const xssFilters = require('xss-filters');
 const sanitize = require('sanitize-filename');
 const { body, checkSchema, validationResult } = require('express-validator');
 
@@ -106,13 +107,14 @@ const moveZipFile = (tmpFolder, fileName) => {
 
 app.post('/api/upload', async (req, res) => {
   const { workingId } = req.body;
+  const safeWorkingId = xssFilters.inHTMLData(workingId);
   console.log(`uploading files to ${workingId}`);
   const filesToUpload = req.files.attach_file;
 
   //create a tmp folder to work in, if it does not exists
   createFolder(tempFolder);
   //create working folder for this session.
-  const workingFolder = `${tempFolder}/${sanitize(workingId)}`;
+  const workingFolder = `${tempFolder}/${safeWorkingId}`;
   createFolder(workingFolder);
 
   try {
@@ -162,11 +164,12 @@ app.post(
     console.log('executing pipeline');
     const { workingId, language, exportPipeline } = req.body;
     const payload = JSON.parse(req.body.payload);
+    const safeWorkingId = xssFilters.inHTMLData(workingId);
 
     //create a tmp folder to work in, if it does not exist
     createFolder(tempFolder);
     //create working folder for this session.
-    const workingFolder = `${tempFolder}/${sanitize(workingId)}`;
+    const workingFolder = `${tempFolder}/${safeWorkingId}`;
     createFolder(workingFolder);
 
     //Upload the input file
@@ -189,13 +192,13 @@ app.post(
 
     // Add additional export file for exporting.
     if (exportPipeline === 'true') {
-      console.log(`creating file ${workingId}.export-aql`);
-      createFile(workingFolder, `${sanitize(workingId)}.export-aql`, '');
+      console.log(`creating file ${safeWorkingId}.export-aql`);
+      createFile(workingFolder, `${safeWorkingId}.export-aql`, '');
     }
 
     //zip tempfolder
     console.time('creating+moving zip file');
-    const zipFileName = `${sanitize(workingId)}.zip`;
+    const zipFileName = `${safeWorkingId}.zip`;
     createZipArchive(workingFolder, zipFileName);
 
     //move zipfile to be executed
@@ -210,8 +213,8 @@ app.post(
 
     res.status(200).send({
       message: 'Execution submitted successfully.',
-      id: sanitize(workingId), // Stored XSS High
-      document,
+      id: safeWorkingId, // Stored XSS High
+      document: xssFilters.inHTMLData(document),
     });
   },
 );
@@ -260,10 +263,11 @@ const hasError = (fileContents) => {
 
 app.get('/api/results', function (req, res) {
   const { workingId, exportPipeline } = req.query;
+  const safeWorkingId = xssFilters.inHTMLData(workingId);
   const resultFileName =
     exportPipeline === 'true'
-      ? `${sanitize(workingId)}-export.zip`
-      : `${sanitize(workingId)}-result.json`;
+      ? `${safeWorkingId}-export.zip`
+      : `${safeWorkingId}-result.json`;
   const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
   if (!fs.existsSync(file)) {
     //no file present, assume that runtime is still in progress
@@ -294,7 +298,7 @@ app.get('/api/results', function (req, res) {
     fileContents.pipe(res);
   } else {
     let fileContents = fs.readFileSync(file, 'utf8');
-    const parsedContents = JSON.parse(fileContents);
+    const parsedContents = JSON.parse(xssFilters.inHTMLData(fileContents));
 
     // execution returned errors
     const errorMessage = hasError(parsedContents);
