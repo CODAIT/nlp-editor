@@ -23,10 +23,12 @@ const cors = require('cors');
 const AdmZip = require('adm-zip');
 const rateLimit = require('express-rate-limit');
 const xssFilters = require('xss-filters');
-const sanitize = require('sanitize-filename');
+const helmet = require('helmet');
 const { body, checkSchema, validationResult } = require('express-validator');
 
 app.use(cors());
+app.use(helmet());
+
 app.use(function (req, res, next) {
   if (req.secure) {
     res.setHeader(
@@ -261,62 +263,71 @@ const hasError = (fileContents) => {
   }
 };
 
-app.get('/api/results', function (req, res) {
-  const { workingId, exportPipeline } = req.query;
-  const safeWorkingId = xssFilters.inHTMLData(workingId);
-  const resultFileName =
-    exportPipeline === 'true'
-      ? `${safeWorkingId}-export.zip`
-      : `${safeWorkingId}-result.json`;
-  const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
-  if (!fs.existsSync(file)) {
-    //no file present, assume that runtime is still in progress
-    console.log(`results file ${resultFileName} not found.`);
-    return res.status(202).send({ status: 'in-progress' });
-  }
-  console.log(
-    `SystemT execution time: ${new Date().getTime() - systemTStartTime} ms`,
-  );
-
-  //result file was found - read contents of file
-  console.log(`results file ${resultFileName} found.`);
-  if (exportPipeline === 'true') {
-    var stat = fs.statSync(file);
-    let fileContents = fs.createReadStream(file);
-    const fileType = 'application/zip';
-    res.writeHead(200, {
-      'Content-Type': fileType,
-      'Content-Length': stat.size,
-    });
-    fileContents.on('close', () => {
-      deleteFile(
-        `${systemTdataFolder}/run-aql-result/${resultFileName}`,
-        resultFileName,
-      );
-      res.end();
-    });
-    fileContents.pipe(res);
-  } else {
-    let fileContents = fs.readFileSync(file, 'utf8');
-    const parsedContents = JSON.parse(xssFilters.inHTMLData(fileContents));
-
-    // execution returned errors
-    const errorMessage = hasError(parsedContents);
-    if (errorMessage) {
-      console.log('found error message', errorMessage);
-      deleteFile(file, resultFileName);
-      return res.status(200).send({ status: 'error', message: errorMessage });
-    }
-
-    const results =
+app.get(
+  '/api/results',
+  rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,
+  }),
+  function (req, res) {
+    const { workingId, exportPipeline } = req.query;
+    const safeWorkingId = xssFilters.inHTMLData(workingId);
+    const resultFileName =
       exportPipeline === 'true'
-        ? parsedContents
-        : formatResults(parsedContents);
+        ? `${safeWorkingId}-export.zip`
+        : `${safeWorkingId}-result.json`;
+    const file = `${systemTdataFolder}/run-aql-result/${resultFileName}`;
+    if (!fs.existsSync(file)) {
+      //no file present, assume that runtime is still in progress
+      console.log(`results file ${resultFileName} not found.`);
+      return res.status(202).send({ status: 'in-progress' });
+    }
+    console.log(
+      `SystemT execution time: ${new Date().getTime() - systemTStartTime} ms`,
+    );
 
-    deleteFile(file, resultFileName);
-    return res.status(200).send({ status: 'success', ...results });
-  }
-});
+    //result file was found - read contents of file
+    console.log(`results file ${resultFileName} found.`);
+    if (exportPipeline === 'true') {
+      var stat = fs.statSync(file);
+      let fileContents = fs.createReadStream(file);
+      const fileType = 'application/zip';
+      res.writeHead(200, {
+        'Content-Type': fileType,
+        'Content-Length': stat.size,
+      });
+      fileContents.on('close', () => {
+        deleteFile(
+          `${systemTdataFolder}/run-aql-result/${resultFileName}`,
+          resultFileName,
+        );
+        res.end();
+      });
+      fileContents.pipe(res);
+    } else {
+      let fileContents = fs.readFileSync(file, 'utf8');
+      const parsedContents = JSON.parse(xssFilters.inHTMLData(fileContents));
+
+      // execution returned errors
+      const errorMessage = hasError(parsedContents);
+      if (errorMessage) {
+        console.log('found error message', errorMessage);
+        deleteFile(file, resultFileName);
+        return res.status(200).send({ status: 'error', message: errorMessage });
+      }
+
+      const results =
+        exportPipeline === 'true'
+          ? parsedContents
+          : formatResults(parsedContents);
+
+      deleteFile(file, resultFileName);
+      return res.status(200).send({ status: 'success', ...results });
+    }
+  },
+);
 
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
