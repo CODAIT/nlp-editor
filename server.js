@@ -27,7 +27,7 @@ const helmet = require('helmet');
 const { body, checkSchema, validationResult } = require('express-validator');
 
 app.use(cors());
-app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: 'preload' }));
+app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }));
 app.use(fileupload());
 const jsonParser = express.json();
 app.use(jsonParser);
@@ -200,13 +200,14 @@ app.post(
 
     //read document to render in UI
     const docPath = `${workingFolder}/payload.txt`;
-    const document = fs.readFileSync(docPath, 'utf8');
+    const unsafeDocument = fs.readFileSync(docPath, 'utf8');
+    const document = xssFilters.inHTMLData(unsafeDocument);
     fs.rmSync(workingFolder, { recursive: true, force: true });
 
     res.status(200).send({
       message: 'Execution submitted successfully.',
       id: safeWorkingId, // Stored XSS High
-      document: xssFilters.inHTMLData(document),
+      document: document,
     });
   },
 );
@@ -297,8 +298,9 @@ app.get(
       });
       fileContents.pipe(res);
     } else {
-      let fileContents = fs.readFileSync(file, 'utf8');
-      const parsedContents = JSON.parse(xssFilters.inHTMLData(fileContents));
+      let unsafeFileContents = fs.readFileSync(file, 'utf8');
+      const fileContents = xssFilters.inHTMLData(unsafeFileContents);
+      const parsedContents = JSON.parse(fileContents);
 
       // execution returned errors
       const errorMessage = hasError(parsedContents);
