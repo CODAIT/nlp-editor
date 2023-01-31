@@ -24,6 +24,7 @@ const AdmZip = require('adm-zip');
 const rateLimit = require('express-rate-limit');
 const xssFilters = require('xss-filters');
 const helmet = require('helmet');
+const { engine } = require('express-handlebars');
 const { body, checkSchema, validationResult } = require('express-validator');
 
 app.use(cors());
@@ -33,6 +34,10 @@ const jsonParser = express.json();
 app.use(jsonParser);
 
 app.use(express.static(path.join(__dirname, 'build')));
+
+//Sets our app to use the handlebars engine
+app.set('view engine', 'handlebars');
+app.engine('handlebars', engine());
 
 //we temporarily store files here before zipping
 const tempFolder = __dirname + '/temp';
@@ -204,10 +209,11 @@ app.post(
     const document = xssFilters.inHTMLData(unsafeDocument);
     fs.rmSync(workingFolder, { recursive: true, force: true });
 
-    res.status(200).send({
-      message: 'Execution submitted successfully.',
-      id: safeWorkingId, // Stored XSS High
-      document: document,
+    res.status(200).render('main', {
+      main: JSON.stringify({
+        id: safeWorkingId, // Stored XSS High
+        document: document,
+      }),
     });
   },
 );
@@ -316,7 +322,7 @@ app.get(
           : formatResults(parsedContents);
 
       deleteFile(file, resultFileName);
-      return res.status(200).send({ status: 'success', ...results });
+      return res.status(200).render('main', { main: JSON.stringify(results) });
     }
   },
 );
