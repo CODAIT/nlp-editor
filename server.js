@@ -305,8 +305,7 @@ app.get(
       });
       fileContents.pipe(res);
     } else {
-      let unsafeFileContents = fs.readFileSync(file, 'utf8');
-      const fileContents = xssFilters.inHTMLData(unsafeFileContents);
+      let fileContents = xssFilters.inHTMLData(fs.readFileSync(file, 'utf8'));
       const parsedContents = JSON.parse(fileContents);
 
       // execution returned errors
