@@ -206,14 +206,15 @@ app.post(
     //read document to render in UI
     const docPath = `${workingFolder}/payload.txt`;
     const unsafeDocument = fs.readFileSync(docPath, 'utf8');
-    const document = xssFilters.inHTMLData(unsafeDocument);
+    const unsafeContents = JSON.stringify({
+      id: safeWorkingId, // Stored XSS High
+      document: unsafeDocument,
+    });
+    const safeContents = xssFilters.inHTMLData(unsafeContents);
     fs.rmSync(workingFolder, { recursive: true, force: true });
 
     res.status(200).render('main', {
-      main: JSON.stringify({
-        id: safeWorkingId, // Stored XSS High
-        document: document,
-      }),
+      main: safeContents,
     });
   },
 );
