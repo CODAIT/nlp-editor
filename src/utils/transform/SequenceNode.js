@@ -41,27 +41,52 @@ export default class SequenceNode {
   }
 
   getOutputSpecName = () => {
-    const { label, renamed } = this.node;
+    const { label, renamed, attributes } = this.node;
+    if (attributes && attributes[0]) {
+      return attributes[0];
+    }
     return renamed || label;
   };
 
   getFieldsList() {
-    const { upstreamNodes } = this.node;
+    const { upstreamNodes, attributes } = this.node;
     const fieldName = this.getOutputSpecName();
+    const upstreamNodesHash = upstreamNodes.reduce((sum, curr) => {
+      sum[curr.nodeId] = curr;
+      return sum;
+    }, {});
     const fields = [
       { '@': { name: fieldName, group: '0', hide: 'no', type: 'Span' } },
     ]; //add the first field for the sequence node
-    upstreamNodes.forEach((node, index) => {
-      const { label, renamed } = node;
-      fields.push({
-        '@': {
-          name: renamed || label,
-          group: index + 1,
-          hide: !node.visible ? 'yes' : 'no', // attributes
-          type: 'Span',
-        },
+
+    const cAttributes = Object.assign({}, attributes);
+    delete cAttributes['0'];
+    if (cAttributes) {
+      Object.keys(cAttributes).map((key, index) => {
+        const { label } = upstreamNodesHash[key];
+        fields.push({
+          '@': {
+            name: cAttributes[key] || label,
+            group: index + 1,
+            hide: !cAttributes[key] ? 'yes' : 'no', // attributes
+            type: 'Span',
+          },
+        });
       });
-    });
+    } else {
+      upstreamNodes.forEach((node, index) => {
+        const { label, renamed } = node;
+        fields.push({
+          '@': {
+            name: renamed || label,
+            group: index + 1,
+            hide: !node.visible ? 'yes' : 'no', // attributes
+            type: 'Span',
+          },
+        });
+      });
+    }
+
     return fields;
   }
 

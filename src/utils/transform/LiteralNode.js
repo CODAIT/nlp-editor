@@ -41,7 +41,7 @@ export default class LiteralNode {
   };
 
   transform() {
-    const { inputText, label, lemmaMatch } = this.node;
+    const { inputText, label, lemmaMatch, attributes } = this.node;
     const fieldName = this.getOutputSpecName();
     const jsonStructure = {
       '@': {
@@ -71,7 +71,7 @@ export default class LiteralNode {
         'output-spec': {
           field: {
             '@': {
-              name: 'Literal_1',
+              name: attributes[0] || label,
               group: 0,
               hide: 'no',
               'func-call': 'no',

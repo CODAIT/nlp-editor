@@ -87,7 +87,7 @@ const createZipArchive = async (tmpFolder, fileName) => {
 const moveZipFile = (tmpFolder, fileName) => {
   const currentPath = `${tmpFolder}/${fileName}`;
   const destinationPath = `${systemTdataFolder}/user-data-in/${fileName}`;
-  fs.rename(currentPath, destinationPath, function (err) {
+  fs.copyFile(currentPath, destinationPath, function (err) {
     if (err) {
       console.log(`error moving zipfile ${fileName}`);
       throw err;
@@ -201,7 +201,7 @@ app.post(
     //read document to render in UI
     const docPath = `${workingFolder}/payload.txt`;
     const document = fs.readFileSync(docPath, 'utf8');
-    fs.rmSync(workingFolder, { recursive: true, force: true });
+    //fs.rmSync(workingFolder, { recursive: true, force: true });
 
     res.status(200).send({
       message: 'Execution submitted successfully.',

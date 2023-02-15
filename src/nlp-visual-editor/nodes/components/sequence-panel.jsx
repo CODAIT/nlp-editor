@@ -33,14 +33,20 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class SequencePanel extends React.Component {
   constructor(props) {
     super(props);
+    const upstreamNodes = JSON.parse(JSON.stringify(this.props.upstreamNodes));
     this.state = {
       nodeId: this.props.nodeId,
       label: this.props.label,
       renamed: this.props.renamed,
       pattern: this.props.pattern,
-      upstreamNodes: JSON.parse(JSON.stringify(this.props.upstreamNodes)),
+      upstreamNodes: upstreamNodes,
+      upstreamNodesHash: upstreamNodes.reduce((sum, curr) => {
+        sum[curr.nodeId] = curr;
+        return sum;
+      }, {}),
       editId: null,
       editLabel: '',
+      attributes: props.attributes || {},
     };
   }
 
@@ -48,31 +54,50 @@ class SequencePanel extends React.Component {
     let { pattern, upstreamNodes } = this.props;
     if (pattern === '') {
       ({ pattern, upstreamNodes } = this.constructPattern());
-      this.setState({ pattern, upstreamNodes });
+      this.setState({
+        pattern,
+        upstreamNodes,
+        upstreamNodesHash: upstreamNodes.reduce((sum, curr) => {
+          sum[curr.nodeId] = curr;
+          return sum;
+        }, {}),
+        attributes: {
+          0: this.props.renamed || this.state.label,
+          ...upstreamNodes.reduce((sum, curr) => {
+            sum[curr.nodeId] = curr.label;
+            return sum;
+          }, {}),
+        },
+      });
     }
-    if (!this.props.renamed) {
-      this.setState({ renamed: this.state.label });
-    }
+    // if( /* attributes keys not equal upstream keys*/)
+    // this.setState({
+    //   attributes: {
+    //     0: this.props.renamed || this.state.label,
+    //     ...upstreamNodes.reduce((sum, curr) => {
+    //       sum[curr.nodeId] = null;
+    //       return sum;
+    //     }, {}),
+    //   },
+    // });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-      let renamed = this.props.renamed;
-      if (!this.props.renamed || this.props.renamed === '') {
-        renamed = this.props.label;
-      }
-      const { label } = this.props;
-      if (this.props.pattern === '') {
-        const { pattern, upstreamNodes } = this.constructPattern();
-        this.setState({ label, renamed, pattern, upstreamNodes });
-      } else {
-        this.setState({
-          label,
-          renamed,
-          pattern: this.props.pattern,
-          upstreamNodes: this.props.upstreamNodes,
-        });
-      }
+      const { label, attributes } = this.props;
+      const { pattern, upstreamNodes } = this.constructPattern();
+      this.setState({
+        label,
+        upstreamNodes,
+        pattern: this.props.pattern || pattern,
+        attributes: {
+          0: this.props.renamed || this.props.label,
+          ...upstreamNodes.reduce((sum, curr) => {
+            sum[curr.nodeId] = curr.label;
+            return sum;
+          }, {}),
+        },
+      });
     }
   }
 
@@ -94,7 +119,6 @@ class SequencePanel extends React.Component {
         nodeId,
         type,
         visible: visible || false,
-        renamed: label,
       });
     });
     return { pattern, upstreamNodes };
@@ -133,7 +157,7 @@ class SequencePanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { pattern, renamed } = this.state;
+    const { pattern, attributes } = this.state;
     const { nodeId } = this.props;
 
     let errorMessage =
@@ -146,7 +170,7 @@ class SequencePanel extends React.Component {
       const upstreamNodes = this.parsePattern();
       const node = {
         nodeId,
-        renamed,
+        attributes,
         pattern,
         upstreamNodes,
         tokens,
@@ -158,20 +182,30 @@ class SequencePanel extends React.Component {
   };
 
   onSaveAttributeLabel(node) {
-    const localNodes = JSON.parse(JSON.stringify(this.state.upstreamNodes));
-    const targetNode = localNodes.find((n) => n.nodeId === node.nodeId);
-    targetNode.renamed = this.state.editLabel;
-    this.setState({ upstreamNodes: localNodes, editId: false });
+    const attributeUpdate = {};
+    attributeUpdate[node.nodeId] = this.state.editLabel;
+    this.setState({
+      editId: false,
+      attributes: {
+        ...this.state.attributes,
+        ...attributeUpdate,
+      },
+    });
   }
   onSaveAttributeVisible(node, value) {
-    const localNodes = JSON.parse(JSON.stringify(this.state.upstreamNodes));
-    const targetNode = localNodes.find((n) => n.nodeId === node.nodeId);
-    targetNode.visible = value;
-    this.setState({ upstreamNodes: localNodes });
+    const attributeUpdate = {};
+    attributeUpdate[node.nodeId] = value ? node.label : null;
+    this.setState({
+      attributes: {
+        ...this.state.attributes,
+        ...attributeUpdate,
+      },
+    });
   }
 
   render() {
     const { pattern } = this.state;
+    const sequenceAttributeLabel = this.state.attributes[0];
     return (
       <div className="sequence-panel">
         <TextArea
@@ -198,7 +232,18 @@ class SequencePanel extends React.Component {
             onKeyDown={(e) => {
               const keyPressed = e.key || e.keyCode;
               if (keyPressed === 'Enter' || keyPressed === 13) {
-                this.setState({ renamed: this.state.editLabel, editId: null });
+                if (this.state.editLabel === '') {
+                  return;
+                }
+                this.setState({
+                  editId: null,
+                  attributes: {
+                    ...this.state.attributes,
+                    ...{
+                      0: this.state.editLabel,
+                    },
+                  },
+                });
               } else if (keyPressed === 'Escape' || keyPressed === 27) {
                 this.setState({ editId: null });
               }
@@ -213,7 +258,7 @@ class SequencePanel extends React.Component {
               disabled
               checked={true}
             />
-            {this.state.renamed || this.state.label}
+            {sequenceAttributeLabel}
             <Button
               id={`button-${this.state.nodeId}`}
               renderIcon={Edit16}
@@ -224,26 +269,36 @@ class SequencePanel extends React.Component {
               onClick={() =>
                 this.setState({
                   editId: this.state.nodeId,
-                  editLabel: this.state.renamed || this.state.label,
+                  editLabel: sequenceAttributeLabel,
                 })
               }
             />
           </div>
         )}
-        {this.state.upstreamNodes.map((node) => {
-          if (node.nodeId === this.state.editId) {
+        {Object.keys(this.state.attributes).map((nodeId) => {
+          if (nodeId === '0') {
+            return;
+          }
+          const { label } = this.state.upstreamNodesHash[nodeId];
+          const editLabel = this.state.attributes[nodeId] || label;
+          if (nodeId === this.state.editId) {
             return (
               <TextInput
-                id={`textIn-${node.nodeId}`}
-                key={`textIn-${node.nodeId}`}
-                labelText={`Rename attribute ${node.label}`}
+                id={`textIn-${nodeId}`}
+                key={`textIn-${nodeId}`}
+                labelText={`Rename attribute ${this.state.upstreamNodesHash[nodeId].label}`}
                 onChange={(e) => {
                   this.setState({ editLabel: e.target.value });
                 }}
                 onKeyDown={(e) => {
                   const keyPressed = e.key || e.keyCode;
+                  if (this.state.editLabel === '') {
+                    return;
+                  }
                   if (keyPressed === 'Enter' || keyPressed === 13) {
-                    this.onSaveAttributeLabel(node);
+                    this.onSaveAttributeLabel(
+                      this.state.upstreamNodesHash[nodeId],
+                    );
                   } else if (keyPressed === 'Escape' || keyPressed === 27) {
                     this.setState({ editId: null });
                   }
@@ -253,16 +308,21 @@ class SequencePanel extends React.Component {
             );
           }
           return (
-            <div className="attributes" key={`span-${node.nodeId}`}>
+            <div className="attributes" key={`span-${nodeId}`}>
               <Checkbox
-                id={`check${node.nodeId}`}
+                id={`check${nodeId}`}
                 labelText=""
-                onChange={(value) => this.onSaveAttributeVisible(node, value)}
-                checked={node.visible}
+                onChange={(value) =>
+                  this.onSaveAttributeVisible(
+                    this.state.upstreamNodesHash[nodeId],
+                    value,
+                  )
+                }
+                checked={!!this.state.attributes[nodeId]}
               />
-              {node.renamed || node.label}
+              {editLabel}
               <Button
-                id={`button-${node.nodeId}`}
+                id={`button-${nodeId}`}
                 renderIcon={Edit16}
                 iconDescription="Edit label"
                 size="sm"
@@ -270,8 +330,8 @@ class SequencePanel extends React.Component {
                 kind="ghost"
                 onClick={() =>
                   this.setState({
-                    editId: node.nodeId,
-                    editLabel: node.renamed,
+                    editId: nodeId,
+                    editLabel: editLabel,
                   })
                 }
               />

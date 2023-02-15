@@ -16,11 +16,12 @@ limitations under the License.
 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, TextInput } from 'carbon-components-react';
+import { Button, TextInput, Checkbox } from 'carbon-components-react';
+import { Edit16 } from '@carbon/icons-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-
+import './literal-panel.scss';
 // import './dictionary-panel.scss';
 
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
@@ -29,9 +30,13 @@ class LiteralPanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      label: props.label,
       inputText: props.inputText,
       lemmaMatch: props.lemmaMatch,
       errorMessage: undefined,
+      attributes: props.attributes || {},
+      editId: null,
+      editLabel: null,
     };
   }
 
@@ -50,7 +55,7 @@ class LiteralPanel extends React.Component {
 
   onSavePane = () => {
     const errorMessage = this.validateParameters();
-    const { lemmaMatch, inputText } = this.state;
+    const { lemmaMatch, inputText, attributes } = this.state;
     const { nodeId } = this.props;
 
     if (!errorMessage) {
@@ -58,6 +63,7 @@ class LiteralPanel extends React.Component {
         nodeId,
         inputText,
         lemmaMatch,
+        attributes,
         isValid: true,
       };
       this.props.saveNlpNode({ node });
@@ -76,7 +82,16 @@ class LiteralPanel extends React.Component {
   };
 
   render() {
-    const { inputText, lemmaMatch, errorMessage } = this.state;
+    const {
+      editId,
+      inputText,
+      lemmaMatch,
+      errorMessage,
+      attributes,
+      label,
+      nodeId,
+    } = this.state;
+    const literalValue = attributes[0] || label;
     return (
       <div className="literal-panel">
         <div
@@ -109,6 +124,61 @@ class LiteralPanel extends React.Component {
           }}
           onSavePanel={this.onSavePane}
         />
+
+        <hr />
+        <h4>Attributes</h4>
+
+        {nodeId === editId ? (
+          <TextInput
+            id={`textIn-${nodeId}`}
+            key={`textIn-${nodeId}`}
+            labelText={`Rename attribute ${label}`}
+            onChange={(e) => {
+              this.setState({ editLabel: e.target.value });
+            }}
+            onKeyDown={(e) => {
+              const keyPressed = e.key || e.keyCode;
+              if (keyPressed === 'Enter' || keyPressed === 13) {
+                if (this.state.editLabel === '') {
+                  return;
+                }
+                this.setState({
+                  editId: null,
+                  attributes: {
+                    0: this.state.editLabel,
+                  },
+                });
+              } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                this.setState({ editId: null });
+              }
+            }}
+            value={this.state.editLabel}
+          />
+        ) : (
+          <div className="attributes" key={`span-${nodeId}`}>
+            <Checkbox
+              id={`check${this.state.nodeId}`}
+              labelText=""
+              disabled
+              checked={true}
+            />
+            {literalValue}
+            <Button
+              id={`button-${nodeId}`}
+              renderIcon={Edit16}
+              iconDescription="Edit label"
+              size="sm"
+              hasIconOnly
+              kind="ghost"
+              onClick={() =>
+                this.setState({
+                  editId: nodeId,
+                  editLabel: literalValue,
+                })
+              }
+            />
+          </div>
+        )}
       </div>
     );
   }
