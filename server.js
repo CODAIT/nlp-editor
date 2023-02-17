@@ -201,7 +201,7 @@ app.post(
     //read document to render in UI
     const docPath = `${workingFolder}/payload.txt`;
     const document = fs.readFileSync(docPath, 'utf8');
-    //fs.rmSync(workingFolder, { recursive: true, force: true });
+    fs.rmSync(workingFolder, { recursive: true, force: true });
 
     res.status(200).send({
       message: 'Execution submitted successfully.',

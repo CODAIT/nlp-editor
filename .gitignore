@@ -6,6 +6,9 @@
 /.pnp
 .pnp.js
 
+/Seer-Core
+/Seer-Core/aql-processor/run-aql-result/.gitignore
+/Seer-Core/aql-processor/user-data-in/.gitignore
 # testing
 /coverage
 
