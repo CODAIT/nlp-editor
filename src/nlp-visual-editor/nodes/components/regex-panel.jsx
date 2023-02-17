@@ -19,6 +19,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import {
+  Button,
+  TextInput,
   Checkbox,
   Dropdown,
   NumberInput,
@@ -26,6 +28,7 @@ import {
   RadioButtonGroup,
   TextArea,
 } from 'carbon-components-react';
+import { Edit16 } from '@carbon/icons-react';
 import RHSPanelButtons from '../../components/rhs-panel-buttons';
 
 import './regex-panel.scss';
@@ -34,16 +37,37 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
-    const { saveNlpNode, setShowRightPanel, label, ...rest } = props;
+    const { saveNlpNode, setShowRightPanel, ...rest } = props;
     this.state = {
       ...rest,
+      attributes: props.attributes || {},
+      editLabel: '',
+      editId: null,
     };
+  }
+
+  componentDidMount() {
+    if (this.state.attributes && !this.state.attributes[0]) {
+      this.setState({
+        attributes: {
+          0: this.state.label,
+        },
+      });
+    }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-      const { saveNlpNode, setShowRightPanel, label, ...rest } = this.props;
-      this.setState({ ...rest });
+      const { saveNlpNode, setShowRightPanel, attributes, ...rest } =
+        this.props;
+      this.setState({
+        ...rest,
+        ...{
+          attributes: attributes || {
+            0: this.props.label,
+          },
+        },
+      });
     }
   }
 
@@ -66,7 +90,7 @@ class RegexPanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { errorMessage, regexInput, ...rest } = this.state;
+    const { errorMessage, regexInput, attributes, ...rest } = this.state;
     const { nodeId } = this.props;
     let err = undefined;
     try {
@@ -83,6 +107,7 @@ class RegexPanel extends React.Component {
     if (!err) {
       const node = {
         nodeId,
+        attributes,
         regexInput,
         ...rest,
         isValid: true,
@@ -125,6 +150,28 @@ class RegexPanel extends React.Component {
     this.setState({ ...props });
   };
 
+  onSaveAttributeLabel(nodeId) {
+    const attributeUpdate = {};
+    attributeUpdate[nodeId] = this.state.editLabel;
+    this.setState({
+      editId: false,
+      attributes: {
+        ...this.state.attributes,
+        ...attributeUpdate,
+      },
+    });
+  }
+  onSaveAttributeVisible(nodeId, value) {
+    const attributeUpdate = {};
+    attributeUpdate[nodeId] = value ? node.label : null;
+    this.setState({
+      attributes: {
+        ...this.state.attributes,
+        ...attributeUpdate,
+      },
+    });
+  }
+
   render() {
     const matchCaseItems = this.getDdlMatchCaseItems();
 
@@ -141,7 +188,7 @@ class RegexPanel extends React.Component {
     } = this.state;
 
     const disableCheckboxes = expressionType === 'literal';
-
+    const regexAttributeLabel = this.state.attributes[0];
     return (
       <div className="regex-panel">
         <div className="regex-panel-contents">
@@ -153,8 +200,34 @@ class RegexPanel extends React.Component {
             invalid={errorMessage !== undefined}
             invalidText={errorMessage}
             onChange={(e) => {
+              let attributes = {
+                0: this.state.attributes['0'],
+              };
+              try {
+                var num_groups =
+                  new RegExp(e.target.value.toString() + '|').exec('').length -
+                  1;
+                while (num_groups) {
+                  num_groups -= 1;
+                  if (num_groups) {
+                    if (
+                      this.state.attributes &&
+                      this.state.attributes[num_groups]
+                    ) {
+                      attributes[num_groups] =
+                        this.state.attributes[num_groups];
+                    } else {
+                      attributes[num_groups] = `group${num_groups}`;
+                    }
+                  }
+                }
+              } catch (e) {
+                attributes = this.state.attributes;
+              }
+
               this.setState({
                 regexInput: e.target.value,
+                attributes: attributes,
                 errorMessage: undefined,
               });
             }}
@@ -277,6 +350,121 @@ class RegexPanel extends React.Component {
             />
           </div>
         </div>
+
+        <hr />
+        <h4>Attributes</h4>
+
+        {this.state.nodeId === this.state.editId ? (
+          <TextInput
+            id={`textIn-${this.state.nodeId}`}
+            key={`textIn-${this.state.nodeId}`}
+            labelText={`Rename attribute ${this.state.label}`}
+            onChange={(e) => {
+              this.setState({ editLabel: e.target.value });
+            }}
+            onKeyDown={(e) => {
+              const keyPressed = e.key || e.keyCode;
+              if (keyPressed === 'Enter' || keyPressed === 13) {
+                if (this.state.editLabel === '') {
+                  return;
+                }
+                this.setState({
+                  editId: null,
+                  attributes: {
+                    ...this.state.attributes,
+                    ...{
+                      0: this.state.editLabel,
+                    },
+                  },
+                });
+              } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                this.setState({ editId: null });
+              }
+            }}
+            value={this.state.editLabel}
+          />
+        ) : (
+          <div className="attributes" key={`span-${this.state.nodeId}`}>
+            <Checkbox
+              id={`check${this.state.nodeId}`}
+              labelText=""
+              disabled
+              checked={true}
+            />
+            {regexAttributeLabel}
+            <Button
+              id={`button-${this.state.nodeId}`}
+              renderIcon={Edit16}
+              iconDescription="Edit label"
+              size="sm"
+              hasIconOnly
+              kind="ghost"
+              onClick={() =>
+                this.setState({
+                  editId: this.state.nodeId,
+                  editLabel: regexAttributeLabel,
+                })
+              }
+            />
+          </div>
+        )}
+
+        {Object.keys(this.state.attributes).map((nodeId) => {
+          if (nodeId === '0') {
+            return;
+          }
+
+          const editLabel = this.state.attributes[nodeId];
+          if (nodeId === this.state.editId) {
+            return (
+              <TextInput
+                id={`textIn-${nodeId}`}
+                key={`textIn-${nodeId}`}
+                labelText={`Rename attribute group${nodeId}`}
+                onChange={(e) => {
+                  this.setState({ editLabel: e.target.value });
+                }}
+                onKeyDown={(e) => {
+                  const keyPressed = e.key || e.keyCode;
+                  if (this.state.editLabel === '') {
+                    return;
+                  }
+                  if (keyPressed === 'Enter' || keyPressed === 13) {
+                    this.onSaveAttributeLabel(nodeId);
+                  } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                    this.setState({ editId: null });
+                  }
+                }}
+                value={this.state.editLabel}
+              />
+            );
+          }
+          return (
+            <div className="attributes" key={`span-${nodeId}`}>
+              <Checkbox
+                id={`check${nodeId}`}
+                labelText=""
+                onChange={(value) => this.onSaveAttributeVisible(nodeId, value)}
+                checked={!!this.state.attributes[nodeId]}
+              />
+              {editLabel}
+              <Button
+                id={`button-${nodeId}`}
+                renderIcon={Edit16}
+                iconDescription="Edit label"
+                size="sm"
+                hasIconOnly
+                kind="ghost"
+                onClick={() =>
+                  this.setState({
+                    editId: nodeId,
+                    editLabel: editLabel,
+                  })
+                }
+              />
+            </div>
+          );
+        })}
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

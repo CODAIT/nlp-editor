@@ -15,8 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 .regex-panel {
-  height: 100%;
-
+  .attributes {
+    line-height: 30px;
+    .bx--checkbox-wrapper {
+      float: left;
+      padding: 0;
+    }
+  }
   .bx--tab-content {
     height: 100%;
   }
