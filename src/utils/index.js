@@ -51,7 +51,7 @@ function getImmediateDownstreamNodes(nodeId, links) {
 function generateNodeName(type, paletteLabel, existingNodes) {
   let tmpName = type === 'dictionary' ? 'MyDictionary' : paletteLabel;
   const nodesWithSameName = existingNodes.filter((n) =>
-    n.label.toLowerCase().startsWith(tmpName.toLowerCase()),
+    n.label?.toLowerCase().startsWith(tmpName.toLowerCase()),
   );
   return `${tmpName}_${nodesWithSameName.length + 1}`;
 }
