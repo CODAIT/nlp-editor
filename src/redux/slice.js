@@ -83,9 +83,14 @@ const nodesSlice = createSlice({
       if (!payload) {
         state.tabularResults = undefined;
       } else {
-        const { annotations, names } = payload;
-        state.tabularResults = { annotations, names };
-        state.currentAnnotation = names[0];
+        const { annotations, names, status, message } = payload;
+        if (status === 'error') {
+          state.errorMessage = message;
+          state.tabularResults = undefined;
+        } else {
+          state.tabularResults = { annotations, names };
+          state.currentAnnotation = names[0];
+        }
       }
     },
     setDocumentViewToAnnotation: (state, action) => {

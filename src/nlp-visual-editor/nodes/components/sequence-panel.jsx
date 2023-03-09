@@ -109,8 +109,8 @@ class SequencePanel extends React.Component {
     const upstreamNodes = [];
     immediateNodes.forEach((id, index) => {
       const node = nodes.find((n) => n.nodeId === id);
-      const { label, nodeId, type, visible } = node;
-      pattern += `(<${label}.${label}>)`;
+      const { label, nodeId, type, visible, attributes } = node;
+      pattern += `(<${label}.${attributes[0] ?? label}>)`;
       if (index < immediateNodes.length - 1) {
         pattern += `<Token>{1,2}`;
       }

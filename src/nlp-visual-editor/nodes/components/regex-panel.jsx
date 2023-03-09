@@ -204,9 +204,9 @@ class RegexPanel extends React.Component {
                 0: this.state.attributes['0'],
               };
               try {
-                var num_groups =
-                  new RegExp(e.target.value.toString() + '|').exec('').length -
-                  1;
+                var num_groups = new RegExp(
+                  e.target.value.toString() + '|',
+                ).exec('').length;
                 while (num_groups) {
                   num_groups -= 1;
                   if (num_groups) {

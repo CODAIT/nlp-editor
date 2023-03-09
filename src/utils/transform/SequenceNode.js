@@ -75,12 +75,12 @@ export default class SequenceNode {
       });
     } else {
       upstreamNodes.forEach((node, index) => {
-        const { label, renamed } = node;
+        const { label, attributes } = node;
         fields.push({
           '@': {
-            name: renamed || label,
+            name: attributes[0] || label,
             group: index + 1,
-            hide: !node.visible ? 'yes' : 'no', // attributes
+            hide: 'yes',
             type: 'Span',
           },
         });
