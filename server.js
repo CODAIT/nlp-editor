@@ -227,6 +227,9 @@ const formatResults = ({ annotations, instrumentationInfo }) => {
     annotation.forEach((elem) => {
       const attributes = {};
       Object.keys(elem).forEach((key) => {
+        if (elem[key] === null) {
+          return;
+        }
         const { location, text } = elem[key];
         attributes[key] = {
           start: location?.begin,
