@@ -118,6 +118,7 @@ class SequencePanel extends React.Component {
         label,
         nodeId,
         type,
+        attributes,
         visible: visible || false,
       });
     });
@@ -131,10 +132,16 @@ class SequencePanel extends React.Component {
     if (nodeList) {
       nodeList.forEach((n) => {
         const nodeName = n.substring(2, n.length);
-        const { nodeId, type, visible, renamed } = upstreamNodes.find(
-          (n) => n.label === nodeName,
-        );
-        newList.push({ label: nodeName, nodeId, type, visible, renamed });
+        const { nodeId, type, visible, renamed, attributes } =
+          upstreamNodes.find((n) => n.label === nodeName);
+        newList.push({
+          label: nodeName,
+          nodeId,
+          type,
+          visible,
+          renamed,
+          attributes,
+        });
       });
     }
     return newList;

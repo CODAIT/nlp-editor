@@ -91,7 +91,7 @@ export default class SequenceNode {
   }
 
   getSequenceItem(node, sequenceLabel, index, tokens, length) {
-    const { label } = node;
+    const { label, attributes } = node;
     let tokenGapItem = undefined;
     let atomItem = {
       '@': { group: `${index + 1}`, min: '1', max: '1' },
@@ -99,7 +99,7 @@ export default class SequenceNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label,
+          'input-field-name': attributes?.[0] ?? label,
         },
       },
     };
