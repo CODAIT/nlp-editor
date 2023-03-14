@@ -18,7 +18,7 @@ import React, { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Checkbox, Dropdown, TextArea } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { RHSPanelButtons } from '../../components';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';

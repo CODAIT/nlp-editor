@@ -17,7 +17,11 @@ limitations under the License.
 import React from 'react';
 import { Button, ButtonSet } from 'carbon-components-react';
 
-function RHSPanelButtons({ onClosePanel, onSavePanel, showSaveButton = true }) {
+export function RHSPanelButtons({
+  onClosePanel,
+  onSavePanel,
+  showSaveButton = true,
+}) {
   return (
     <>
       {showSaveButton ? (
@@ -41,5 +45,3 @@ function RHSPanelButtons({ onClosePanel, onSavePanel, showSaveButton = true }) {
     </>
   );
 }
-
-export default RHSPanelButtons;

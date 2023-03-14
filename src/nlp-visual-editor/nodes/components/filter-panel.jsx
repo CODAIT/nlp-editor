@@ -17,7 +17,7 @@ limitations under the License.
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox, TextInput, Dropdown } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { RHSPanelButtons } from '../../components';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { getImmediateUpstreamNodes } from '../../../utils';

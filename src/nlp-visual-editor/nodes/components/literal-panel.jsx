@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, TextInput, Checkbox } from 'carbon-components-react';
 import { Edit16 } from '@carbon/icons-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { RHSPanelButtons } from '../../components';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import './literal-panel.scss';

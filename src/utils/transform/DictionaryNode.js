@@ -92,7 +92,7 @@ export default class DictionaryNode {
     const fieldValues = [
       {
         '@': {
-          name: attributes[0] || label, //node name lowercase
+          name: attributes[0]?.value || label, //node name lowercase
           group: 0,
           hide: 'no',
           'func-call': 'no',

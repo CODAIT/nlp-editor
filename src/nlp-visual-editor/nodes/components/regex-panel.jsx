@@ -29,7 +29,7 @@ import {
   TextArea,
 } from 'carbon-components-react';
 import { Edit16 } from '@carbon/icons-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { RHSPanelButtons } from '../../components';
 
 import './regex-panel.scss';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';

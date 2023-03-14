@@ -20,7 +20,7 @@ import {
   FileUploader,
   FileUploaderItem,
 } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { RHSPanelButtons } from '../../components';
 import { connect } from 'react-redux';
 import './input-panel.scss';
 

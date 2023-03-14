@@ -24,8 +24,7 @@ import {
   Dropdown,
   TextArea,
 } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
-import { Edit16 } from '@carbon/icons-react';
+import { RHSPanelButtons, AttributesList } from '../../components';
 import './sequence-panel.scss';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
@@ -40,13 +39,18 @@ class SequencePanel extends React.Component {
       renamed: this.props.renamed,
       pattern: this.props.pattern,
       upstreamNodes: upstreamNodes,
-      upstreamNodesHash: upstreamNodes.reduce((sum, curr) => {
-        sum[curr.nodeId] = curr;
-        return sum;
-      }, {}),
       editId: null,
       editLabel: '',
-      attributes: props.attributes || {},
+      attributes:
+        props.attributes ??
+        props.upstreamNodes.map((node) => {
+          return {
+            nodeId: node.nodeId,
+            value: node.renamed ?? node.attributes?.[0]?.value ?? node.label,
+            visible: true,
+            label: node.label,
+          };
+        }),
     };
   }
 
@@ -57,17 +61,14 @@ class SequencePanel extends React.Component {
       this.setState({
         pattern,
         upstreamNodes,
-        upstreamNodesHash: upstreamNodes.reduce((sum, curr) => {
-          sum[curr.nodeId] = curr;
-          return sum;
-        }, {}),
-        attributes: {
-          0: this.props.renamed || this.state.label,
-          ...upstreamNodes.reduce((sum, curr) => {
-            sum[curr.nodeId] = curr.label;
-            return sum;
-          }, {}),
-        },
+        attributes: upstreamNodes.map((node) => {
+          return {
+            nodeId: node.nodeId,
+            value: node.renamed ?? node.attributes?.[0]?.value ?? node.label,
+            visible: true,
+            label: node.label,
+          };
+        }),
       });
     }
     // if( /* attributes keys not equal upstream keys*/)
@@ -84,33 +85,42 @@ class SequencePanel extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
-      const { label, attributes } = this.props;
+      const { label } = this.props;
       const { pattern, upstreamNodes } = this.constructPattern();
       this.setState({
         label,
         upstreamNodes,
         pattern: this.props.pattern || pattern,
-        attributes: {
-          0: this.props.renamed || this.props.label,
-          ...upstreamNodes.reduce((sum, curr) => {
-            sum[curr.nodeId] = curr.label;
-            return sum;
-          }, {}),
-        },
+        attributes: [
+          upstreamNodes.map((node) => {
+            return {
+              nodeId: node.nodeID,
+              value: node.attributes?.[0]?.value ?? node.label,
+              visible: true,
+            };
+          }),
+        ],
       });
     }
   }
 
   constructPattern = () => {
-    const { canvasController, nodeId, pipelineId, nodes } = this.props;
+    const { canvasController, nodeId, pipelineId, nodes, label } = this.props;
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
     let pattern = '';
-    const upstreamNodes = [];
+    const upstreamNodes = [
+      {
+        nodeId,
+        label,
+        visible: true,
+        value: this.state.attributes?.[0]?.value ?? label,
+      },
+    ];
     immediateNodes.forEach((id, index) => {
       const node = nodes.find((n) => n.nodeId === id);
       const { label, nodeId, type, visible, attributes } = node;
-      pattern += `(<${label}.${attributes[0] ?? label}>)`;
+      pattern += `(<${label}.${attributes?.[0]?.value ?? label}>)`;
       if (index < immediateNodes.length - 1) {
         pattern += `<Token>{1,2}`;
       }
@@ -211,8 +221,7 @@ class SequencePanel extends React.Component {
   }
 
   render() {
-    const { pattern } = this.state;
-    const sequenceAttributeLabel = this.state.attributes[0];
+    const { pattern, attributes } = this.state;
     return (
       <div className="sequence-panel">
         <TextArea
@@ -226,126 +235,13 @@ class SequencePanel extends React.Component {
           }}
         />
         <hr />
-        <h4>Attributes</h4>
-
-        {this.state.nodeId === this.state.editId ? (
-          <TextInput
-            id={`textIn-${this.state.nodeId}`}
-            key={`textIn-${this.state.nodeId}`}
-            labelText={`Rename attribute ${this.state.label}`}
-            onChange={(e) => {
-              this.setState({ editLabel: e.target.value });
-            }}
-            onKeyDown={(e) => {
-              const keyPressed = e.key || e.keyCode;
-              if (keyPressed === 'Enter' || keyPressed === 13) {
-                if (this.state.editLabel === '') {
-                  return;
-                }
-                this.setState({
-                  editId: null,
-                  attributes: {
-                    ...this.state.attributes,
-                    ...{
-                      0: this.state.editLabel,
-                    },
-                  },
-                });
-              } else if (keyPressed === 'Escape' || keyPressed === 27) {
-                this.setState({ editId: null });
-              }
-            }}
-            value={this.state.editLabel}
-          />
-        ) : (
-          <div className="attributes" key={`span-${this.state.nodeId}`}>
-            <Checkbox
-              id={`check${this.state.nodeId}`}
-              labelText=""
-              disabled
-              checked={true}
-            />
-            {sequenceAttributeLabel}
-            <Button
-              id={`button-${this.state.nodeId}`}
-              renderIcon={Edit16}
-              iconDescription="Edit label"
-              size="sm"
-              hasIconOnly
-              kind="ghost"
-              onClick={() =>
-                this.setState({
-                  editId: this.state.nodeId,
-                  editLabel: sequenceAttributeLabel,
-                })
-              }
-            />
-          </div>
-        )}
-        {Object.keys(this.state.attributes).map((nodeId) => {
-          if (nodeId === '0') {
-            return;
-          }
-          const { label } = this.state.upstreamNodesHash[nodeId];
-          const editLabel = this.state.attributes[nodeId] || label;
-          if (nodeId === this.state.editId) {
-            return (
-              <TextInput
-                id={`textIn-${nodeId}`}
-                key={`textIn-${nodeId}`}
-                labelText={`Rename attribute ${this.state.upstreamNodesHash[nodeId].label}`}
-                onChange={(e) => {
-                  this.setState({ editLabel: e.target.value });
-                }}
-                onKeyDown={(e) => {
-                  const keyPressed = e.key || e.keyCode;
-                  if (this.state.editLabel === '') {
-                    return;
-                  }
-                  if (keyPressed === 'Enter' || keyPressed === 13) {
-                    this.onSaveAttributeLabel(
-                      this.state.upstreamNodesHash[nodeId],
-                    );
-                  } else if (keyPressed === 'Escape' || keyPressed === 27) {
-                    this.setState({ editId: null });
-                  }
-                }}
-                value={this.state.editLabel}
-              />
-            );
-          }
-          return (
-            <div className="attributes" key={`span-${nodeId}`}>
-              <Checkbox
-                id={`check${nodeId}`}
-                labelText=""
-                onChange={(value) =>
-                  this.onSaveAttributeVisible(
-                    this.state.upstreamNodesHash[nodeId],
-                    value,
-                  )
-                }
-                checked={!!this.state.attributes[nodeId]}
-              />
-              {editLabel}
-              <Button
-                id={`button-${nodeId}`}
-                renderIcon={Edit16}
-                iconDescription="Edit label"
-                size="sm"
-                hasIconOnly
-                kind="ghost"
-                onClick={() =>
-                  this.setState({
-                    editId: nodeId,
-                    editLabel: editLabel,
-                  })
-                }
-              />
-            </div>
-          );
-        })}
-
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes) => {
+            this.setState({ attributes: newAttributes });
+          }}
+          label={this.props.label}
+        />
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

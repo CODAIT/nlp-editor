@@ -39,7 +39,7 @@ import {
   TableToolbarContent,
   DataTable,
 } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { AttributesList, RHSPanelButtons } from '../../components';
 import { Delete16, Edit16 } from '@carbon/icons-react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -74,7 +74,14 @@ class DictionaryPanel extends React.Component {
       mappedItems: Array.isArray(props.items ?? []) ? {} : props.items,
       page: 1,
       pageSize: 10,
-      attributes: props.attributes || {},
+      attributes: props.attributes ?? [
+        {
+          nodeId: this.props.nodeId,
+          label: this.props.label,
+          value: this.props.label,
+          visible: true,
+        },
+      ],
       editId: null,
       editLabel: null,
     };
@@ -222,21 +229,14 @@ class DictionaryPanel extends React.Component {
 
   render() {
     const {
-      inputText,
       caseSensitivity,
       externalResourceChecked,
       lemmaMatch,
       errorMessage,
-      items,
       mapTerms,
       mappedItems,
       attributes,
-      label,
-      editId,
     } = this.state;
-    const { nodeId } = this.props;
-    console.log(nodeId);
-    const dicValue = attributes[0] || label;
     return (
       <div className="dictionary-panel">
         <FileUploader
@@ -446,59 +446,13 @@ class DictionaryPanel extends React.Component {
         </RadioButtonGroup>
 
         <hr />
-        <h4>Attributes</h4>
-
-        {nodeId === editId ? (
-          <TextInput
-            id={`textIn-${nodeId}`}
-            key={`textIn-${nodeId}`}
-            labelText={`Rename attribute ${label}`}
-            onChange={(e) => {
-              this.setState({ editLabel: e.target.value });
-            }}
-            onKeyDown={(e) => {
-              const keyPressed = e.key || e.keyCode;
-              if (keyPressed === 'Enter' || keyPressed === 13) {
-                if (this.state.editLabel === '') {
-                  return;
-                }
-                this.setState({
-                  editId: null,
-                  attributes: {
-                    0: this.state.editLabel,
-                  },
-                });
-              } else if (keyPressed === 'Escape' || keyPressed === 27) {
-                this.setState({ editId: null });
-              }
-            }}
-            value={this.state.editLabel}
-          />
-        ) : (
-          <div className="attributes" key={`span-${nodeId}`}>
-            <Checkbox
-              id={`check${this.state.nodeId}`}
-              labelText=""
-              disabled
-              checked={true}
-            />
-            {dicValue}
-            <Button
-              id={`button-${nodeId}`}
-              renderIcon={Edit16}
-              iconDescription="Edit label"
-              size="sm"
-              hasIconOnly
-              kind="ghost"
-              onClick={() =>
-                this.setState({
-                  editId: nodeId,
-                  editLabel: dicValue,
-                })
-              }
-            />
-          </div>
-        )}
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes) => {
+            this.setState({ attributes: newAttributes });
+          }}
+          label={this.props.label}
+        />
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

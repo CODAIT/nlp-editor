@@ -90,7 +90,6 @@ const moveZipFile = (tmpFolder, fileName) => {
   fs.copyFile(currentPath, destinationPath, function (err) {
     if (err) {
       console.log(`error moving zipfile ${fileName}`);
-      throw err;
     } else {
       console.log(`moved zipfile ${fileName} to be processed.`);
     }
@@ -201,7 +200,7 @@ app.post(
     //read document to render in UI
     const docPath = `${workingFolder}/payload.txt`;
     const document = fs.readFileSync(docPath, 'utf8');
-    fs.rmSync(workingFolder, { recursive: true, force: true });
+    // fs.rmSync(workingFolder, { recursive: true, force: true });
 
     res.status(200).send({
       message: 'Execution submitted successfully.',

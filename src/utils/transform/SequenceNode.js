@@ -42,33 +42,22 @@ export default class SequenceNode {
 
   getOutputSpecName = () => {
     const { label, renamed, attributes } = this.node;
-    if (attributes && attributes[0]) {
-      return attributes[0];
-    }
-    return renamed || label;
+    return attributes?.[0]?.value ?? renamed ?? label;
   };
 
   getFieldsList() {
     const { upstreamNodes, attributes } = this.node;
     const fieldName = this.getOutputSpecName();
-    const upstreamNodesHash = upstreamNodes.reduce((sum, curr) => {
-      sum[curr.nodeId] = curr;
-      return sum;
-    }, {});
-    const fields = [
-      { '@': { name: fieldName, group: '0', hide: 'no', type: 'Span' } },
-    ]; //add the first field for the sequence node
+    const fields = [];
 
-    const cAttributes = Object.assign({}, attributes);
-    delete cAttributes['0'];
-    if (cAttributes) {
-      Object.keys(cAttributes).map((key, index) => {
-        const { label } = upstreamNodesHash[key];
+    if (attributes) {
+      attributes.map((attribute, index) => {
+        const { label, value, visible } = attribute;
         fields.push({
           '@': {
-            name: cAttributes[key] || label,
-            group: index + 1,
-            hide: !cAttributes[key] ? 'yes' : 'no', // attributes
+            name: value || label,
+            group: index,
+            hide: !visible ? 'yes' : 'no', // attributes
             type: 'Span',
           },
         });
@@ -78,8 +67,8 @@ export default class SequenceNode {
         const { label, attributes } = node;
         fields.push({
           '@': {
-            name: attributes[0] || label,
-            group: index + 1,
+            name: attributes[0]?.value || label,
+            group: index,
             hide: 'yes',
             type: 'Span',
           },
@@ -99,7 +88,7 @@ export default class SequenceNode {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': attributes?.[0] ?? label,
+          'input-field-name': attributes?.[0]?.value ?? label,
         },
       },
     };
