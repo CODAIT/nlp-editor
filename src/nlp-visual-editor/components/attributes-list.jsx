@@ -74,7 +74,7 @@ export class AttributesList extends React.Component {
                     this.setState({ editIndex: null });
                   }
                 }}
-                defaultValue={value}
+                defaultValue={value ?? label}
               />
             );
           } else {
@@ -89,7 +89,7 @@ export class AttributesList extends React.Component {
                   disabled={disabled}
                   defaultChecked={visible}
                 />
-                {value}
+                {value ?? label}
                 <Button
                   id={`button-${index}`}
                   renderIcon={Edit16}

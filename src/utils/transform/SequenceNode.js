@@ -40,14 +40,8 @@ export default class SequenceNode {
     return inputConcepts;
   }
 
-  getOutputSpecName = () => {
-    const { label, renamed, attributes } = this.node;
-    return attributes?.[0]?.value ?? renamed ?? label;
-  };
-
   getFieldsList() {
     const { upstreamNodes, attributes } = this.node;
-    const fieldName = this.getOutputSpecName();
     const fields = [];
 
     if (attributes) {

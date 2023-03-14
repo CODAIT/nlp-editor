@@ -66,35 +66,23 @@ export default class RegexNode {
   }
 
   getFieldList() {
-    const { label, attributes } = this.node;
-    const fields = [
-      {
-        '@': {
-          name: attributes ? attributes[0] : label, //node name lowercase
-        },
-      },
-    ];
+    const { attributes } = this.node;
 
-    const rAttributes = Object.assign({}, attributes);
-    delete rAttributes['0'];
-    if (rAttributes) {
-      Object.keys(rAttributes).map((key, index) => {
-        const { label } = rAttributes[key];
-        fields.push({
-          '@': {
-            name: rAttributes[key],
-            group: index + 1,
-            hide: !rAttributes[key] ? 'yes' : 'no', // attributes
-            type: 'Span',
-          },
-        });
-      });
-    }
-    return fields;
+    return attributes.map((attribute, index) => {
+      const { label, value, visible } = attribute;
+      return {
+        '@': {
+          name: value ?? label,
+          group: index,
+          hide: !visible ? 'yes' : 'no', // attributes
+          type: 'Span',
+        },
+      };
+    });
   }
 
   transform() {
-    const { label, attributes, regexInput: pattern } = this.node;
+    const { label, regexInput: pattern } = this.node;
     const fieldName = label;
     const fieldList = this.getFieldList();
     const matchingFlag = this.getMatchingFlag();
