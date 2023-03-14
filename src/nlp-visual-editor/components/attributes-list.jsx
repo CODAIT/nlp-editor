@@ -45,8 +45,16 @@ export class AttributesList extends React.Component {
   }
 
   onSaveAttributeVisible(visible, index) {
-    const newAttributes = Object.assign(this.state.attributes, []);
-    newAttributes[index].visible = visible;
+    const newAttributes = this.props.attributes.map((v, i) => {
+      if (index === i) {
+        return {
+          ...v,
+          visible,
+        };
+      } else {
+        return v;
+      }
+    });
     this.props.onChange(newAttributes);
   }
 
