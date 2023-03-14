@@ -55,7 +55,7 @@ export class AttributesList extends React.Component {
       <div>
         <h4>Attributes</h4>
         {this.props.attributes?.map((attribute, index) => {
-          const { value, visible, label } = attribute;
+          const { value, visible, label, disabled } = attribute;
           // This returns the editable input
           if (index === this.state.editIndex) {
             return (
@@ -86,7 +86,7 @@ export class AttributesList extends React.Component {
                   onChange={(value) =>
                     this.onSaveAttributeVisible(!visible, index)
                   }
-                  disabled={index === 0}
+                  disabled={disabled}
                   defaultChecked={visible}
                 />
                 {value}

@@ -104,7 +104,7 @@ export default class DictionaryNode {
     if (mapTerms) {
       fieldValues.push({
         '@': {
-          name: `Mapped Term`,
+          name: attributes?.[1]?.value ?? `Mapped Term`,
           'mapped-entry': 'yes',
           hide: 'no',
         },

@@ -49,6 +49,7 @@ class SequencePanel extends React.Component {
             value: node.renamed ?? node.attributes?.[0]?.value ?? node.label,
             visible: true,
             label: node.label,
+            disabled: false,
           };
         }),
     };
@@ -57,49 +58,24 @@ class SequencePanel extends React.Component {
   componentDidMount() {
     let { pattern, upstreamNodes } = this.props;
     if (pattern === '') {
-      ({ pattern, upstreamNodes } = this.constructPattern());
+      const { pattern, attributes } = this.constructPattern();
       this.setState({
         pattern,
         upstreamNodes,
-        attributes: upstreamNodes.map((node) => {
-          return {
-            nodeId: node.nodeId,
-            value: node.renamed ?? node.attributes?.[0]?.value ?? node.label,
-            visible: true,
-            label: node.label,
-          };
-        }),
+        attributes,
       });
     }
-    // if( /* attributes keys not equal upstream keys*/)
-    // this.setState({
-    //   attributes: {
-    //     0: this.props.renamed || this.state.label,
-    //     ...upstreamNodes.reduce((sum, curr) => {
-    //       sum[curr.nodeId] = null;
-    //       return sum;
-    //     }, {}),
-    //   },
-    // });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
       const { label } = this.props;
-      const { pattern, upstreamNodes } = this.constructPattern();
+      const { pattern, attributes } = this.constructPattern();
       this.setState({
         label,
         upstreamNodes,
         pattern: this.props.pattern || pattern,
-        attributes: [
-          upstreamNodes.map((node) => {
-            return {
-              nodeId: node.nodeID,
-              value: node.attributes?.[0]?.value ?? node.label,
-              visible: true,
-            };
-          }),
-        ],
+        attributes,
       });
     }
   }
@@ -109,12 +85,13 @@ class SequencePanel extends React.Component {
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
     let pattern = '';
-    const upstreamNodes = [
+    const newAttributes = [
       {
         nodeId,
         label,
         visible: true,
         value: this.state.attributes?.[0]?.value ?? label,
+        disabled: true,
       },
     ];
     immediateNodes.forEach((id, index) => {
@@ -124,15 +101,20 @@ class SequencePanel extends React.Component {
       if (index < immediateNodes.length - 1) {
         pattern += `<Token>{1,2}`;
       }
-      upstreamNodes.push({
-        label,
-        nodeId,
-        type,
-        attributes,
-        visible: visible || false,
-      });
+      // Add all attributes from each node (but filter out other node's attributes)
+      for (const attribute of attributes) {
+        if (attribute.nodeId === node.nodeId) {
+          newAttributes.push({
+            label,
+            nodeId,
+            value: attribute.value ?? label,
+            disabled: false,
+            visible: visible || false,
+          });
+        }
+      }
     });
-    return { pattern, upstreamNodes };
+    return { pattern, attributes: newAttributes };
   };
 
   parsePattern = () => {
@@ -143,7 +125,7 @@ class SequencePanel extends React.Component {
       nodeList.forEach((n) => {
         const nodeName = n.substring(2, n.length);
         const { nodeId, type, visible, renamed, attributes } =
-          upstreamNodes.find((n) => n.label === nodeName);
+          this.state.attributes.find((n) => n.label === nodeName);
         newList.push({
           label: nodeName,
           nodeId,

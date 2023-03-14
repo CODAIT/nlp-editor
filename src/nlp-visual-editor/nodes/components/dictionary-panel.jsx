@@ -80,6 +80,7 @@ class DictionaryPanel extends React.Component {
           label: this.props.label,
           value: this.props.label,
           visible: true,
+          disabled: true,
         },
       ],
       editId: null,
@@ -237,6 +238,7 @@ class DictionaryPanel extends React.Component {
       mappedItems,
       attributes,
     } = this.state;
+    const { nodeId } = this.props;
     return (
       <div className="dictionary-panel">
         <FileUploader
@@ -256,9 +258,23 @@ class DictionaryPanel extends React.Component {
         <Toggle
           toggled={mapTerms}
           onToggle={() => {
-            this.setState({ mapTerms: !mapTerms });
+            this.setState({
+              mapTerms: !mapTerms,
+              attributes: !mapTerms
+                ? [
+                    attributes[0],
+                    {
+                      label: 'Mapped Term',
+                      value: 'Mapped Term',
+                      nodeId,
+                      visible: true,
+                      disabled: true,
+                    },
+                  ]
+                : [attributes[0]],
+            });
           }}
-          id={`toggle-${this.props.nodeId}`}
+          id={`toggle-${nodeId}`}
           labelText="Map Terms"
         />
         <DataTable
