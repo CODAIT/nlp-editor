@@ -25,9 +25,9 @@ export default class SequenceNode {
   }
 
   getInputConcepts() {
-    const { upstreamNodes } = this.node;
+    const { attributes } = this.node;
     const inputConcepts = [];
-    upstreamNodes.forEach((node) => {
+    attributes.forEach((node) => {
       const { label } = node;
       inputConcepts.push({
         '@': {
@@ -40,40 +40,28 @@ export default class SequenceNode {
   }
 
   getFieldsList() {
-    const { upstreamNodes, attributes } = this.node;
+    const { attributes } = this.node;
     const fields = [];
 
-    if (attributes) {
-      attributes.map((attribute, index) => {
-        const { label, value, visible } = attribute;
-        fields.push({
-          '@': {
-            name: value || label,
-            group: index,
-            hide: !visible ? 'yes' : 'no', // attributes
-            type: 'Span',
-          },
-        });
+    attributes.forEach((attribute, index) => {
+      const { label, value, visible } = attribute;
+      fields.push({
+        '@': {
+          name: value || label,
+          group: index,
+          hide: !visible ? 'yes' : 'no', // attributes
+          type: 'Span',
+        },
       });
-    } else {
-      upstreamNodes.forEach((node, index) => {
-        const { label, attributes } = node;
-        fields.push({
-          '@': {
-            name: attributes[0]?.value || label,
-            group: index,
-            hide: 'yes',
-            type: 'Span',
-          },
-        });
-      });
-    }
+    });
 
     return fields;
   }
 
-  getSequenceItem(node, sequenceLabel, index, tokens, length) {
-    const { label, attributes } = node;
+  getSequenceItem(node, index, tokens, length) {
+    const { label, attributes } = this.nodes.find(
+      (n) => n.nodeId === node.nodeId,
+    );
     let tokenGapItem = undefined;
     let atomItem = {
       '@': { group: `${index + 1}`, min: '1', max: '1' },
@@ -105,15 +93,14 @@ export default class SequenceNode {
   }
 
   getSequence() {
-    const { label: sequenceLabel, tokens, upstreamNodes } = this.node;
+    const { tokens, attributes } = this.node;
     let sequenceString = '';
-    upstreamNodes.forEach((node, index) => {
+    attributes.forEach((node, index) => {
       sequenceString += this.getSequenceItem(
         node,
-        sequenceLabel,
         index,
         tokens[index],
-        upstreamNodes.length,
+        attributes.length,
       );
     });
     return sequenceString;

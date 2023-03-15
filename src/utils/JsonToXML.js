@@ -26,7 +26,7 @@ import {
 
 export default function JsonToXML(canvasController) {
   this.canvasController = canvasController;
-  this.transform = function (node, moduleName) {
+  this.transform = function (node, moduleName, nodes) {
     const { type } = node;
     let obj;
     switch (type) {
@@ -37,7 +37,7 @@ export default function JsonToXML(canvasController) {
         obj = new DictionaryNode(this.canvasController, node, moduleName);
         break;
       case 'sequence':
-        obj = new SequenceNode(this.canvasController, node, moduleName);
+        obj = new SequenceNode(this.canvasController, node, moduleName, nodes);
         break;
       case 'union':
         obj = new UnionNode(node, moduleName);

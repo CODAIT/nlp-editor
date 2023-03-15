@@ -94,8 +94,15 @@ class SequencePanel extends React.Component {
   };
 
   parsePattern = () => {
-    const { pattern } = this.state;
-    const newList = [];
+    const { pattern, attributes, label, nodeId } = this.state;
+    const newList = [
+      attributes?.[0] ?? {
+        nodeId,
+        label,
+        visible: true,
+        disabled: true,
+      },
+    ];
     const nodeList = pattern.match(/\(<.+?(?=\.)/g);
     if (nodeList) {
       nodeList.forEach((n) => {
@@ -142,7 +149,6 @@ class SequencePanel extends React.Component {
 
     if (!errorMessage) {
       const tokens = this.getTokens();
-      const attributes = this.parsePattern();
       const node = {
         nodeId,
         attributes,
