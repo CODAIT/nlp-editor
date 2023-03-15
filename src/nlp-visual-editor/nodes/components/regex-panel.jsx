@@ -19,8 +19,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import {
-  Button,
-  TextInput,
   Checkbox,
   Dropdown,
   NumberInput,
@@ -28,7 +26,6 @@ import {
   RadioButtonGroup,
   TextArea,
 } from 'carbon-components-react';
-import { Edit16 } from '@carbon/icons-react';
 import { RHSPanelButtons, AttributesList } from '../../components';
 
 import './regex-panel.scss';

@@ -301,21 +301,19 @@ class VisualEditor extends React.Component {
     const { selectedNodeId, editorSettings } = this.state;
     const payload = [];
 
-    let upstreamNodeIds = this.canvasController
+    let upstreamNodes = this.canvasController
       .getUpstreamNodes([selectedNodeId], pipelineId)
-      .nodes[pipelineId].reverse();
+      .nodes[pipelineId].reverse()
+      .map((id) => {
+        return nodes.find((n) => n.nodeId === id);
+      });
 
-    const objNodes = nodes.reduce((sum, curr) => {
-      sum[curr.nodeId] = { ...{}, ...curr };
-      return sum;
-    }, {});
-
-    upstreamNodeIds.forEach((id) => {
-      let node = objNodes[id];
+    upstreamNodes.forEach((node) => {
       if (node.type !== 'input') {
         const results = this.jsonToXML.transform(
           node,
           editorSettings.moduleName,
+          nodes,
         );
         if (!Array.isArray(results)) {
           //dictionaries return a list

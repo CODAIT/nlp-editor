@@ -14,16 +14,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import React, { Children, isValidElement, cloneElement } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  Button,
-  TextInput,
-  Checkbox,
-  Dropdown,
-  TextArea,
-} from 'carbon-components-react';
+import { TextArea } from 'carbon-components-react';
 import { RHSPanelButtons, AttributesList } from '../../components';
 import './sequence-panel.scss';
 
@@ -32,36 +26,23 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class SequencePanel extends React.Component {
   constructor(props) {
     super(props);
-    const upstreamNodes = JSON.parse(JSON.stringify(this.props.upstreamNodes));
     this.state = {
-      nodeId: this.props.nodeId,
-      label: this.props.label,
-      renamed: this.props.renamed,
-      pattern: this.props.pattern,
-      upstreamNodes: upstreamNodes,
+      nodeId: props.nodeId,
+      label: props.label,
+      renamed: props.renamed,
+      pattern: props.pattern,
       editId: null,
       editLabel: '',
-      attributes:
-        props.attributes ??
-        props.upstreamNodes.map((node) => {
-          return {
-            nodeId: node.nodeId,
-            value: node.renamed ?? node.attributes?.[0]?.value ?? node.label,
-            visible: true,
-            label: node.label,
-            disabled: false,
-          };
-        }),
+      attributes: props.attributes ?? [],
     };
   }
 
   componentDidMount() {
-    let { pattern, upstreamNodes } = this.props;
+    let { pattern } = this.props;
     if (pattern === '') {
       const { pattern, attributes } = this.constructPattern();
       this.setState({
         pattern,
-        upstreamNodes,
         attributes,
       });
     }
@@ -73,7 +54,6 @@ class SequencePanel extends React.Component {
       const { pattern, attributes } = this.constructPattern();
       this.setState({
         label,
-        upstreamNodes,
         pattern: this.props.pattern || pattern,
         attributes,
       });
@@ -102,30 +82,26 @@ class SequencePanel extends React.Component {
         pattern += `<Token>{1,2}`;
       }
       // Add all attributes from each node (but filter out other node's attributes)
-      for (const attribute of attributes) {
-        if (attribute.nodeId === node.nodeId) {
-          newAttributes.push({
-            label,
-            nodeId,
-            value: attribute.value ?? label,
-            disabled: false,
-            visible: visible || false,
-          });
-        }
-      }
+      newAttributes.push({
+        label,
+        nodeId,
+        value: attributes?.[0]?.value ?? label,
+        disabled: false,
+        visible: true,
+      });
     });
     return { pattern, attributes: newAttributes };
   };
 
   parsePattern = () => {
-    const { pattern, upstreamNodes } = this.state;
+    const { pattern } = this.state;
     const newList = [];
     const nodeList = pattern.match(/\(<.+?(?=\.)/g);
     if (nodeList) {
       nodeList.forEach((n) => {
         const nodeName = n.substring(2, n.length);
         const { nodeId, type, visible, renamed, attributes } =
-          this.state.attributes.find((n) => n.label === nodeName);
+          this.props.nodes.find((n) => n.label === nodeName);
         newList.push({
           label: nodeName,
           nodeId,
@@ -166,12 +142,11 @@ class SequencePanel extends React.Component {
 
     if (!errorMessage) {
       const tokens = this.getTokens();
-      const upstreamNodes = this.parsePattern();
+      const attributes = this.parsePattern();
       const node = {
         nodeId,
         attributes,
         pattern,
-        upstreamNodes,
         tokens,
         isValid: true,
       };

@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 const js2xmlparser = require('js2xmlparser');
-import { getImmediateDownstreamNodes } from '../index';
-import { store } from '../../redux/store';
 
 export default class SequenceNode {
-  constructor(canvasController, node, moduleName) {
+  constructor(canvasController, node, moduleName, nodes) {
     this.canvasController = canvasController;
     this.node = node;
     this.moduleName = moduleName;
+    this.nodes = nodes;
   }
 
   getInputConcepts() {
@@ -121,8 +120,7 @@ export default class SequenceNode {
   }
 
   transform() {
-    const { label, consolidate, consolidateTarget, consolidatePolicy } =
-      this.node;
+    const { label } = this.node;
     const inputConcepts = this.getInputConcepts();
     const fieldList = this.getFieldsList();
     const sequence = this.getSequence();

@@ -17,7 +17,7 @@
 const js2xmlparser = require('js2xmlparser');
 import { store } from '../../redux/store';
 
-export default class SequenceNode {
+export default class FilterNode {
   constructor(canvasController, node, moduleName) {
     this.canvasController = canvasController;
     this.node = node;
