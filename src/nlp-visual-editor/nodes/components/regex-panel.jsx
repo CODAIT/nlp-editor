@@ -166,7 +166,7 @@ class RegexPanel extends React.Component {
                 var num_groups = new RegExp(
                   e.target.value.toString() + '|',
                 ).exec('').length;
-                for (let i = 0; i < num_groups; i++) {
+                for (let i = 1; i < num_groups; i++) {
                   attributes.push({
                     nodeId,
                     label,
