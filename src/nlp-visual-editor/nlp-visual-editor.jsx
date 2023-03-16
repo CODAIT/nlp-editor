@@ -704,7 +704,7 @@ class VisualEditor extends React.Component {
     if (['linkNodes', 'deleteLink'].includes(editType)) {
       // Automatically update union node properties when links are created / deleted.
       const linkId = data.id ?? data.linkIds?.[0];
-      const link = this.canvasController.getLink(linkId);
+      const link = command.linkInfo;
       const linkedNodes = [link.srcNodeId, link.trgNodeId];
       for (const nodeId of linkedNodes) {
         const node = nodes.find((n) => n.nodeId === nodeId);

@@ -14,11 +14,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import React, { Children, isValidElement, cloneElement } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Checkbox, Dropdown, TextArea } from 'carbon-components-react';
-import { RHSPanelButtons } from '../../components';
+import { Dropdown } from 'carbon-components-react';
+import { AttributesList, RHSPanelButtons } from '../../components';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
@@ -43,8 +42,9 @@ class ConsolidatePanel extends React.Component {
 
     this.state = {
       upstreamNodes: upstreamNodes,
-      consolidateTarget: this.props.consolidateTarget,
-      consolidatePolicy: this.props.consolidatePolicy,
+      attributes: this.getAttributes(),
+      consolidateTarget: props.consolidateTarget,
+      consolidatePolicy: props.consolidatePolicy,
       consolidateMethod: [
         {
           id: 'ContainedWithin',
@@ -70,6 +70,25 @@ class ConsolidatePanel extends React.Component {
     };
   }
 
+  getAttributes() {
+    const pipelineLinks = this.props.canvasController.getLinks(
+      this.props.pipelineId,
+    );
+    const immediateNodes = getImmediateUpstreamNodes(
+      this.props.nodeId,
+      pipelineLinks,
+    );
+    const primaryNode = this.props.nodes.find(
+      (n) => n.nodeId === immediateNodes?.[0],
+    );
+    return primaryNode?.attributes.map((attr) => {
+      return {
+        ...attr,
+        disabled: false,
+      };
+    });
+  }
+
   validateParameters = () => {
     const { consolidatePolicy, consolidateTarget } = this.state;
     const { nodeId } = this.props;
@@ -85,7 +104,7 @@ class ConsolidatePanel extends React.Component {
   };
 
   render() {
-    const { pattern } = this.state;
+    const { attributes } = this.state;
     return (
       <div className="sequence-panel">
         Manage overlapping matches
@@ -120,6 +139,13 @@ class ConsolidatePanel extends React.Component {
               consolidatePolicy: e.selectedItem.id,
             });
           }}
+        />
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes) => {
+            this.setState({ attributes: newAttributes });
+          }}
+          label={this.props.label}
         />
         <RHSPanelButtons
           onClosePanel={() => {

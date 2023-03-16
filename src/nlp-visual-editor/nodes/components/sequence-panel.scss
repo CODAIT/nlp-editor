@@ -14,40 +14,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-.sequence-panel{
-    .attributes {
-		line-height: 30px;
-		.bx--checkbox-wrapper {
-			float: left;
-			padding: 0;
-		}
-	}
-    .token-controls {
-        display: flex;
-        padding-left: 30px;
+.sequence-panel {
+  .token-controls {
+    display: flex;
+    padding-left: 30px;
 
-        span {
-            padding: 0 10px;
-            align-items: center;
-            display: inline-flex;
-        }
-
-        >.bx--form-item {
-            padding: 0 0;
-            flex: 0;
-        }
-
-        .number-range {
-            max-width: 100px;
-
-            input {
-                padding-right: 2rem;
-                min-width: 100px;
-            }
-        }
+    span {
+      padding: 0 10px;
+      align-items: center;
+      display: inline-flex;
     }
 
-    .bx--form-item{
-        padding-top: 1.5rem;
+    > .bx--form-item {
+      padding: 0 0;
+      flex: 0;
     }
+
+    .number-range {
+      max-width: 100px;
+
+      input {
+        padding-right: 2rem;
+        min-width: 100px;
+      }
+    }
+  }
+
+  .bx--form-item {
+    padding-top: 1.5rem;
+  }
 }

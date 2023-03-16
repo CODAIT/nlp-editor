@@ -16,9 +16,8 @@ limitations under the License.
 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, TextInput, Dropdown } from 'carbon-components-react';
-import { RHSPanelButtons } from '../../components';
-import classNames from 'classnames';
+import { Dropdown } from 'carbon-components-react';
+import { RHSPanelButtons, AttributesList } from '../../components';
 import { connect } from 'react-redux';
 import { getImmediateUpstreamNodes } from '../../../utils';
 
@@ -40,6 +39,7 @@ class FilterPanel extends React.Component {
     upstream = upstream.map((u) => ({ id: u, text: nodes[u].label }));
     this.state = {
       filterType: props.filterType,
+      attributes: this.getAttributes(),
       filterTypeItems: [
         {
           id: 'exclusive-predicates',
@@ -102,6 +102,25 @@ class FilterPanel extends React.Component {
     };
   }
 
+  getAttributes() {
+    const pipelineLinks = this.props.canvasController.getLinks(
+      this.props.pipelineId,
+    );
+    const immediateNodes = getImmediateUpstreamNodes(
+      this.props.nodeId,
+      pipelineLinks,
+    );
+    const primaryNode = this.props.nodes.find(
+      (n) => n.nodeId === immediateNodes?.[0],
+    );
+    return primaryNode?.attributes.map((attr) => {
+      return {
+        ...attr,
+        disabled: false,
+      };
+    });
+  }
+
   componentDidUpdate(prevProps) {}
 
   onSavePane = () => {
@@ -122,7 +141,7 @@ class FilterPanel extends React.Component {
   };
 
   render() {
-    const { inputText, lemmaMatch, errorMessage, attributes } = this.state;
+    const { attributes } = this.state;
 
     return (
       <div className="literal-panel">
@@ -211,6 +230,13 @@ class FilterPanel extends React.Component {
           }}
         />
 
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes) => {
+            this.setState({ attributes: newAttributes });
+          }}
+          label={this.props.label}
+        />
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

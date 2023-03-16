@@ -45,6 +45,14 @@ limitations under the License.
     }
   }
 
+  .attributes {
+    line-height: 30px;
+    .bx--checkbox-wrapper {
+      float: left;
+      padding: 0;
+    }
+  }
+
   .rhs-buttons {
     position: fixed;
     bottom: 0;
