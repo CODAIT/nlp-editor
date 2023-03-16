@@ -31,27 +31,16 @@ export default class UnionNode {
   };
 
   getInputSpans = (childNode) => {
-    const { label: parentNodeLabel } = this.node; //union-node label
     const { label, nodeId } = childNode;
-    const upstreamNodes = this.getChildUpstreamNodes(nodeId);
     const spans = [
       {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label, //'Literal_1',
+          'input-field-name': label,
         },
       },
     ]; //add the first field for the sequence node
-    /*upstreamNodes.forEach((node, index) => {
-      spans.push({
-        '@': {
-          'input-concept-module': this.moduleName,
-          'input-concept-name': label,
-          'input-field-name': node.label,
-        },
-      });
-    });*/
     return spans;
   };
 
@@ -69,7 +58,7 @@ export default class UnionNode {
         'output-spec': {
           field: {
             '@': {
-              name: node.renamed, //"Literal_1",
+              name: node.renamed,
               hide: 'no',
               'func-call': 'no',
               renamed: 'yes',

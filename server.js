@@ -307,7 +307,7 @@ app.get(
       if (errorMessage) {
         console.log('found error message', errorMessage);
         deleteFile(file, resultFileName);
-        return res.status(200).send({ status: 'error', message: errorMessage });
+        return res.status(409).send({ status: 'error', message: errorMessage });
       }
 
       const results =

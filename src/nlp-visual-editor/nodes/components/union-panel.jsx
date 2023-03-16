@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { RHSPanelButtons } from '../../components';
+import { AttributesList, RHSPanelButtons } from '../../components';
 import { Information24 } from '@carbon/icons-react';
 import './union-panel.scss';
 
@@ -28,6 +28,10 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class UnionPanel extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      attributes: props.attributes ?? [],
+      mismatchedAttributes: false,
+    };
   }
 
   componentDidMount() {
@@ -44,20 +48,46 @@ class UnionPanel extends React.Component {
     const { canvasController, nodeId, pipelineId, nodes } = this.props;
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
-    const upstreamNodes = [];
-    immediateNodes.forEach((id, index) => {
+    // Explanation of attributes:
+    // The union can only be created if the input nodes have the same schema:
+    // Same number of attributes and same names for attributes.
+    const firstImmediateNode = nodes.find(
+      (n) => n.nodeId === immediateNodes?.[0],
+    );
+    const attributeValues = firstImmediateNode?.attributes?.map(
+      (attribute) => attribute.value,
+    );
+    let attributesMatch = true;
+    // Check if each node has the same number of attributes and all match
+    for (const id of immediateNodes) {
       const node = nodes.find((n) => n.nodeId === id);
-      const { label, nodeId } = node;
-      upstreamNodes.push({ label, nodeId });
-    });
-
-    //assume it's valid even if user has not interacted with input controls
-    const node = {
-      nodeId,
-      upstreamNodes,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
+      if (!node?.attributes) {
+        attributesMatch = false;
+        break;
+      }
+      for (const attribute of node.attributes ?? []) {
+        if (!attributeValues.includes(attribute.value)) {
+          attributesMatch = false;
+          break;
+        }
+      }
+      if (node.attributes?.length !== attributeValues?.length) {
+        attributesMatch = false;
+        break;
+      }
+    }
+    if (attributesMatch) {
+      //assume it's valid even if user has not interacted with input controls
+      const node = {
+        nodeId,
+        attributes: firstImmediateNode?.attributes,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.setState({ attributes: firstImmediateNode?.attributes });
+    } else {
+      this.setState({ mismatchedAttributes: true });
+    }
   };
 
   onSavePane = () => {
@@ -73,10 +103,21 @@ class UnionPanel extends React.Component {
   };
 
   render() {
+    const { attributes, mismatchedAttributes } = this.state;
     return (
       <div className="union-panel">
         <Information24 aria-label="Information" className="info-icon" />
-        <span>No configuration necessary.</span>
+        {mismatchedAttributes ? (
+          <span>Upstream nodes must have the same attributes. </span>
+        ) : (
+          <AttributesList
+            attributes={attributes}
+            onChange={(newAttributes) => {
+              this.setState({ attributes: newAttributes });
+            }}
+            label={this.props.label}
+          />
+        )}
         <RHSPanelButtons
           showSaveButton={false}
           onClosePanel={() => {

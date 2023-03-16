@@ -38,14 +38,13 @@ class SequencePanel extends React.Component {
   }
 
   componentDidMount() {
-    let { pattern } = this.props;
-    if (pattern === '') {
-      const { pattern, attributes } = this.constructPattern();
-      this.setState({
-        pattern,
-        attributes,
-      });
-    }
+    const { label } = this.props;
+    const { pattern, attributes } = this.constructPattern();
+    this.setState({
+      label,
+      pattern: this.props.pattern || pattern,
+      attributes,
+    });
   }
 
   componentDidUpdate(prevProps) {
