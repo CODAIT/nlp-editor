@@ -701,16 +701,28 @@ class VisualEditor extends React.Component {
         node,
       });
     }
-    if (['linkNodes', 'deleteLink'].includes(editType)) {
+    if (editType === 'linkNodes') {
       // Automatically update union node properties when links are created / deleted.
-      const linkId = data.id ?? data.linkIds?.[0];
-      const link = command.linkInfo;
-      const linkedNodes = [link.srcNodeId, link.trgNodeId];
-      for (const nodeId of linkedNodes) {
-        const node = nodes.find((n) => n.nodeId === nodeId);
-        if (node.type === 'union') {
-          this.updateUnionProperties(node);
-        }
+      const link = this.canvasController.getLink(data.linkIds?.[0]);
+      const trgNode = nodes.find((n) => n.nodeId === link?.trgNodeId);
+      if (trgNode.type === 'union') {
+        this.updateUnionProperties(trgNode);
+      }
+      if (
+        trgNode.type === 'consolidate' &&
+        !this.canvasController
+          .getLinks()
+          .find((l) => l.trgNodeId === trgNode.nodeId)
+      ) {
+        this.canvasController.deleteLink(link.id);
+      }
+    } else if (editType === 'deleteLink') {
+      // Automatically update union node properties when links are created / deleted.
+      const trgNode = nodes.find(
+        (n) => n.nodeId === data.targetObject?.trgNodeId,
+      );
+      if (trgNode.type === 'union') {
+        this.updateUnionProperties(trgNode);
       }
     }
   };
