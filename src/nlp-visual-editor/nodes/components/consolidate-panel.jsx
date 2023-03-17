@@ -42,7 +42,7 @@ class ConsolidatePanel extends React.Component {
 
     this.state = {
       upstreamNodes: upstreamNodes,
-      attributes: this.getAttributes(),
+      attributes: this.getAttributes(props.consolidateTarget),
       consolidateTarget: props.consolidateTarget,
       consolidatePolicy: props.consolidatePolicy,
       consolidateMethod: [
@@ -70,23 +70,21 @@ class ConsolidatePanel extends React.Component {
     };
   }
 
-  getAttributes() {
-    const pipelineLinks = this.props.canvasController.getLinks(
-      this.props.pipelineId,
+  getAttributes(consolidateTarget) {
+    const { nodes } = this.props;
+    const primaryNodeLabel = this.state?.consolidateTarget ?? consolidateTarget;
+    if (!primaryNodeLabel) {
+      return [];
+    }
+    const primaryNode = nodes.find((n) => n.label === primaryNodeLabel);
+    return (
+      primaryNode?.attributes?.map((attr) => {
+        return {
+          ...attr,
+          disabled: false,
+        };
+      }) ?? []
     );
-    const immediateNodes = getImmediateUpstreamNodes(
-      this.props.nodeId,
-      pipelineLinks,
-    );
-    const primaryNode = this.props.nodes.find(
-      (n) => n.nodeId === immediateNodes?.[0],
-    );
-    return primaryNode?.attributes.map((attr) => {
-      return {
-        ...attr,
-        disabled: false,
-      };
-    });
   }
 
   validateParameters = () => {
@@ -121,6 +119,7 @@ class ConsolidatePanel extends React.Component {
           onChange={(e) => {
             this.setState({
               consolidateTarget: e.selectedItem.label,
+              attributes: this.getAttributes(e.selectedItem.label),
             });
           }}
         />

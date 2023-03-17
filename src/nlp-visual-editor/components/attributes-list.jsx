@@ -59,62 +59,67 @@ export class AttributesList extends React.Component {
   }
 
   render() {
+    const { attributes } = this.props;
     return (
       <div>
         <h4>Attributes</h4>
-        {this.props.attributes?.map((attribute, index) => {
-          const { value, visible, label, disabled } = attribute;
-          // This returns the editable input
-          if (index === this.state.editIndex) {
-            return (
-              <TextInput
-                id={`textIn-${index}`}
-                key={`textIn-${index}`}
-                labelText={`Rename attribute ${label}`}
-                onKeyDown={(e) => {
-                  const keyPressed = e.key || e.keyCode;
-                  if (this.state.editLabel === '') {
-                    return;
-                  }
-                  if (keyPressed === 'Enter' || keyPressed === 13) {
-                    this.onSaveAttributeLabel(e.target.value, index);
-                  } else if (keyPressed === 'Escape' || keyPressed === 27) {
-                    this.setState({ editIndex: null });
-                  }
-                }}
-                defaultValue={value ?? label}
-              />
-            );
-          } else {
-            return (
-              <div className="attributes" key={`span-${index}`}>
-                <Checkbox
-                  id={`check${index}`}
-                  labelText=""
-                  onChange={(value) =>
-                    this.onSaveAttributeVisible(!visible, index)
-                  }
-                  disabled={disabled}
-                  defaultChecked={visible}
+        {!attributes || attributes.length === 0 ? (
+          <span>No attributes available. </span>
+        ) : (
+          attributes.map((attribute, index) => {
+            const { value, visible, label, disabled } = attribute;
+            // This returns the editable input
+            if (index === this.state.editIndex) {
+              return (
+                <TextInput
+                  id={`textIn-${index}`}
+                  key={`textIn-${index}`}
+                  labelText={`Rename attribute ${label}`}
+                  onKeyDown={(e) => {
+                    const keyPressed = e.key || e.keyCode;
+                    if (this.state.editLabel === '') {
+                      return;
+                    }
+                    if (keyPressed === 'Enter' || keyPressed === 13) {
+                      this.onSaveAttributeLabel(e.target.value, index);
+                    } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                      this.setState({ editIndex: null });
+                    }
+                  }}
+                  defaultValue={value ?? label}
                 />
-                {value ?? label}
-                <Button
-                  id={`button-${index}`}
-                  renderIcon={Edit16}
-                  iconDescription="Edit label"
-                  size="sm"
-                  hasIconOnly
-                  kind="ghost"
-                  onClick={() =>
-                    this.setState({
-                      editIndex: index,
-                    })
-                  }
-                />
-              </div>
-            );
-          }
-        })}
+              );
+            } else {
+              return (
+                <div className="attributes" key={`span-${index}`}>
+                  <Checkbox
+                    id={`check${index}`}
+                    labelText=""
+                    onChange={(value) =>
+                      this.onSaveAttributeVisible(!visible, index)
+                    }
+                    disabled={disabled}
+                    defaultChecked={visible}
+                  />
+                  {value ?? label}
+                  <Button
+                    id={`button-${index}`}
+                    renderIcon={Edit16}
+                    iconDescription="Edit label"
+                    size="sm"
+                    hasIconOnly
+                    kind="ghost"
+                    onClick={() =>
+                      this.setState({
+                        editIndex: index,
+                      })
+                    }
+                  />
+                </div>
+              );
+            }
+          })
+        )}
       </div>
     );
   }
