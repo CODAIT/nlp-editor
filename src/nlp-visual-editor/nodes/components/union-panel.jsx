@@ -29,7 +29,7 @@ class UnionPanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      attributes: props.attributes ?? [],
+      attributes: props.attributes,
       mismatchedAttributes: false,
     };
   }
@@ -45,6 +45,9 @@ class UnionPanel extends React.Component {
   }
 
   setUpstreamNodes = () => {
+    if (this.state.attributes) {
+      return;
+    }
     const { canvasController, nodeId, pipelineId, nodes } = this.props;
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
@@ -54,24 +57,25 @@ class UnionPanel extends React.Component {
     const firstImmediateNode = nodes.find(
       (n) => n.nodeId === immediateNodes?.[0],
     );
-    const attributeValues = firstImmediateNode?.attributes?.map(
-      (attribute) => attribute.value,
+    const attributeValues = JSON.stringify(
+      firstImmediateNode?.attributes
+        ?.filter((attribute) => attribute.visible)
+        .map((attribute) => attribute.value)
+        ?.sort(),
     );
     let attributesMatch = true;
     // Check if each node has the same number of attributes and all match
     for (const id of immediateNodes) {
       const node = nodes.find((n) => n.nodeId === id);
-      if (!node?.attributes) {
+      const attributes = node?.attributes
+        ?.filter((attribute) => attribute.visible)
+        .map((attribute) => attribute.value)
+        ?.sort();
+      if (!attributes) {
         attributesMatch = false;
         break;
       }
-      for (const attribute of node.attributes ?? []) {
-        if (!attributeValues.includes(attribute.value)) {
-          attributesMatch = false;
-          break;
-        }
-      }
-      if (node.attributes?.length !== attributeValues?.length) {
+      if (JSON.stringify(attributes) !== attributeValues) {
         attributesMatch = false;
         break;
       }
@@ -111,7 +115,7 @@ class UnionPanel extends React.Component {
           <span>Upstream nodes must have the same attributes. </span>
         ) : (
           <AttributesList
-            attributes={attributes}
+            attributes={attributes ?? []}
             onChange={(newAttributes) => {
               this.setState({ attributes: newAttributes });
             }}
@@ -119,7 +123,8 @@ class UnionPanel extends React.Component {
           />
         )}
         <RHSPanelButtons
-          showSaveButton={false}
+          showSaveButton={true}
+          onSavePanel={this.onSavePane}
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });
           }}

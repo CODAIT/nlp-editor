@@ -45,7 +45,7 @@ export default class UnionNode {
   };
 
   getRules() {
-    const { upstreamNodes, label } = this.node;
+    const { upstreamNodes } = this.node;
     const { nodes } = store.getState()['nodesReducer'];
     const rules = [];
     upstreamNodes.forEach((n) => {
@@ -58,7 +58,7 @@ export default class UnionNode {
         'output-spec': {
           field: {
             '@': {
-              name: node.renamed,
+              name: node.attributes?.[0] ?? node.label,
               hide: 'no',
               'func-call': 'no',
               renamed: 'yes',
