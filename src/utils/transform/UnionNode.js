@@ -58,7 +58,7 @@ export default class UnionNode {
         'output-spec': {
           field: {
             '@': {
-              name: node.attributes?.[0] ?? node.label,
+              name: node.attributes?.[0]?.value ?? node.label,
               hide: 'no',
               'func-call': 'no',
               renamed: 'yes',

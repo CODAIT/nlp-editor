@@ -27,7 +27,10 @@ export default class SequenceNode {
   getInputConcepts() {
     const { attributes } = this.node;
     const inputConcepts = [];
-    attributes.forEach((node) => {
+    attributes.forEach((node, index) => {
+      if (index === 0) {
+        return;
+      }
       const { label } = node;
       inputConcepts.push({
         '@': {
@@ -64,7 +67,7 @@ export default class SequenceNode {
     );
     let tokenGapItem = undefined;
     let atomItem = {
-      '@': { group: `${index + 1}`, min: '1', max: '1' },
+      '@': { group: `${index}`, min: '1', max: '1' },
       'col-ref': {
         '@': {
           'input-concept-module': this.moduleName,
@@ -96,6 +99,9 @@ export default class SequenceNode {
     const { tokens, attributes } = this.node;
     let sequenceString = '';
     attributes.forEach((node, index) => {
+      if (index === 0) {
+        return;
+      }
       sequenceString += this.getSequenceItem(
         node,
         index,
