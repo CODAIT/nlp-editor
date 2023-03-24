@@ -68,7 +68,7 @@ export default class RegexNode {
   getFieldList() {
     const { attributes } = this.node;
 
-    return attributes.map((attribute, index) => {
+    return attributes?.map((attribute, index) => {
       const { label, value, visible } = attribute;
       return {
         '@': {

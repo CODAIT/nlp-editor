@@ -72,11 +72,11 @@ class ConsolidatePanel extends React.Component {
 
   getAttributes(consolidateTarget) {
     const { nodes } = this.props;
-    const primaryNodeLabel = this.state?.consolidateTarget ?? consolidateTarget;
-    if (!primaryNodeLabel) {
+    const primaryNodeInfo = this.state?.consolidateTarget ?? consolidateTarget;
+    if (!primaryNodeInfo) {
       return [];
     }
-    const primaryNode = nodes.find((n) => n.label === primaryNodeLabel);
+    const primaryNode = nodes.find((n) => n.nodeId === primaryNodeInfo.nodeId);
     return (
       primaryNode?.attributes?.map((attr) => {
         return {
@@ -112,14 +112,14 @@ class ConsolidatePanel extends React.Component {
           light
           label="Output Column"
           initialSelectedItem={this.state.upstreamNodes.find(
-            (item) => this.state.consolidateTarget == item.label,
+            (item) => this.state.consolidateTarget?.label == item.label,
           )}
           items={this.state.upstreamNodes}
           itemToString={(item) => (item ? item.label : '')}
           onChange={(e) => {
             this.setState({
-              consolidateTarget: e.selectedItem.label,
-              attributes: this.getAttributes(e.selectedItem.label),
+              consolidateTarget: e.selectedItem,
+              attributes: this.getAttributes(e.selectedItem),
             });
           }}
         />

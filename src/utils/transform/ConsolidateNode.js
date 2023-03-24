@@ -25,7 +25,8 @@ export default class ConsolidateNode {
   }
 
   transform() {
-    const { label, consolidateTarget, consolidatePolicy } = this.node;
+    const { label, consolidateTarget, consolidatePolicy, attributes } =
+      this.node;
     const { nodes } = store.getState()['nodesReducer'];
     const primaryInput = nodes.find((n) => n.nodeId === this.node.primary);
     const jsonStructure = {
@@ -40,7 +41,7 @@ export default class ConsolidateNode {
           {
             '@': {
               module: this.moduleName,
-              name: consolidateTarget,
+              name: consolidateTarget?.label,
             },
           },
         ],
@@ -51,8 +52,9 @@ export default class ConsolidateNode {
             {
               '@': {
                 'input-concept-module': this.moduleName,
-                'input-concept-name': consolidateTarget,
-                'input-field-name': consolidateTarget,
+                'input-concept-name': consolidateTarget?.label,
+                'input-field-name':
+                  attributes?.[0]?.value ?? consolidateTarget?.label,
               },
             },
           ],
@@ -61,7 +63,7 @@ export default class ConsolidateNode {
           field: [
             {
               '@': {
-                name: consolidateTarget,
+                name: attributes?.[0]?.value ?? consolidateTarget?.label,
               },
             },
           ],
@@ -72,7 +74,7 @@ export default class ConsolidateNode {
       },
       'consolidation-spec': {
         '@': {
-          target: consolidateTarget,
+          target: consolidateTarget?.label,
           policy: consolidatePolicy,
         },
       },
