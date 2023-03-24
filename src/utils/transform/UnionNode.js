@@ -31,13 +31,13 @@ export default class UnionNode {
   };
 
   getInputSpans = (childNode) => {
-    const { label, nodeId } = childNode;
+    const { label, nodeId, attributes } = childNode;
     const spans = [
       {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label,
+          'input-field-name': attributes?.[0]?.value ?? label,
         },
       },
     ]; //add the first field for the sequence node
@@ -49,8 +49,8 @@ export default class UnionNode {
     const { nodes } = store.getState()['nodesReducer'];
     const rules = [];
     upstreamNodes.forEach((n) => {
-      const inputSpans = this.getInputSpans(n);
       const node = nodes.find((node) => node.nodeId === n.nodeId);
+      const inputSpans = this.getInputSpans(node);
       rules.push({
         'input-spec': {
           'input-span': inputSpans,
