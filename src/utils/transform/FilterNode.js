@@ -63,7 +63,8 @@ export default class FilterNode {
               '@': {
                 'input-concept-module': this.moduleName,
                 'input-concept-name': primaryInput.label,
-                'input-field-name': primaryInput.label,
+                'input-field-name':
+                  primaryInput.attributes?.[0]?.value ?? primaryInput.label,
               },
             },
           ],
@@ -91,8 +92,9 @@ export default class FilterNode {
             {
               'field-spec': {
                 '@': {
-                  'input-field-name': primaryInput.label,
-                  'input-concept-name': label,
+                  'input-field-name':
+                    primaryInput.attributes?.[0]?.value ?? primaryInput.label,
+                  'input-concept-name': primaryInput.label,
                   'input-concept-module': this.moduleName,
                 },
               },

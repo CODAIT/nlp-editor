@@ -50,8 +50,7 @@ class DocumentViewer extends React.Component {
   getInputDocumentName = () => {
     const { nodes } = this.props;
     const node = nodes.find((n) => n.type === 'input') || {};
-    const { name } = node.files[0];
-    return name;
+    return node?.files[0]?.name;
   };
 
   render() {

@@ -74,7 +74,9 @@ export default class RegexNode {
         '@': {
           name: value ?? label,
           group: index,
-          hide: !visible ? 'yes' : 'no', // attributes
+          hide: !visible ? 'yes' : 'no', // attributes,
+          renamed: 'no',
+          'func-call': 'no',
           type: 'Span',
         },
       };

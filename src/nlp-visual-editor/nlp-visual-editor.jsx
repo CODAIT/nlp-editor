@@ -399,6 +399,14 @@ class VisualEditor extends React.Component {
           });
           this.props.setTabularResults(undefined);
         }
+      })
+      .catch((err) => {
+        clearInterval(this.timer);
+        this.setState({
+          isLoading: false,
+          errorMessage: err.message,
+        });
+        this.props.setTabularResults(undefined);
       });
   };
 
