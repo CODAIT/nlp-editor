@@ -113,12 +113,14 @@ class FilterPanel extends React.Component {
     const primaryNode = this.props.nodes.find(
       (n) => n.nodeId === immediateNodes?.[0],
     );
-    return primaryNode?.attributes.map((attr) => {
-      return {
-        ...attr,
-        disabled: false,
-      };
-    });
+    return (
+      primaryNode?.attributes?.map((attr) => {
+        return {
+          ...attr,
+          disabled: false,
+        };
+      }) ?? []
+    );
   }
 
   componentDidUpdate(prevProps) {}
