@@ -34,13 +34,13 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
-    const { saveNlpNode, setShowRightPanel, ...rest } = props;
+    const { saveNlpNode, setShowRightPanel, label, nodeId, ...rest } = props;
     this.state = {
       ...rest,
       attributes: props.attributes ?? [
         {
-          nodeId: props.nodeId,
-          label: props.label,
+          nodeId: nodeId,
+          label: label,
           visible: true,
           disabled: true,
         },
@@ -48,6 +48,13 @@ class RegexPanel extends React.Component {
       editLabel: '',
       editId: null,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.nodeId !== prevProps.nodeId) {
+      const { saveNlpNode, setShowRightPanel, label, ...rest } = this.props;
+      this.setState({ ...rest });
+    }
   }
 
   fetchResults = () => {
