@@ -96,7 +96,7 @@ export class AttributesList extends React.Component {
                     id={`check${index}`}
                     labelText=""
                     onChange={(value) =>
-                      this.onSaveAttributeVisible(!visible, index)
+                      this.onSaveAttributeVisible(value, index)
                     }
                     disabled={disabled}
                     defaultChecked={visible}
