@@ -110,7 +110,6 @@ class UnionPanel extends React.Component {
     const { attributes, mismatchedAttributes } = this.state;
     return (
       <div className="union-panel">
-        <Information24 aria-label="Information" className="info-icon" />
         {mismatchedAttributes ? (
           <span>Upstream nodes must have the same attributes. </span>
         ) : (
