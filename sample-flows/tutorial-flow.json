@@ -445,6 +445,41 @@
   },
   "nodes": [
     {
+      "label": "RevenueByDivision",
+      "nodeId": "295c7f55-9008-46d2-9f00-e5fcfa8cdbf6",
+      "type": "sequence",
+      "description": "Connect your extractors for execution",
+      "isValid": true,
+      "renamed": "RevenueByDivision",
+      "pattern": "(<RevenueOfDivision.RevenueOfDivision>)<Token>{0,35}(<Amount.Amount>)",
+      "upstreamNodes": [
+        {
+          "label": "RevenueOfDivision",
+          "nodeId": "3f122664-92b1-4d36-ac49-4341d3281294",
+          "type": "union",
+          "visible": false,
+          "renamed": "RevenueOfDivision"
+        },
+        {
+          "label": "Amount",
+          "nodeId": "7ac4050a-15a3-4c8b-8eb3-ece334de9bd2",
+          "type": "regex",
+          "visible": false,
+          "renamed": "Amount"
+        }
+      ],
+      "tokens": [{ "min": "0", "max": "35" }]
+    },
+    {
+      "label": "RevenueConsolidated",
+      "nodeId": "9de33a19-783f-4a93-83dd-3467710dd430",
+      "type": "consolidate",
+      "description": "Remove overlapping annotations",
+      "isValid": true,
+      "consolidateTarget": "RevenueByDivision",
+      "consolidatePolicy": "NotContainedWithin"
+    },
+    {
       "label": "Division",
       "nodeId": "bba756a6-5a45-426c-a8d9-4a1cd6a19881",
       "type": "dictionary",
@@ -459,19 +494,16 @@
       "caseSensitivity": "match",
       "lemmaMatch": false,
       "externalResourceChecked": false,
-      "mapTerms": false
-    },
-    {
-      "label": "Preposition",
-      "nodeId": "df2832a2-957f-43aa-88e4-a09fdf4c3b46",
-      "type": "dictionary",
-      "description": "Phrases to be matched.",
-      "isValid": true,
-      "items": ["from", "for"],
-      "caseSensitivity": "ignore",
-      "lemmaMatch": false,
-      "externalResourceChecked": false,
-      "mapTerms": false
+      "mapTerms": false,
+      "attributes": [
+        {
+          "nodeId": "bba756a6-5a45-426c-a8d9-4a1cd6a19881",
+          "label": "Division",
+          "value": "Division",
+          "visible": true,
+          "disabled": true
+        }
+      ]
     },
     {
       "label": "Metric",
@@ -483,7 +515,62 @@
       "caseSensitivity": "ignore",
       "lemmaMatch": true,
       "externalResourceChecked": false,
-      "mapTerms": false
+      "mapTerms": false,
+      "attributes": [
+        {
+          "nodeId": "8494ae16-4f5e-4e48-87d0-988b98c2cefd",
+          "label": "Metric",
+          "value": "Metric",
+          "visible": true,
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "label": "Preposition",
+      "nodeId": "df2832a2-957f-43aa-88e4-a09fdf4c3b46",
+      "type": "dictionary",
+      "description": "Phrases to be matched.",
+      "isValid": true,
+      "items": ["from", "for"],
+      "caseSensitivity": "ignore",
+      "lemmaMatch": false,
+      "externalResourceChecked": false,
+      "mapTerms": false,
+      "attributes": [
+        {
+          "nodeId": "df2832a2-957f-43aa-88e4-a09fdf4c3b46",
+          "label": "Preposition",
+          "value": "Preposition",
+          "visible": true,
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "label": "Amount",
+      "nodeId": "7ac4050a-15a3-4c8b-8eb3-ece334de9bd2",
+      "type": "regex",
+      "description": "Build a regular expression extractor.",
+      "isValid": true,
+      "regexInput": "\\$\\d+(\\.\\d+)?\\s+billion",
+      "expressionType": "regular",
+      "caseSensitivity": "match",
+      "tokenRange": { "checked": false, "range": [0, 0] },
+      "canonEq": false,
+      "dotAll": true,
+      "multiline": false,
+      "unixLines": false,
+      "attributes": [
+        {
+          "nodeId": "7ac4050a-15a3-4c8b-8eb3-ece334de9bd2",
+          "label": "Amount",
+          "visible": true,
+          "disabled": true
+        }
+      ],
+      "editLabel": "",
+      "editId": null
     },
     {
       "label": "RevenueOfDivision1",
@@ -509,7 +596,30 @@
           "renamed": "Metric"
         }
       ],
-      "tokens": [{ "min": "1", "max": "2" }]
+      "tokens": [{ "min": "1", "max": "2" }],
+      "attributes": [
+        {
+          "nodeId": "863f5c4c-6c1e-427a-9482-5592732aa81e",
+          "label": "RevenueOfDivision1",
+          "visible": true,
+          "value": "RevenueOfDivision",
+          "disabled": true
+        },
+        {
+          "label": "Division",
+          "nodeId": "bba756a6-5a45-426c-a8d9-4a1cd6a19881",
+          "value": "Division",
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Metric",
+          "nodeId": "8494ae16-4f5e-4e48-87d0-988b98c2cefd",
+          "value": "Metric",
+          "disabled": false,
+          "visible": true
+        }
+      ]
     },
     {
       "label": "RevenueOfDivision2",
@@ -545,22 +655,37 @@
       "tokens": [
         { "min": "0", "max": "1" },
         { "min": "0", "max": "2" }
+      ],
+      "attributes": [
+        {
+          "nodeId": "27fc9430-cb52-4dff-965b-f5f2261c43eb",
+          "label": "RevenueOfDivision2",
+          "visible": true,
+          "value": "RevenueOfDivision",
+          "disabled": true
+        },
+        {
+          "label": "Metric",
+          "nodeId": "8494ae16-4f5e-4e48-87d0-988b98c2cefd",
+          "value": "Metric",
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Preposition",
+          "nodeId": "df2832a2-957f-43aa-88e4-a09fdf4c3b46",
+          "value": "Preposition",
+          "disabled": false,
+          "visible": false
+        },
+        {
+          "label": "Division",
+          "nodeId": "bba756a6-5a45-426c-a8d9-4a1cd6a19881",
+          "value": "Division",
+          "disabled": false,
+          "visible": true
+        }
       ]
-    },
-    {
-      "label": "Amount",
-      "nodeId": "7ac4050a-15a3-4c8b-8eb3-ece334de9bd2",
-      "type": "regex",
-      "description": "Build a regular expression extractor.",
-      "isValid": true,
-      "regexInput": "\\$\\d+(\\.\\d+)?\\s+billion",
-      "expressionType": "regular",
-      "caseSensitivity": "match",
-      "tokenRange": { "checked": false, "range": [0, 0] },
-      "canonEq": false,
-      "dotAll": true,
-      "multiline": false,
-      "unixLines": false
     },
     {
       "label": "RevenueOfDivision",
@@ -577,42 +702,31 @@
           "label": "RevenueOfDivision2",
           "nodeId": "27fc9430-cb52-4dff-965b-f5f2261c43eb"
         }
-      ]
-    },
-    {
-      "label": "RevenueByDivision",
-      "nodeId": "295c7f55-9008-46d2-9f00-e5fcfa8cdbf6",
-      "type": "sequence",
-      "description": "Connect your extractors for execution",
-      "isValid": true,
-      "renamed": "RevenueByDivision",
-      "pattern": "(<RevenueOfDivision.RevenueOfDivision>)<Token>{0,35}(<Amount.Amount>)",
-      "upstreamNodes": [
+      ],
+      "attributes": [
         {
-          "label": "RevenueOfDivision",
-          "nodeId": "3f122664-92b1-4d36-ac49-4341d3281294",
-          "type": "union",
-          "visible": false,
-          "renamed": "RevenueOfDivision"
+          "nodeId": "863f5c4c-6c1e-427a-9482-5592732aa81e",
+          "label": "RevenueOfDivision1",
+          "visible": true,
+          "value": "RevenueOfDivision",
+          "disabled": true
         },
         {
-          "label": "Amount",
-          "nodeId": "7ac4050a-15a3-4c8b-8eb3-ece334de9bd2",
-          "type": "regex",
-          "visible": false,
-          "renamed": "Amount"
+          "label": "Division",
+          "nodeId": "bba756a6-5a45-426c-a8d9-4a1cd6a19881",
+          "value": "Division",
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Metric",
+          "nodeId": "8494ae16-4f5e-4e48-87d0-988b98c2cefd",
+          "value": "Metric",
+          "disabled": false,
+          "visible": true
         }
       ],
-      "tokens": [{ "min": "0", "max": "35" }]
-    },
-    {
-      "label": "RevenueConsolidated",
-      "nodeId": "9de33a19-783f-4a93-83dd-3467710dd430",
-      "type": "consolidate",
-      "description": "Remove overlapping annotations",
-      "isValid": true,
-      "consolidateTarget": "RevenueByDivision",
-      "consolidatePolicy": "NotContainedWithin"
+      "mismatchedAttributes": false
     },
     {
       "label": "Input Documents_1",

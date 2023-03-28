@@ -32,15 +32,15 @@ export default class UnionNode {
 
   getInputSpans = (childNode) => {
     const { label, nodeId, attributes } = childNode;
-    const spans = [
-      {
+    const spans = attributes?.map((attribute) => {
+      return {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': attributes?.[0]?.value ?? label,
+          'input-field-name': attribute.value ?? label,
         },
-      },
-    ]; //add the first field for the sequence node
+      };
+    });
     return spans;
   };
 
@@ -56,15 +56,17 @@ export default class UnionNode {
           'input-span': inputSpans,
         },
         'output-spec': {
-          field: {
-            '@': {
-              name: node.attributes?.[0]?.value ?? node.label,
-              hide: 'no',
-              'func-call': 'no',
-              renamed: 'yes',
-              type: 'Span',
-            },
-          },
+          field: node.attributes?.map((attribute) => {
+            return {
+              '@': {
+                name: attribute.value ?? node.label,
+                hide: 'no',
+                'func-call': 'no',
+                renamed: 'no',
+                type: 'Span',
+              },
+            };
+          }),
         },
         'rule-spec': { 'concept-projection': {} },
       });
