@@ -39,9 +39,6 @@ export class AttributesList extends React.Component {
       }
     });
     this.props.onChange(newAttributes);
-    this.setState({
-      editIndex: null,
-    });
   }
 
   onSaveAttributeVisible(visible, index) {
@@ -80,11 +77,17 @@ export class AttributesList extends React.Component {
                     if (this.state.editLabel === '') {
                       return;
                     }
-                    if (keyPressed === 'Enter' || keyPressed === 13) {
-                      this.onSaveAttributeLabel(e.target.value, index);
-                    } else if (keyPressed === 'Escape' || keyPressed === 27) {
+                    if (
+                      keyPressed === 'Enter' ||
+                      keyPressed === 13 ||
+                      keyPressed === 'Escape' ||
+                      keyPressed === 27
+                    ) {
                       this.setState({ editIndex: null });
                     }
+                  }}
+                  onChange={(e) => {
+                    this.onSaveAttributeLabel(e.target.value, index);
                   }}
                   defaultValue={value ?? label}
                 />
