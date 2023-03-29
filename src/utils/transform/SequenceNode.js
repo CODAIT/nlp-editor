@@ -27,7 +27,7 @@ export default class SequenceNode {
   getInputConcepts() {
     const { attributes } = this.node;
     const inputConcepts = [];
-    attributes.forEach((node, index) => {
+    attributes?.forEach((node, index) => {
       if (index === 0) {
         return;
       }
@@ -46,7 +46,7 @@ export default class SequenceNode {
     const { attributes } = this.node;
     const fields = [];
 
-    attributes.forEach((attribute, index) => {
+    attributes?.forEach((attribute, index) => {
       const { label, value, visible } = attribute;
       fields.push({
         '@': {
@@ -98,7 +98,7 @@ export default class SequenceNode {
   getSequence() {
     const { tokens, attributes } = this.node;
     let sequenceString = '';
-    attributes.forEach((node, index) => {
+    attributes?.forEach((node, index) => {
       if (index === 0) {
         return;
       }
