@@ -96,14 +96,16 @@ class UnionPanel extends React.Component {
 
   onSavePane = () => {
     const { nodeId } = this.props;
-    const { ...stateProps } = this.state;
-    const node = {
-      nodeId,
-      ...stateProps,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
-    this.props.setShowRightPanel({ showPanel: false });
+    const { hasAttributesError, ...stateProps } = this.state;
+    if (!hasAttributesError) {
+      const node = {
+        nodeId,
+        ...stateProps,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
+    }
   };
 
   render() {
@@ -114,9 +116,12 @@ class UnionPanel extends React.Component {
           <span>Upstream nodes must have the same attributes. </span>
         ) : (
           <AttributesList
-            attributes={attributes ?? []}
-            onChange={(newAttributes) => {
-              this.setState({ attributes: newAttributes });
+            attributes={attributes}
+            onChange={(newAttributes, hasError) => {
+              this.setState({
+                attributes: newAttributes,
+                hasAttributesError: hasError,
+              });
             }}
             label={this.props.label}
           />

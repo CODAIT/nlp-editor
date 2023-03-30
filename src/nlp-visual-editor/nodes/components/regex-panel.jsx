@@ -76,7 +76,13 @@ class RegexPanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { errorMessage, regexInput, attributes, ...rest } = this.state;
+    const {
+      errorMessage,
+      regexInput,
+      attributes,
+      hasAttributesError,
+      ...rest
+    } = this.state;
     const { nodeId } = this.props;
     let err = undefined;
     try {
@@ -90,7 +96,7 @@ class RegexPanel extends React.Component {
 
     this.setState({ errorMessage: err });
 
-    if (!err) {
+    if (!err && !hasAttributesError) {
       const node = {
         nodeId,
         attributes,
@@ -312,8 +318,11 @@ class RegexPanel extends React.Component {
         <hr />
         <AttributesList
           attributes={attributes}
-          onChange={(newAttributes) => {
-            this.setState({ attributes: newAttributes });
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
           }}
           label={this.props.label}
         />

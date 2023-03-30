@@ -33,6 +33,7 @@ class SequencePanel extends React.Component {
       pattern: props.pattern,
       editId: null,
       editLabel: '',
+      hasAttributesError: false,
       attributes: props.attributes ?? [],
     };
   }
@@ -138,7 +139,7 @@ class SequencePanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { pattern, attributes } = this.state;
+    const { pattern, attributes, hasAttributesError } = this.state;
     const { nodeId } = this.props;
 
     let errorMessage =
@@ -146,7 +147,7 @@ class SequencePanel extends React.Component {
 
     this.setState({ errorMessage });
 
-    if (!errorMessage) {
+    if (!errorMessage && !hasAttributesError) {
       const tokens = this.getTokens();
       const node = {
         nodeId,
@@ -159,28 +160,6 @@ class SequencePanel extends React.Component {
       this.props.setShowRightPanel({ showPanel: false });
     }
   };
-
-  onSaveAttributeLabel(node) {
-    const attributeUpdate = {};
-    attributeUpdate[node.nodeId] = this.state.editLabel;
-    this.setState({
-      editId: false,
-      attributes: {
-        ...this.state.attributes,
-        ...attributeUpdate,
-      },
-    });
-  }
-  onSaveAttributeVisible(node, value) {
-    const attributeUpdate = {};
-    attributeUpdate[node.nodeId] = value ? node.label : null;
-    this.setState({
-      attributes: {
-        ...this.state.attributes,
-        ...attributeUpdate,
-      },
-    });
-  }
 
   render() {
     const { pattern, attributes } = this.state;
@@ -199,8 +178,11 @@ class SequencePanel extends React.Component {
         <hr />
         <AttributesList
           attributes={attributes}
-          onChange={(newAttributes) => {
-            this.setState({ attributes: newAttributes });
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
           }}
           label={this.props.label}
         />

@@ -28,6 +28,17 @@ export class AttributesList extends React.Component {
   }
 
   onSaveAttributeLabel(newLabel, index) {
+    let hasError = false;
+    if (
+      this.props.attributes.find((attribute) => attribute.value === newLabel)
+    ) {
+      hasError = true;
+      this.setState({
+        errorMessage: 'Two attributes cannot have the same value.',
+      });
+    } else {
+      this.setState({ errorMessage: undefined });
+    }
     const newAttributes = this.props.attributes.map((v, i) => {
       if (index === i) {
         return {
@@ -38,7 +49,7 @@ export class AttributesList extends React.Component {
         return v;
       }
     });
-    this.props.onChange(newAttributes);
+    this.props.onChange(newAttributes, hasError);
   }
 
   onSaveAttributeVisible(visible, index) {
@@ -57,6 +68,7 @@ export class AttributesList extends React.Component {
 
   render() {
     const { attributes } = this.props;
+    const { errorMessage } = this.state;
     return (
       <div>
         <h4>Attributes</h4>
@@ -71,6 +83,8 @@ export class AttributesList extends React.Component {
                 <TextInput
                   id={`textIn-${index}`}
                   key={`textIn-${index}`}
+                  invalid={!!errorMessage}
+                  invalidText={errorMessage}
                   labelText={`Rename attribute ${label}`}
                   onKeyDown={(e) => {
                     const keyPressed = e.key || e.keyCode;
@@ -78,10 +92,11 @@ export class AttributesList extends React.Component {
                       return;
                     }
                     if (
-                      keyPressed === 'Enter' ||
-                      keyPressed === 13 ||
-                      keyPressed === 'Escape' ||
-                      keyPressed === 27
+                      !errorMessage &&
+                      (keyPressed === 'Enter' ||
+                        keyPressed === 13 ||
+                        keyPressed === 'Escape' ||
+                        keyPressed === 27)
                     ) {
                       this.setState({ editIndex: null });
                     }

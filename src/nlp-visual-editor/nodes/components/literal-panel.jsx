@@ -60,10 +60,11 @@ class LiteralPanel extends React.Component {
 
   onSavePane = () => {
     const errorMessage = this.validateParameters();
-    const { lemmaMatch, inputText, attributes } = this.state;
+    const { lemmaMatch, inputText, attributes, hasAttributesError } =
+      this.state;
     const { nodeId } = this.props;
 
-    if (!errorMessage) {
+    if (!errorMessage && !hasAttributesError) {
       const node = {
         nodeId,
         inputText,
@@ -116,8 +117,11 @@ class LiteralPanel extends React.Component {
         />
         <AttributesList
           attributes={attributes}
-          onChange={(newAttributes) => {
-            this.setState({ attributes: newAttributes });
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
           }}
           label={this.props.label}
         />

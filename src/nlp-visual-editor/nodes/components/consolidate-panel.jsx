@@ -88,17 +88,20 @@ class ConsolidatePanel extends React.Component {
   }
 
   validateParameters = () => {
-    const { consolidatePolicy, consolidateTarget } = this.state;
+    const { consolidatePolicy, consolidateTarget, hasAttributesError } =
+      this.state;
     const { nodeId } = this.props;
 
-    const node = {
-      nodeId,
-      consolidateTarget,
-      consolidatePolicy,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
-    this.props.setShowRightPanel({ showPanel: false });
+    if (!hasAttributesError) {
+      const node = {
+        nodeId,
+        consolidateTarget,
+        consolidatePolicy,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
+    }
   };
 
   render() {
@@ -141,8 +144,11 @@ class ConsolidatePanel extends React.Component {
         />
         <AttributesList
           attributes={attributes}
-          onChange={(newAttributes) => {
-            this.setState({ attributes: newAttributes });
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
           }}
           label={this.props.label}
         />

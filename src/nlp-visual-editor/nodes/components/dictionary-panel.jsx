@@ -176,6 +176,7 @@ class DictionaryPanel extends React.Component {
   };
 
   onSavePane = () => {
+    const { hasAttributesError } = this.state;
     const errorMessage = this.validateParameters();
     const {
       items,
@@ -188,7 +189,7 @@ class DictionaryPanel extends React.Component {
     } = this.state;
     const { nodeId } = this.props;
 
-    if (!errorMessage) {
+    if (!errorMessage && !hasAttributesError) {
       const node = {
         nodeId,
         items: mapTerms ? mappedItems : items,
@@ -464,8 +465,11 @@ class DictionaryPanel extends React.Component {
         <hr />
         <AttributesList
           attributes={attributes}
-          onChange={(newAttributes) => {
-            this.setState({ attributes: newAttributes });
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
           }}
           label={this.props.label}
         />

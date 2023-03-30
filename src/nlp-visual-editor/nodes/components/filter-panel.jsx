@@ -126,20 +126,29 @@ class FilterPanel extends React.Component {
   componentDidUpdate(prevProps) {}
 
   onSavePane = () => {
-    const { primary, filterType, funcName, secondary, scope } = this.state;
-    const { nodeId } = this.props;
-
-    const node = {
-      nodeId,
+    const {
       primary,
       filterType,
       funcName,
       secondary,
       scope,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
-    this.props.setShowRightPanel({ showPanel: false });
+      hasAttributesError,
+    } = this.state;
+    const { nodeId } = this.props;
+
+    if (!hasAttributesError) {
+      const node = {
+        nodeId,
+        primary,
+        filterType,
+        funcName,
+        secondary,
+        scope,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
+    }
   };
 
   render() {
@@ -234,8 +243,11 @@ class FilterPanel extends React.Component {
 
         <AttributesList
           attributes={attributes}
-          onChange={(newAttributes) => {
-            this.setState({ attributes: newAttributes });
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
           }}
           label={this.props.label}
         />
