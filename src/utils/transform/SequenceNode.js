@@ -105,7 +105,7 @@ export default class SequenceNode {
       sequenceString += this.getSequenceItem(
         node,
         index,
-        tokens[index],
+        tokens[index - 1],
         attributes.length,
       );
     });
