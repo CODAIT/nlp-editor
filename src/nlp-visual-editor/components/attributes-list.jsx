@@ -85,7 +85,7 @@ export class AttributesList extends React.Component {
                   key={`textIn-${index}`}
                   invalid={!!errorMessage}
                   invalidText={errorMessage}
-                  labelText={`Rename attribute ${label}`}
+                  labelText="Rename attribute"
                   onKeyDown={(e) => {
                     const keyPressed = e.key || e.keyCode;
                     if (this.state.editLabel === '') {
