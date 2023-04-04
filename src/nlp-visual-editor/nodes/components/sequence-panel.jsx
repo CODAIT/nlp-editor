@@ -40,10 +40,10 @@ class SequencePanel extends React.Component {
 
   componentDidMount() {
     const { label } = this.props;
-    const { pattern, attributes } = this.constructPattern();
+    const { pattern, attributes } = this.constructPattern(this.props.pattern);
     this.setState({
       label,
-      pattern: this.props.pattern || pattern,
+      pattern,
       attributes,
     });
   }
@@ -51,20 +51,20 @@ class SequencePanel extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.nodeId !== prevProps.nodeId) {
       const { label } = this.props;
-      const { pattern, attributes } = this.constructPattern();
+      const { pattern, attributes } = this.constructPattern(this.props.pattern);
       this.setState({
         label,
-        pattern: this.props.pattern || pattern,
+        pattern,
         attributes,
       });
     }
   }
 
-  constructPattern = () => {
+  constructPattern = (currentPattern) => {
     const { canvasController, nodeId, pipelineId, nodes, label } = this.props;
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
-    let pattern = '';
+    let pattern = currentPattern ?? '';
     const newAttributes = [
       {
         nodeId,
@@ -77,9 +77,16 @@ class SequencePanel extends React.Component {
     immediateNodes.forEach((id, index) => {
       const node = nodes.find((n) => n.nodeId === id);
       const { label, nodeId, type, visible, attributes } = node;
-      pattern += `(<${label}.${attributes?.[0]?.value ?? label}>)`;
-      if (index < immediateNodes.length - 1) {
-        pattern += `<Token>{1,2}`;
+      if (currentPattern !== undefined) {
+        pattern = pattern.replace(
+          new RegExp(`<${label}.(.*?)>`),
+          `<${label}.${attributes?.[0]?.value ?? label}`,
+        );
+      } else {
+        pattern += `(<${label}.${attributes?.[0]?.value ?? label}>)`;
+        if (index < immediateNodes.length - 1) {
+          pattern += `<Token>{1,2}`;
+        }
       }
       // Add all attributes from each node (but filter out other node's attributes)
       newAttributes.push({
