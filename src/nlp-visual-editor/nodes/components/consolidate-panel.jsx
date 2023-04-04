@@ -22,6 +22,29 @@ import { AttributesList, RHSPanelButtons } from '../../components';
 import { getImmediateUpstreamNodes } from '../../../utils';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
+const consolidateMethod = [
+  {
+    id: 'ContainedWithin',
+    text: 'Contained Within',
+  },
+  {
+    id: 'NotContainedWithin',
+    text: 'Not Contained Within',
+  },
+  {
+    id: 'ContainsButNotEqual',
+    text: 'Contains But Not Equal',
+  },
+  {
+    id: 'ExactMatch',
+    text: 'Exact match',
+  },
+  {
+    id: 'LeftToRight',
+    text: 'Left To Right',
+  },
+];
+
 class ConsolidatePanel extends React.Component {
   constructor(props) {
     super(props);
@@ -45,28 +68,6 @@ class ConsolidatePanel extends React.Component {
       attributes: this.getAttributes(props.consolidateTarget),
       consolidateTarget: props.consolidateTarget,
       consolidatePolicy: props.consolidatePolicy,
-      consolidateMethod: [
-        {
-          id: 'ContainedWithin',
-          text: 'Contained Within',
-        },
-        {
-          id: 'NotContainedWithin',
-          text: 'Not Contained Within',
-        },
-        {
-          id: 'ContainsButNotEqual',
-          text: 'Contains But Not Equal',
-        },
-        {
-          id: 'ExactMatch',
-          text: 'Exact match',
-        },
-        {
-          id: 'LeftToRight',
-          text: 'Left To Right',
-        },
-      ],
     };
   }
 
@@ -105,7 +106,23 @@ class ConsolidatePanel extends React.Component {
   };
 
   render() {
-    const { attributes } = this.state;
+    const { attributes, upstreamNodes, consolidateTarget, consolidatePolicy } =
+      this.state;
+    const nodeOptions = [];
+    upstreamNodes.forEach((upstreamNode) => {
+      const node = this.props.nodes.find(
+        (n) => n.nodeId === upstreamNode.nodeId,
+      );
+      const { attributes, label, nodeId } = node;
+      attributes?.forEach((attribute) => {
+        nodeOptions.push({
+          nodeId,
+          attribute: attribute.value ?? label,
+          label,
+          text: `<${label}.${attribute.value ?? label}>`,
+        });
+      });
+    });
     return (
       <div className="sequence-panel">
         Manage overlapping matches
@@ -114,11 +131,11 @@ class ConsolidatePanel extends React.Component {
           size="sm"
           light
           label="Output Column"
-          initialSelectedItem={this.state.upstreamNodes.find(
-            (item) => this.state.consolidateTarget?.label == item.label,
+          initialSelectedItem={nodeOptions.find(
+            (item) => consolidateTarget?.text == item.text,
           )}
-          items={this.state.upstreamNodes}
-          itemToString={(item) => (item ? item.label : '')}
+          items={nodeOptions}
+          itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
               consolidateTarget: e.selectedItem,
@@ -131,10 +148,10 @@ class ConsolidatePanel extends React.Component {
           size="sm"
           light
           label="Method"
-          initialSelectedItem={this.state.consolidateMethod.find(
-            (item) => this.state.consolidatePolicy == item.id,
+          initialSelectedItem={consolidateMethod.find(
+            (item) => consolidatePolicy == item.id,
           )}
-          items={this.state.consolidateMethod}
+          items={consolidateMethod}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({

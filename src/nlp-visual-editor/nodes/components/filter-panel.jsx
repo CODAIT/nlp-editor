@@ -201,14 +201,14 @@ class FilterPanel extends React.Component {
           size="sm"
           light
           initialSelectedItem={nodeOptions.find(
-            (item) => primary == item.nodeId,
+            (item) => primary.text == item.text,
           )}
           label="Primary"
           items={nodeOptions}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
-              primary: e.selectedItem.nodeId,
+              primary: e.selectedItem,
               attributes: this.getAttributes(e.selectedItem.nodeId),
             });
           }}
@@ -251,14 +251,14 @@ class FilterPanel extends React.Component {
           size="sm"
           light
           initialSelectedItem={nodeOptions.find(
-            (item) => secondary == item.nodeId,
+            (item) => secondary.text == item.text,
           )}
           label="Secondary"
           items={nodeOptions}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
-              secondary: e.selectedItem.nodeId,
+              secondary: e.selectedItem,
             });
           }}
         />
