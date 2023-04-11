@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { AttributesList, RHSPanelButtons } from '../../components';
 import { Information24 } from '@carbon/icons-react';
 import './union-panel.scss';
 
@@ -28,6 +28,10 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class UnionPanel extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      attributes: props.attributes,
+      mismatchedAttributes: false,
+    };
   }
 
   componentDidMount() {
@@ -41,44 +45,90 @@ class UnionPanel extends React.Component {
   }
 
   setUpstreamNodes = () => {
+    if (this.state.attributes) {
+      return;
+    }
     const { canvasController, nodeId, pipelineId, nodes } = this.props;
     const pipelineLinks = canvasController.getLinks(pipelineId);
     const immediateNodes = getImmediateUpstreamNodes(nodeId, pipelineLinks);
-    const upstreamNodes = [];
-    immediateNodes.forEach((id, index) => {
+    // Explanation of attributes:
+    // The union can only be created if the input nodes have the same schema:
+    // Same number of attributes and same names for attributes.
+    const firstImmediateNode = nodes.find(
+      (n) => n.nodeId === immediateNodes?.[0],
+    );
+    const attributeValues = JSON.stringify(
+      firstImmediateNode?.attributes
+        ?.filter((attribute) => attribute.visible)
+        .map((attribute) => attribute.value)
+        ?.sort(),
+    );
+    let attributesMatch = true;
+    // Check if each node has the same number of attributes and all match
+    for (const id of immediateNodes) {
       const node = nodes.find((n) => n.nodeId === id);
-      const { label, nodeId } = node;
-      upstreamNodes.push({ label, nodeId });
-    });
-
-    //assume it's valid even if user has not interacted with input controls
-    const node = {
-      nodeId,
-      upstreamNodes,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
+      const attributes = node?.attributes
+        ?.filter((attribute) => attribute.visible)
+        .map((attribute) => attribute.value)
+        ?.sort();
+      if (!attributes) {
+        attributesMatch = false;
+        break;
+      }
+      if (JSON.stringify(attributes) !== attributeValues) {
+        attributesMatch = false;
+        break;
+      }
+    }
+    if (attributesMatch) {
+      //assume it's valid even if user has not interacted with input controls
+      const node = {
+        nodeId,
+        attributes: firstImmediateNode?.attributes,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.setState({ attributes: firstImmediateNode?.attributes });
+    } else {
+      this.setState({ mismatchedAttributes: true });
+    }
   };
 
   onSavePane = () => {
     const { nodeId } = this.props;
-    const { ...stateProps } = this.state;
-    const node = {
-      nodeId,
-      ...stateProps,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
-    this.props.setShowRightPanel({ showPanel: false });
+    const { hasAttributesError, ...stateProps } = this.state;
+    if (!hasAttributesError) {
+      const node = {
+        nodeId,
+        ...stateProps,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
+    }
   };
 
   render() {
+    const { attributes, mismatchedAttributes } = this.state;
     return (
       <div className="union-panel">
-        <Information24 aria-label="Information" className="info-icon" />
-        <span>No configuration necessary.</span>
+        {mismatchedAttributes ? (
+          <span>Upstream nodes must have the same attributes. </span>
+        ) : (
+          <AttributesList
+            attributes={attributes}
+            onChange={(newAttributes, hasError) => {
+              this.setState({
+                attributes: newAttributes,
+                hasAttributesError: hasError,
+              });
+            }}
+            label={this.props.label}
+          />
+        )}
         <RHSPanelButtons
-          showSaveButton={false}
+          showSaveButton={true}
+          onSavePanel={this.onSavePane}
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });
           }}

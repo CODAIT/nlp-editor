@@ -17,7 +17,7 @@
 const js2xmlparser = require('js2xmlparser');
 import { store } from '../../redux/store';
 
-export default class SequenceNode {
+export default class ConsolidateNode {
   constructor(canvasController, node, moduleName) {
     this.canvasController = canvasController;
     this.node = node;
@@ -25,7 +25,8 @@ export default class SequenceNode {
   }
 
   transform() {
-    const { label, consolidateTarget, consolidatePolicy } = this.node;
+    const { label, consolidateTarget, consolidatePolicy, attributes } =
+      this.node;
     const { nodes } = store.getState()['nodesReducer'];
     const primaryInput = nodes.find((n) => n.nodeId === this.node.primary);
     const jsonStructure = {
@@ -40,7 +41,7 @@ export default class SequenceNode {
           {
             '@': {
               module: this.moduleName,
-              name: consolidateTarget,
+              name: consolidateTarget?.label,
             },
           },
         ],
@@ -51,8 +52,9 @@ export default class SequenceNode {
             {
               '@': {
                 'input-concept-module': this.moduleName,
-                'input-concept-name': consolidateTarget,
-                'input-field-name': consolidateTarget,
+                'input-concept-name': consolidateTarget?.label,
+                'input-field-name':
+                  attributes?.[0]?.value ?? consolidateTarget?.label,
               },
             },
           ],
@@ -61,7 +63,7 @@ export default class SequenceNode {
           field: [
             {
               '@': {
-                name: consolidateTarget,
+                name: attributes?.[0]?.value ?? consolidateTarget?.label,
               },
             },
           ],
@@ -72,7 +74,7 @@ export default class SequenceNode {
       },
       'consolidation-spec': {
         '@': {
-          target: consolidateTarget,
+          target: consolidateTarget?.label,
           policy: consolidatePolicy,
         },
       },

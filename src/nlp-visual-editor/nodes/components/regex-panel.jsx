@@ -26,7 +26,7 @@ import {
   RadioButtonGroup,
   TextArea,
 } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { RHSPanelButtons, AttributesList } from '../../components';
 
 import './regex-panel.scss';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
@@ -34,9 +34,19 @@ import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 class RegexPanel extends React.Component {
   constructor(props) {
     super(props);
-    const { saveNlpNode, setShowRightPanel, label, ...rest } = props;
+    const { saveNlpNode, setShowRightPanel, label, nodeId, ...rest } = props;
     this.state = {
       ...rest,
+      attributes: props.attributes ?? [
+        {
+          nodeId: nodeId,
+          label: label,
+          visible: true,
+          disabled: true,
+        },
+      ],
+      editLabel: '',
+      editId: null,
     };
   }
 
@@ -66,7 +76,13 @@ class RegexPanel extends React.Component {
   };
 
   validateParameters = () => {
-    const { errorMessage, regexInput, ...rest } = this.state;
+    const {
+      errorMessage,
+      regexInput,
+      attributes,
+      hasAttributesError,
+      ...rest
+    } = this.state;
     const { nodeId } = this.props;
     let err = undefined;
     try {
@@ -80,9 +96,10 @@ class RegexPanel extends React.Component {
 
     this.setState({ errorMessage: err });
 
-    if (!err) {
+    if (!err && !hasAttributesError) {
       const node = {
         nodeId,
+        attributes,
         regexInput,
         ...rest,
         isValid: true,
@@ -104,7 +121,7 @@ class RegexPanel extends React.Component {
     this.setState({ ...props });
   };
 
-  onExpresionTypeChange = (type) => {
+  onExpressionTypeChange = (type) => {
     const { caseSensitivity } = this.state;
     let props = { expressionType: type };
     if (type === 'literal') {
@@ -138,10 +155,11 @@ class RegexPanel extends React.Component {
       multiline,
       unixLines,
       errorMessage,
+      attributes,
     } = this.state;
+    const { nodeId, label } = this.props;
 
     const disableCheckboxes = expressionType === 'literal';
-
     return (
       <div className="regex-panel">
         <div className="regex-panel-contents">
@@ -153,8 +171,27 @@ class RegexPanel extends React.Component {
             invalid={errorMessage !== undefined}
             invalidText={errorMessage}
             onChange={(e) => {
+              let attributes = [this.state.attributes[0]];
+              try {
+                var num_groups = new RegExp(
+                  e.target.value.toString() + '|',
+                ).exec('').length;
+                for (let i = 1; i < num_groups; i++) {
+                  attributes.push({
+                    nodeId,
+                    label,
+                    value: `group${i}`,
+                    visible: true,
+                    disabled: false,
+                  });
+                }
+              } catch (e) {
+                attributes = this.state.attributes;
+              }
+
               this.setState({
                 regexInput: e.target.value,
+                attributes,
                 errorMessage: undefined,
               });
             }}
@@ -164,7 +201,7 @@ class RegexPanel extends React.Component {
             name="rdExpression"
             defaultSelected={expressionType}
             onChange={(value) => {
-              this.onExpresionTypeChange(value);
+              this.onExpressionTypeChange(value);
             }}
           >
             <RadioButton
@@ -277,6 +314,18 @@ class RegexPanel extends React.Component {
             />
           </div>
         </div>
+
+        <hr />
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
+          }}
+          label={this.props.label}
+        />
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

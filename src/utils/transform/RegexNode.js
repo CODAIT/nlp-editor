@@ -65,9 +65,28 @@ export default class RegexNode {
     return { min, max };
   }
 
+  getFieldList() {
+    const { attributes } = this.node;
+
+    return attributes?.map((attribute, index) => {
+      const { label, value, visible } = attribute;
+      return {
+        '@': {
+          name: value ?? label,
+          group: index,
+          hide: !visible ? 'yes' : 'no', // attributes,
+          renamed: 'no',
+          'func-call': 'no',
+          type: 'Span',
+        },
+      };
+    });
+  }
+
   transform() {
     const { label, regexInput: pattern } = this.node;
     const fieldName = label;
+    const fieldList = this.getFieldList();
     const matchingFlag = this.getMatchingFlag();
     const { min, max } = this.getRange();
     const jsonStructure = {
@@ -98,11 +117,7 @@ export default class RegexNode {
           },
         },
         'output-spec': {
-          field: {
-            '@': {
-              name: fieldName, //node name lowercase
-            },
-          },
+          field: fieldList,
         },
         'rule-spec': {
           'regex-match': {

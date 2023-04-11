@@ -39,8 +39,8 @@ import {
   TableToolbarContent,
   DataTable,
 } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
-import { Delete16 } from '@carbon/icons-react';
+import { AttributesList, RHSPanelButtons } from '../../components';
+import { Delete16, Edit16 } from '@carbon/icons-react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { parse } from 'csv-parse/browser/esm';
@@ -62,6 +62,7 @@ class DictionaryPanel extends React.Component {
       ? props.items?.filter(filterItems) ?? []
       : Object.keys(props.items).filter(filterItems);
     this.state = {
+      label: props.label,
       inputText: '',
       items: filteredItems,
       caseSensitivity: props.caseSensitivity,
@@ -73,6 +74,17 @@ class DictionaryPanel extends React.Component {
       mappedItems: Array.isArray(props.items ?? []) ? {} : props.items,
       page: 1,
       pageSize: 10,
+      attributes: props.attributes ?? [
+        {
+          nodeId: this.props.nodeId,
+          label: this.props.label,
+          value: this.props.label,
+          visible: true,
+          disabled: true,
+        },
+      ],
+      editId: null,
+      editLabel: null,
     };
     this.reader.onload = (event) => {
       const { items, mapTerms, mappedItems } = this.state;
@@ -164,6 +176,7 @@ class DictionaryPanel extends React.Component {
   };
 
   onSavePane = () => {
+    const { hasAttributesError } = this.state;
     const errorMessage = this.validateParameters();
     const {
       items,
@@ -172,10 +185,11 @@ class DictionaryPanel extends React.Component {
       externalResourceChecked,
       mapTerms,
       mappedItems,
+      attributes,
     } = this.state;
     const { nodeId } = this.props;
 
-    if (!errorMessage) {
+    if (!errorMessage && !hasAttributesError) {
       const node = {
         nodeId,
         items: mapTerms ? mappedItems : items,
@@ -184,6 +198,7 @@ class DictionaryPanel extends React.Component {
         externalResourceChecked,
         isValid: true,
         mapTerms,
+        attributes,
       };
       this.props.saveNlpNode({ node });
       this.props.setShowRightPanel({ showPanel: false });
@@ -216,15 +231,15 @@ class DictionaryPanel extends React.Component {
 
   render() {
     const {
-      inputText,
       caseSensitivity,
       externalResourceChecked,
       lemmaMatch,
       errorMessage,
-      items,
       mapTerms,
       mappedItems,
+      attributes,
     } = this.state;
+    const { nodeId } = this.props;
     return (
       <div className="dictionary-panel">
         <FileUploader
@@ -244,8 +259,23 @@ class DictionaryPanel extends React.Component {
         <Toggle
           toggled={mapTerms}
           onToggle={() => {
-            this.setState({ mapTerms: !mapTerms });
+            this.setState({
+              mapTerms: !mapTerms,
+              attributes: !mapTerms
+                ? [
+                    attributes[0],
+                    {
+                      label: 'Mapped Term',
+                      value: 'Mapped Term',
+                      nodeId,
+                      visible: true,
+                      disabled: true,
+                    },
+                  ]
+                : [attributes[0]],
+            });
           }}
+          id={`toggle-${nodeId}`}
           labelText="Map Terms"
         />
         <DataTable
@@ -309,10 +339,13 @@ class DictionaryPanel extends React.Component {
                         this.onDeleteItems(props);
                       }}
                       renderIcon={Delete16}
+                      iconDescription={'H'}
                     />
                   </TableBatchActions>
                   <TableToolbarContent style={{ height: 'fit-content' }}>
                     <TextInput
+                      labelText={this.state.label}
+                      id={`textInput-${this.props.nodeId}`}
                       value={this.state.inputText}
                       invalid={errorMessage !== undefined}
                       invalidText={errorMessage}
@@ -428,6 +461,18 @@ class DictionaryPanel extends React.Component {
             value="lemmaMatch"
           />
         </RadioButtonGroup>
+
+        <hr />
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
+          }}
+          label={this.props.label}
+        />
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

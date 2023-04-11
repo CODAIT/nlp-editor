@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 const js2xmlparser = require('js2xmlparser');
-import { getImmediateDownstreamNodes } from '../index';
-import { store } from '../../redux/store';
 
 export default class SequenceNode {
-  constructor(canvasController, node, moduleName) {
+  constructor(canvasController, node, moduleName, nodes) {
     this.canvasController = canvasController;
     this.node = node;
     this.moduleName = moduleName;
+    this.nodes = nodes;
   }
 
   getInputConcepts() {
-    const { upstreamNodes } = this.node;
+    const { attributes } = this.node;
     const inputConcepts = [];
-    upstreamNodes.forEach((node) => {
+    attributes?.forEach((node, index) => {
+      if (index === 0) {
+        return;
+      }
       const { label } = node;
       inputConcepts.push({
         '@': {
@@ -40,41 +42,37 @@ export default class SequenceNode {
     return inputConcepts;
   }
 
-  getOutputSpecName = () => {
-    const { label, renamed } = this.node;
-    return renamed || label;
-  };
-
   getFieldsList() {
-    const { upstreamNodes } = this.node;
-    const fieldName = this.getOutputSpecName();
-    const fields = [
-      { '@': { name: fieldName, group: '0', hide: 'no', type: 'Span' } },
-    ]; //add the first field for the sequence node
-    upstreamNodes.forEach((node, index) => {
-      const { label, renamed } = node;
+    const { attributes } = this.node;
+    const fields = [];
+
+    attributes?.forEach((attribute, index) => {
+      const { label, value, visible } = attribute;
       fields.push({
         '@': {
-          name: renamed || label,
-          group: index + 1,
-          hide: !node.visible ? 'yes' : 'no', // attributes
+          name: value || label,
+          group: index,
+          hide: !visible ? 'yes' : 'no', // attributes
           type: 'Span',
         },
       });
     });
+
     return fields;
   }
 
-  getSequenceItem(node, sequenceLabel, index, tokens, length) {
-    const { label } = node;
+  getSequenceItem(node, index, tokens, length) {
+    const { label, attributes } = this.nodes.find(
+      (n) => n.nodeId === node.nodeId,
+    );
     let tokenGapItem = undefined;
     let atomItem = {
-      '@': { group: `${index + 1}`, min: '1', max: '1' },
+      '@': { group: `${index}`, min: '1', max: '1' },
       'col-ref': {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label,
+          'input-field-name': attributes?.[0]?.value ?? label,
         },
       },
     };
@@ -98,23 +96,24 @@ export default class SequenceNode {
   }
 
   getSequence() {
-    const { label: sequenceLabel, tokens, upstreamNodes } = this.node;
+    const { tokens, attributes } = this.node;
     let sequenceString = '';
-    upstreamNodes.forEach((node, index) => {
+    attributes?.forEach((node, index) => {
+      if (index === 0) {
+        return;
+      }
       sequenceString += this.getSequenceItem(
         node,
-        sequenceLabel,
         index,
-        tokens[index],
-        upstreamNodes.length,
+        tokens[index - 1],
+        attributes.length,
       );
     });
     return sequenceString;
   }
 
   transform() {
-    const { label, consolidate, consolidateTarget, consolidatePolicy } =
-      this.node;
+    const { label } = this.node;
     const inputConcepts = this.getInputConcepts();
     const fieldList = this.getFieldsList();
     const sequence = this.getSequence();

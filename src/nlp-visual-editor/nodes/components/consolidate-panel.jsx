@@ -14,14 +14,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import React, { Children, isValidElement, cloneElement } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Checkbox, Dropdown, TextArea } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { Dropdown } from 'carbon-components-react';
+import { AttributesList, RHSPanelButtons } from '../../components';
 
 import { getImmediateUpstreamNodes } from '../../../utils';
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
+
+const consolidateMethod = [
+  {
+    id: 'ContainedWithin',
+    text: 'Contained Within',
+  },
+  {
+    id: 'NotContainedWithin',
+    text: 'Not Contained Within',
+  },
+  {
+    id: 'ContainsButNotEqual',
+    text: 'Contains But Not Equal',
+  },
+  {
+    id: 'ExactMatch',
+    text: 'Exact match',
+  },
+  {
+    id: 'LeftToRight',
+    text: 'Left To Right',
+  },
+];
 
 class ConsolidatePanel extends React.Component {
   constructor(props) {
@@ -43,49 +65,64 @@ class ConsolidatePanel extends React.Component {
 
     this.state = {
       upstreamNodes: upstreamNodes,
-      consolidateTarget: this.props.consolidateTarget,
-      consolidatePolicy: this.props.consolidatePolicy,
-      consolidateMethod: [
-        {
-          id: 'ContainedWithin',
-          text: 'Contained Within',
-        },
-        {
-          id: 'NotContainedWithin',
-          text: 'Not Contained Within',
-        },
-        {
-          id: 'ContainsButNotEqual',
-          text: 'Contains But Not Equal',
-        },
-        {
-          id: 'ExactMatch',
-          text: 'Exact match',
-        },
-        {
-          id: 'LeftToRight',
-          text: 'Left To Right',
-        },
-      ],
+      attributes: this.getAttributes(props.consolidateTarget),
+      consolidateTarget: props.consolidateTarget,
+      consolidatePolicy: props.consolidatePolicy,
     };
   }
 
+  getAttributes(consolidateTarget) {
+    const { nodes } = this.props;
+    const primaryNodeInfo = this.state?.consolidateTarget ?? consolidateTarget;
+    if (!primaryNodeInfo) {
+      return [];
+    }
+    const primaryNode = nodes.find((n) => n.nodeId === primaryNodeInfo.nodeId);
+    return (
+      primaryNode?.attributes?.map((attr) => {
+        return {
+          ...attr,
+          disabled: false,
+        };
+      }) ?? []
+    );
+  }
+
   validateParameters = () => {
-    const { consolidatePolicy, consolidateTarget } = this.state;
+    const { consolidatePolicy, consolidateTarget, hasAttributesError } =
+      this.state;
     const { nodeId } = this.props;
 
-    const node = {
-      nodeId,
-      consolidateTarget,
-      consolidatePolicy,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
-    this.props.setShowRightPanel({ showPanel: false });
+    if (!hasAttributesError) {
+      const node = {
+        nodeId,
+        consolidateTarget,
+        consolidatePolicy,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
+    }
   };
 
   render() {
-    const { pattern } = this.state;
+    const { attributes, upstreamNodes, consolidateTarget, consolidatePolicy } =
+      this.state;
+    const nodeOptions = [];
+    upstreamNodes.forEach((upstreamNode) => {
+      const node = this.props.nodes.find(
+        (n) => n.nodeId === upstreamNode.nodeId,
+      );
+      const { attributes, label, nodeId } = node;
+      attributes?.forEach((attribute) => {
+        nodeOptions.push({
+          nodeId,
+          attribute: attribute.value ?? label,
+          label,
+          text: `<${label}.${attribute.value ?? label}>`,
+        });
+      });
+    });
     return (
       <div className="sequence-panel">
         Manage overlapping matches
@@ -94,14 +131,15 @@ class ConsolidatePanel extends React.Component {
           size="sm"
           light
           label="Output Column"
-          initialSelectedItem={this.state.upstreamNodes.find(
-            (item) => this.state.consolidateTarget == item.label,
+          initialSelectedItem={nodeOptions.find(
+            (item) => consolidateTarget?.text == item.text,
           )}
-          items={this.state.upstreamNodes}
-          itemToString={(item) => (item ? item.label : '')}
+          items={nodeOptions}
+          itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
-              consolidateTarget: e.selectedItem.label,
+              consolidateTarget: e.selectedItem,
+              attributes: this.getAttributes(e.selectedItem),
             });
           }}
         />
@@ -110,16 +148,26 @@ class ConsolidatePanel extends React.Component {
           size="sm"
           light
           label="Method"
-          initialSelectedItem={this.state.consolidateMethod.find(
-            (item) => this.state.consolidatePolicy == item.id,
+          initialSelectedItem={consolidateMethod.find(
+            (item) => consolidatePolicy == item.id,
           )}
-          items={this.state.consolidateMethod}
+          items={consolidateMethod}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
               consolidatePolicy: e.selectedItem.id,
             });
           }}
+        />
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
+          }}
+          label={this.props.label}
         />
         <RHSPanelButtons
           onClosePanel={() => {

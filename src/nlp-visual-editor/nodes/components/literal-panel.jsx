@@ -16,12 +16,11 @@ limitations under the License.
 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, TextInput } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
+import { TextInput, Checkbox } from 'carbon-components-react';
+import { RHSPanelButtons, AttributesList } from '../../components';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-
-// import './dictionary-panel.scss';
+import './literal-panel.scss';
 
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
@@ -29,9 +28,20 @@ class LiteralPanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      label: props.label,
       inputText: props.inputText,
       lemmaMatch: props.lemmaMatch,
       errorMessage: undefined,
+      attributes: props.attributes ?? [
+        {
+          label: props.label,
+          visible: true,
+          disabled: true,
+          nodeId: props.nodeId,
+        },
+      ],
+      editId: null,
+      editLabel: null,
     };
   }
 
@@ -50,14 +60,16 @@ class LiteralPanel extends React.Component {
 
   onSavePane = () => {
     const errorMessage = this.validateParameters();
-    const { lemmaMatch, inputText } = this.state;
+    const { lemmaMatch, inputText, attributes, hasAttributesError } =
+      this.state;
     const { nodeId } = this.props;
 
-    if (!errorMessage) {
+    if (!errorMessage && !hasAttributesError) {
       const node = {
         nodeId,
         inputText,
         lemmaMatch,
+        attributes,
         isValid: true,
       };
       this.props.saveNlpNode({ node });
@@ -76,7 +88,7 @@ class LiteralPanel extends React.Component {
   };
 
   render() {
-    const { inputText, lemmaMatch, errorMessage } = this.state;
+    const { inputText, lemmaMatch, errorMessage, attributes } = this.state;
     return (
       <div className="literal-panel">
         <div
@@ -102,6 +114,16 @@ class LiteralPanel extends React.Component {
           id="chkLemmaMatch"
           onChange={this.onChangeLemmaMatch}
           checked={lemmaMatch}
+        />
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
+          }}
+          label={this.props.label}
         />
         <RHSPanelButtons
           onClosePanel={() => {

@@ -16,9 +16,8 @@ limitations under the License.
 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, TextInput, Dropdown } from 'carbon-components-react';
-import RHSPanelButtons from '../../components/rhs-panel-buttons';
-import classNames from 'classnames';
+import { Dropdown } from 'carbon-components-react';
+import { RHSPanelButtons, AttributesList } from '../../components';
 import { connect } from 'react-redux';
 import { getImmediateUpstreamNodes } from '../../../utils';
 
@@ -26,10 +25,67 @@ import { getImmediateUpstreamNodes } from '../../../utils';
 
 import { saveNlpNode, setShowRightPanel } from '../../../redux/slice';
 
+const filterTypeItems = [
+  {
+    id: 'exclusive-predicates',
+    text: 'Exclude',
+  },
+  {
+    id: 'inclusive-predicates',
+    text: 'Include',
+  },
+];
+
+const funcNameItems = [
+  {
+    id: '',
+    text: 'equals',
+  },
+  {
+    id: 'Contains',
+    text: 'contains',
+  },
+  {
+    id: '',
+    text: 'starts with',
+  },
+  {
+    id: '',
+    text: 'ends with',
+  },
+  {
+    id: 'Overlaps',
+    text: 'overlaps with',
+  },
+  {
+    id: '',
+    text: 'occurs before',
+  },
+  {
+    id: '',
+    text: 'occurs after',
+  },
+];
+
+const scopeItems = [
+  {
+    id: 'length',
+    text: 'length',
+  },
+  {
+    id: 'text',
+    text: 'text',
+  },
+  {
+    id: 'span',
+    text: 'span',
+  },
+];
+
 class FilterPanel extends React.Component {
   constructor(props) {
     super(props);
-    let upstream = getImmediateUpstreamNodes(
+    let upstreamNodes = getImmediateUpstreamNodes(
       this.props.nodeId,
       this.props.canvasController.getLinks(this.props.pipelineId),
     );
@@ -37,92 +93,89 @@ class FilterPanel extends React.Component {
       sum[curr.nodeId] = curr;
       return sum;
     }, {});
-    upstream = upstream.map((u) => ({ id: u, text: nodes[u].label }));
     this.state = {
       filterType: props.filterType,
-      filterTypeItems: [
-        {
-          id: 'exclusive-predicates',
-          text: 'Exclude',
-        },
-        {
-          id: 'inclusive-predicates',
-          text: 'Include',
-        },
-      ],
+      attributes: props.attributes ?? this.getAttributes(props.primary),
       primary: props.primary,
       funcName: props.funcName,
-      funcNameItems: [
-        {
-          id: '',
-          text: 'equals',
-        },
-        {
-          id: 'Contains',
-          text: 'contains',
-        },
-        {
-          id: '',
-          text: 'starts with',
-        },
-        {
-          id: '',
-          text: 'ends with',
-        },
-        {
-          id: 'Overlaps',
-          text: 'overlaps with',
-        },
-        {
-          id: '',
-          text: 'occurs before',
-        },
-        {
-          id: '',
-          text: 'occurs after',
-        },
-      ],
       secondary: props.secondary,
-      upstream: upstream,
+      upstreamNodes,
       scope: props.scope,
-      scopeItems: [
-        {
-          id: 'length',
-          text: 'length',
-        },
-        {
-          id: 'text',
-          text: 'text',
-        },
-        {
-          id: 'span',
-          text: 'span',
-        },
-      ],
     };
   }
 
-  componentDidUpdate(prevProps) {}
+  getAttributes(primaryNodeId) {
+    const pipelineLinks = this.props.canvasController.getLinks(
+      this.props.pipelineId,
+    );
+    const upstreamNodes = getImmediateUpstreamNodes(
+      this.props.nodeId,
+      pipelineLinks,
+    );
+    const primaryNode = this.props.nodes.find(
+      (n) => n.nodeId === primaryNodeId ?? upstreamNodes?.[0],
+    );
+    return (
+      primaryNode?.attributes?.map((attr) => {
+        return {
+          ...attr,
+          disabled: false,
+        };
+      }) ?? []
+    );
+  }
 
   onSavePane = () => {
-    const { primary, filterType, funcName, secondary, scope } = this.state;
-    const { nodeId } = this.props;
-
-    const node = {
-      nodeId,
+    const {
       primary,
       filterType,
       funcName,
       secondary,
       scope,
-      isValid: true,
-    };
-    this.props.saveNlpNode({ node });
-    this.props.setShowRightPanel({ showPanel: false });
+      hasAttributesError,
+      attributes,
+    } = this.state;
+    const { nodeId } = this.props;
+
+    if (!hasAttributesError) {
+      const node = {
+        nodeId,
+        primary,
+        filterType,
+        funcName,
+        secondary,
+        attributes,
+        scope,
+        isValid: true,
+      };
+      this.props.saveNlpNode({ node });
+      this.props.setShowRightPanel({ showPanel: false });
+    }
   };
 
   render() {
-    const { inputText, lemmaMatch, errorMessage, attributes } = this.state;
+    const {
+      attributes,
+      upstreamNodes,
+      filterType,
+      primary,
+      secondary,
+      scope,
+      funcName,
+    } = this.state;
+    const nodeOptions = [];
+    upstreamNodes.forEach((nodeId) => {
+      const node = this.props.nodes.find((n) => n.nodeId === nodeId);
+      const { attributes, label } = node;
+      attributes?.forEach((attribute) => {
+        nodeOptions.push({
+          nodeId,
+          attribute: attribute.value ?? label,
+          label,
+          text: `<${label}.${attribute.value ?? label}>`,
+        });
+      });
+    });
 
     return (
       <div className="literal-panel">
@@ -130,11 +183,11 @@ class FilterPanel extends React.Component {
           id="filterType"
           size="sm"
           light
-          initialSelectedItem={this.state.filterTypeItems.find(
-            (item) => this.state.filterType == item.id,
+          initialSelectedItem={filterTypeItems.find(
+            (item) => filterType == item.id,
           )}
           label="Filter"
-          items={this.state.filterTypeItems}
+          items={filterTypeItems}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
@@ -147,15 +200,16 @@ class FilterPanel extends React.Component {
           id="primary"
           size="sm"
           light
-          initialSelectedItem={this.state.upstream.find(
-            (item) => this.state.primary == item.id,
+          initialSelectedItem={nodeOptions.find(
+            (item) => primary.text == item.text,
           )}
           label="Primary"
-          items={this.state.upstream}
+          items={nodeOptions}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
-              primary: e.selectedItem.id,
+              primary: e.selectedItem,
+              attributes: this.getAttributes(e.selectedItem.nodeId),
             });
           }}
         />
@@ -164,11 +218,9 @@ class FilterPanel extends React.Component {
           id="scope"
           size="sm"
           light
-          initialSelectedItem={this.state.scopeItems.find(
-            (item) => this.state.scope == item.id,
-          )}
+          initialSelectedItem={scopeItems.find((item) => scope == item.id)}
           label="Scope"
-          items={this.state.scopeItems}
+          items={scopeItems}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
@@ -181,11 +233,11 @@ class FilterPanel extends React.Component {
           id="funcName"
           size="sm"
           light
-          initialSelectedItem={this.state.funcNameItems.find(
-            (item) => this.state.funcName == item.id,
+          initialSelectedItem={funcNameItems.find(
+            (item) => funcName == item.id,
           )}
           label="Filter"
-          items={this.state.funcNameItems}
+          items={funcNameItems}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
@@ -198,19 +250,29 @@ class FilterPanel extends React.Component {
           id="secondary"
           size="sm"
           light
-          initialSelectedItem={this.state.upstream.find(
-            (item) => this.state.secondary == item.id,
+          initialSelectedItem={nodeOptions.find(
+            (item) => secondary.text == item.text,
           )}
           label="Secondary"
-          items={this.state.upstream}
+          items={nodeOptions}
           itemToString={(item) => (item ? item.text : '')}
           onChange={(e) => {
             this.setState({
-              secondary: e.selectedItem.id,
+              secondary: e.selectedItem,
             });
           }}
         />
 
+        <AttributesList
+          attributes={attributes}
+          onChange={(newAttributes, hasError) => {
+            this.setState({
+              attributes: newAttributes,
+              hasAttributesError: hasError,
+            });
+          }}
+          label={this.props.label}
+        />
         <RHSPanelButtons
           onClosePanel={() => {
             this.props.setShowRightPanel({ showPanel: false });

@@ -31,51 +31,42 @@ export default class UnionNode {
   };
 
   getInputSpans = (childNode) => {
-    const { label: parentNodeLabel } = this.node; //union-node label
-    const { label, nodeId } = childNode;
-    const upstreamNodes = this.getChildUpstreamNodes(nodeId);
-    const spans = [
-      {
+    const { label, nodeId, attributes } = childNode;
+    const spans = attributes?.map((attribute) => {
+      return {
         '@': {
           'input-concept-module': this.moduleName,
           'input-concept-name': label,
-          'input-field-name': label, //'Literal_1',
+          'input-field-name': attribute.value ?? label,
         },
-      },
-    ]; //add the first field for the sequence node
-    /*upstreamNodes.forEach((node, index) => {
-      spans.push({
-        '@': {
-          'input-concept-module': this.moduleName,
-          'input-concept-name': label,
-          'input-field-name': node.label,
-        },
-      });
-    });*/
+      };
+    });
     return spans;
   };
 
   getRules() {
-    const { upstreamNodes, label } = this.node;
+    const { upstreamNodes } = this.node;
     const { nodes } = store.getState()['nodesReducer'];
     const rules = [];
     upstreamNodes.forEach((n) => {
-      const inputSpans = this.getInputSpans(n);
       const node = nodes.find((node) => node.nodeId === n.nodeId);
+      const inputSpans = this.getInputSpans(node);
       rules.push({
         'input-spec': {
           'input-span': inputSpans,
         },
         'output-spec': {
-          field: {
-            '@': {
-              name: node.renamed, //"Literal_1",
-              hide: 'no',
-              'func-call': 'no',
-              renamed: 'yes',
-              type: 'Span',
-            },
-          },
+          field: node.attributes?.map((attribute) => {
+            return {
+              '@': {
+                name: attribute.value ?? node.label,
+                hide: 'no',
+                'func-call': 'no',
+                renamed: 'no',
+                type: 'Span',
+              },
+            };
+          }),
         },
         'rule-spec': { 'concept-projection': {} },
       });

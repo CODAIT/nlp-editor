@@ -17,7 +17,7 @@
 const js2xmlparser = require('js2xmlparser');
 import { store } from '../../redux/store';
 
-export default class SequenceNode {
+export default class FilterNode {
   constructor(canvasController, node, moduleName) {
     this.canvasController = canvasController;
     this.node = node;
@@ -63,7 +63,8 @@ export default class SequenceNode {
               '@': {
                 'input-concept-module': this.moduleName,
                 'input-concept-name': primaryInput.label,
-                'input-field-name': primaryInput.label,
+                'input-field-name':
+                  primaryInput.attributes?.[0]?.value ?? primaryInput.label,
               },
             },
           ],
@@ -91,8 +92,9 @@ export default class SequenceNode {
             {
               'field-spec': {
                 '@': {
-                  'input-field-name': primaryInput.label,
-                  'input-concept-name': label,
+                  'input-field-name':
+                    primaryInput.attributes?.[0]?.value ?? primaryInput.label,
+                  'input-concept-name': primaryInput.label,
                   'input-concept-module': this.moduleName,
                 },
               },

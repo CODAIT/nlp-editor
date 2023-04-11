@@ -86,13 +86,13 @@ export default class DictionaryNode {
       label,
       lemmaMatch,
       mapTerms,
+      attributes,
     } = this.node;
-    const fieldName = this.getOutputSpecName();
     const isCaseSensitive = caseSensitivity === 'match';
     const fieldValues = [
       {
         '@': {
-          name: fieldName, //node name lowercase
+          name: attributes?.[0]?.value || label,
           group: 0,
           hide: 'no',
           'func-call': 'no',
@@ -104,7 +104,7 @@ export default class DictionaryNode {
     if (mapTerms) {
       fieldValues.push({
         '@': {
-          name: `Mapped Term`,
+          name: attributes?.[1]?.value ?? `Mapped Term`,
           'mapped-entry': 'yes',
           hide: 'no',
         },

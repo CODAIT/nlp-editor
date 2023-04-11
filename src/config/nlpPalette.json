@@ -60,7 +60,7 @@
                 "ui_data": {
                   "cardinality": {
                     "min": 1,
-                    "max": 1
+                    "max": -1
                   },
                   "label": "Output Port"
                 }
@@ -119,48 +119,48 @@
             }
           }
         },
-		{
-			"id": "literal-node",
-			"op": "literal",
-			"parameters": { "type": "literal" },
-			"inputs": [
-			  {
-				"id": "inPort",
-				"app_data": {
-				  "ui_data": {
-					"cardinality": {
-					  "min": 1,
-					  "max": 1
-					},
-					"label": "Input Port"
-				  }
-				}
-			  }
-			],
-			"outputs": [
-			  {
-				"id": "outPort",
-				"app_data": {
-				  "ui_data": {
-					"cardinality": {
-					  "min": 1,
-					  "max": -1
-					},
-					"label": "Output Port"
-				  }
-				}
-			  }
-			],
-			"app_data": {
-			  "ui_data": {
-				"label": "Literal",
-				"description": "Literal string to be matched.",
-				"image": "/images/palette/nodes/row.svg",
-				"x_pos": 0,
-				"y_pos": 0
-			  }
-			}
-		  }
+        {
+          "id": "literal-node",
+          "op": "literal",
+          "parameters": { "type": "literal" },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 1,
+                    "max": 1
+                  },
+                  "label": "Input Port"
+                }
+              }
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 1,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ],
+          "app_data": {
+            "ui_data": {
+              "label": "Literal",
+              "description": "Literal string to be matched.",
+              "image": "/images/palette/nodes/row.svg",
+              "x_pos": 0,
+              "y_pos": 0
+            }
+          }
+        }
       ]
     },
     {

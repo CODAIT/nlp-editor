@@ -84,7 +84,7 @@ class RHSPanel extends React.Component {
           <DictionaryPanel {...node} canvasController={canvasController} />
         );
       case 'union':
-        return <UnionPanel {...nodeProps} />;
+        return <UnionPanel {...nodeProps} {...node} />;
       case 'sequence':
         return <SequencePanel {...node} canvasController={canvasController} />;
       default:
