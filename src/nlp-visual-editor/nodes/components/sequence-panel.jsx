@@ -80,7 +80,7 @@ class SequencePanel extends React.Component {
       if (currentPattern !== undefined) {
         pattern = pattern.replace(
           new RegExp(`<${label}.(.*?)>`),
-          `<${label}.${attributes?.[0]?.value ?? label}`,
+          `<${label}.${attributes?.[0]?.value ?? label}>`,
         );
       } else {
         pattern += `(<${label}.${attributes?.[0]?.value ?? label}>)`;
