@@ -40,6 +40,13 @@ export default class UnionNode {
         error: 'The Union upstream nodes require attributes aligned',
       };
     }
+    if (this.upstreamAttributeNameAligned()) {
+      return {
+        isValid: false,
+        error:
+          'The Union upstream nodes require attribute to be equal to Union name',
+      };
+    }
     return { isValid: true };
   }
 
@@ -66,6 +73,22 @@ export default class UnionNode {
       }
     });
     return isInvalidAttributes;
+  }
+  upstreamAttributeNameAligned() {
+    const pipelineLinks = this.canvasController.getLinks(this.pipelineId);
+    const upstreamNodes = getImmediateUpstreamNodes(
+      this.nodeProps.nodeId,
+      pipelineLinks,
+    );
+    let isInvalidAttribute = false;
+    const uNode = this.nodes.find((no) => no.nodeId === this.nodeProps.nodeId);
+    upstreamNodes.forEach((n, i) => {
+      const node = this.nodes.find((no) => no.nodeId === n);
+      if (uNode.label !== node.renamed) {
+        isInvalidAttribute = true;
+      }
+    });
+    return isInvalidAttribute;
   }
   checkCardinality(nodeId) {
     const inputPorts = this.canvasController.getNodeInputPorts(
